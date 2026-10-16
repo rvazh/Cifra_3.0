@@ -1,0 +1,844 @@
+/* ===== Tela "A receber" (usa a base do Painel: .pp, .pp__topo, .pp__novo) ===== */
+.rcb__novo {
+  border: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Números do topo */
+.rcb-numeros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.rcb-numero {
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rcb-numero span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.rcb-numero b {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--preto);
+}
+
+.rcb-numero small {
+  font-size: 12.5px;
+  color: var(--cinza);
+}
+
+.rcb-numero--destaque {
+  background: var(--esc-fundo);
+  border-color: var(--esc-borda);
+}
+
+.rcb-numero--destaque span,
+.rcb-numero--destaque small {
+  color: var(--esc-texto-suave);
+}
+
+.rcb-numero--destaque b {
+  color: var(--esc-dourado);
+}
+
+:root[data-tema='claro'] .rcb-numero--destaque {
+  border: 2px solid var(--dourado);
+}
+
+.rcb-numero--alerta {
+  border-color: #f0c2bc;
+  background: #fdf3f1;
+}
+
+.rcb-numero--alerta b {
+  color: var(--negativo);
+}
+
+.rcb__aviso {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #e3f1e8;
+  color: var(--positivo);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Filtros */
+.rcb-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rcb-filtro {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.rcb-filtro:hover {
+  border-color: var(--preto);
+}
+
+.rcb-filtro--ativo {
+  border-color: var(--preto);
+  background: var(--preto);
+  color: var(--creme);
+}
+
+/* Cartões */
+.rcb__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.rcb-cartao {
+  padding: 22px;
+  border-radius: 22px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rcb-cartao--atrasada {
+  border-color: #f0c2bc;
+  box-shadow: inset 4px 0 0 var(--negativo);
+}
+
+.rcb-cartao--quitada {
+  border-color: #a8d5a2;
+}
+
+.rcb-cartao__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rcb-cartao__avatar {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--dourado-claro);
+  border: 1.5px solid var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dourado-escuro);
+}
+
+.rcb-cartao__nomes {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rcb-cartao__nomes h2 {
+  font-size: 17px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rcb-cartao__nomes span {
+  font-size: 13px;
+  color: var(--cinza);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rcb-selo {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rcb-selo--em-dia {
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+}
+
+.rcb-selo--atrasada {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.rcb-selo--quitada {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.rcb-cartao__valores {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rcb-cartao__valores div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rcb-cartao__valores span {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.rcb-cartao__valores b {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--preto);
+}
+
+.rcb-cartao__total {
+  text-align: right;
+}
+
+.rcb-cartao__total b {
+  font-size: 16px;
+  color: var(--texto-suave);
+}
+
+.rcb-cartao__progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rcb-cartao__trilho {
+  height: 10px;
+  border-radius: 999px;
+  background: #f1ede6;
+  overflow: hidden;
+}
+
+.rcb-cartao__trilho span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--positivo);
+}
+
+.rcb-cartao__progresso small {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.rcb-cartao__dados {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--borda);
+}
+
+.rcb-cartao__dados div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--borda);
+  font-size: 13.5px;
+}
+
+.rcb-cartao__dados dt {
+  color: var(--cinza);
+  flex-shrink: 0;
+}
+
+.rcb-cartao__dados dd {
+  margin: 0;
+  font-weight: 700;
+  color: var(--preto);
+  text-align: right;
+}
+
+.rcb-atraso {
+  color: var(--negativo) !important;
+}
+
+.rcb-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Histórico de recebimentos */
+.rcb-historico {
+  list-style: none;
+  margin: -6px 0 0;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--fundo-painel);
+}
+
+.rcb-historico li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.rcb-historico li + li {
+  border-top: 1px solid var(--borda);
+}
+
+.rcb-historico__conta {
+  flex: 1;
+  min-width: 0;
+  color: var(--cinza);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rcb-historico button {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--branco);
+  color: var(--cinza);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.rcb-historico button:hover {
+  color: var(--negativo);
+}
+
+.rcb-cartao__obs {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--texto-suave);
+}
+
+/* Botões */
+.rcb-cartao__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rcb-botao {
+  flex: 1;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--preto);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rcb-botao:hover {
+  border-color: var(--preto);
+}
+
+.rcb-botao--principal {
+  flex: 2;
+  border-color: var(--dourado);
+  background: var(--dourado);
+}
+
+.rcb-botao--principal:hover {
+  border-color: var(--dourado);
+  filter: brightness(1.05);
+}
+
+.rcb-botao--whats {
+  color: #0b6b33;
+  border-color: #bfe8cf;
+  background: #effaf3;
+}
+
+.rcb-botao--whats:hover {
+  border-color: #25d366;
+}
+
+.rcb-botao--pequeno {
+  flex: 0 0 auto;
+}
+
+/* Registrar recebimento */
+.rcb-receber {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--dourado-claro);
+}
+
+.rcb-receber label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  min-width: 0;
+}
+
+.rcb-receber__linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.rcb-receber input,
+.rcb-receber select {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--preto);
+  min-width: 0;
+}
+
+.rcb-receber input:focus,
+.rcb-receber select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.rcb-receber__tudo {
+  align-self: flex-start;
+  font-size: 13px;
+}
+
+.rcb-erro {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--negativo);
+}
+
+/* Vazio */
+.rcb-vazio {
+  padding: 40px 24px;
+  border-radius: 22px;
+  border: 2px dashed #d8ccb7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.rcb-vazio__icone {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--dourado-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+}
+
+.rcb-vazio h2 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.rcb-vazio p {
+  max-width: 520px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--texto-suave);
+}
+
+.rcb-vazio .rcb-botao {
+  flex: 0 0 auto;
+  min-width: 240px;
+}
+
+.rcb__nada {
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  text-align: center;
+  color: var(--cinza);
+}
+
+.rcb__nota {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--cinza);
+}
+
+.rcb__nota b {
+  color: var(--texto-suave);
+}
+
+/* Formulário */
+.rcb-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rcb-form {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: -6px 6px 0 var(--preto);
+}
+
+.rcb-form__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rcb-form__topo h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.rcb-form__fechar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--fundo-painel);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.rcb-form__tipos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rcb-tipo {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rcb-tipo b {
+  font-size: 15px;
+  color: var(--preto);
+}
+
+.rcb-tipo small {
+  font-size: 12.5px;
+  color: var(--cinza);
+}
+
+.rcb-tipo--ativo {
+  border-color: var(--dourado);
+  background: var(--dourado-claro);
+  box-shadow: inset 0 0 0 1px var(--dourado);
+}
+
+.rcb-form__dupla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.rcb-form__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  min-width: 0;
+}
+
+.rcb-form__campo small {
+  font-weight: 500;
+  color: var(--cinza);
+}
+
+.rcb-form__campo input,
+.rcb-form__campo select {
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+  min-width: 0;
+}
+
+.rcb-form__campo input:focus,
+.rcb-form__campo select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.rcb-form__dica {
+  margin-top: -6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dourado-escuro);
+}
+
+.rcb-form__acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.rcb-form__acoes .rcb-botao {
+  min-height: 46px;
+  font-size: 15px;
+}
+
+.rcb-form__excluir {
+  align-self: center;
+  padding: 6px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--negativo);
+  cursor: pointer;
+}
+
+/* ===== Tablet e celular ===== */
+@media (max-width: 1100px) {
+  .rcb-numeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .rcb-numeros {
+    gap: 10px;
+  }
+
+  .rcb-numero {
+    padding: 14px;
+  }
+
+  .rcb-numero b {
+    font-size: 19px;
+  }
+
+  .rcb__grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rcb-cartao {
+    padding: 18px;
+  }
+
+  /* Registrar ocupa a linha; Cobrar e Editar dividem a de baixo */
+  .rcb-cartao__acoes .rcb-botao--principal {
+    flex: 1 0 100%;
+  }
+
+  .rcb-cartao__acoes .rcb-botao--pequeno {
+    flex: 1;
+  }
+
+  .rcb-form__dupla,
+  .rcb-form__tipos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ===== Juros por atraso ===== */
+.rcb-juros {
+  margin-top: -4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rcb-juros--correndo {
+  background: #fdf3f1;
+  border-color: #f0c2bc;
+}
+
+.rcb-juros__linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+  color: var(--texto-suave);
+}
+
+.rcb-juros__linha b {
+  font-size: 15px;
+  color: var(--negativo);
+}
+
+.rcb-juros__linha--total {
+  padding-top: 6px;
+  border-top: 1px dashed #e6c9c4;
+}
+
+.rcb-juros__linha--total span {
+  font-weight: 700;
+  color: var(--preto);
+}
+
+.rcb-juros__linha--total b {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.rcb-juros small {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.rcb-historico__juros {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.rcb-receber__nota {
+  font-size: 12.5px;
+  color: var(--texto-suave);
+}
+
+.rcb-form__juros {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+}
+
+.rcb-form__pergunta {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.rcb-form__simnao {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.rcb-simnao {
+  min-width: 64px;
+  min-height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.rcb-simnao--ativo {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.rcb-form__dica--juros {
+  margin-top: -4px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  line-height: 1.5;
+}

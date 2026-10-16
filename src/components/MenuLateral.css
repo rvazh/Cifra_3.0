@@ -1,0 +1,236 @@
+/* ===== Estrutura: menu lateral + conteúdo ===== */
+.pp-app {
+  min-height: 100vh;
+  display: flex;
+  background: var(--fundo-painel);
+}
+
+/* ===== Menu lateral ===== */
+.lateral {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 240px;
+  flex-shrink: 0;
+  padding: 24px 16px;
+  background: var(--esc-fundo);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  overflow-y: auto;
+}
+
+.lateral__marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--esc-texto);
+}
+
+.lateral__logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--creme);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lateral__logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.lateral__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Linha cinza entre as ferramentas e Cursos/Notícias */
+.lateral__separador {
+  display: block;
+  height: 1px;
+  margin: 8px 14px;
+  background: var(--esc-linha);
+  flex-shrink: 0;
+}
+
+.lateral__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--esc-texto-suave);
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lateral__item svg {
+  color: var(--esc-texto-apagado);
+}
+
+.lateral__item:hover {
+  background: var(--esc-campo);
+  color: var(--esc-texto);
+}
+
+.lateral__item.active {
+  background: var(--dourado);
+  color: var(--preto);
+  font-weight: 700;
+}
+
+.lateral__item.active svg {
+  color: var(--preto);
+}
+
+.lateral__fim {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lateral__plano {
+  margin-bottom: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--esc-campo);
+  border: 1px solid var(--esc-linha);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--esc-texto);
+  font-size: 15px;
+}
+
+.lateral__plano-rotulo {
+  font-size: 12px;
+  color: var(--esc-texto-apagado);
+}
+
+.lateral__plano-nota {
+  font-size: 12px;
+  color: var(--esc-texto-apagado);
+}
+
+.lateral__plano-trilho {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--esc-linha);
+  overflow: hidden;
+}
+
+.lateral__plano-trilho span {
+  display: block;
+  height: 100%;
+  background: var(--dourado);
+}
+
+.lateral__plano-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--esc-dourado);
+}
+
+.lateral__extra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--esc-texto-apagado);
+  cursor: pointer;
+  text-align: left;
+}
+
+.lateral__extra:hover {
+  background: var(--esc-campo);
+  color: var(--esc-texto);
+}
+
+/* Configurações aberta: fica dourada como os itens do menu */
+.lateral__extra.active {
+  background: var(--dourado);
+  color: var(--preto);
+  font-weight: 700;
+}
+
+
+/* ===== Tablet e celular: menu vira uma barra no topo ===== */
+@media (max-width: 900px) {
+  .pp-app {
+    flex-direction: column;
+  }
+  .lateral {
+    position: sticky;
+    z-index: 10;
+    width: 100%;
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    overflow-x: auto;
+  }
+  .lateral__marca {
+    padding: 0;
+    font-size: 20px;
+  }
+  .lateral__logo {
+    width: 38px;
+    height: 38px;
+  }
+  .lateral__logo img {
+    width: 30px;
+    height: 30px;
+  }
+  .lateral__menu {
+    flex-direction: row;
+  }
+  /* No celular a linha fica em pé, entre as abas */
+  .lateral__separador {
+    width: 1px;
+    height: 24px;
+    margin: 0 6px;
+    align-self: center;
+  }
+  .lateral__fim {
+    margin-top: 0;
+    margin-left: auto;
+    flex-direction: row;
+  }
+  .lateral__plano {
+    display: none;
+  }
+
+  /* No celular: olho, configurações e sair viram só ícones */
+  .lateral__extra {
+    padding: 0 12px;
+  }
+
+  .lateral__texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

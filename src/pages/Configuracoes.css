@@ -1,0 +1,606 @@
+/* ===== Tela de Configurações (lista simples, estilo celular) ===== */
+
+.cfg__coluna {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ===== Perfil (faixa preta) ===== */
+.cfg-perfil {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 28px 30px;
+  border-radius: 24px;
+  background: var(--esc-fundo);
+}
+
+/* Enfeite dourado no canto */
+.cfg-perfil::before {
+  content: '';
+  position: absolute;
+  right: -70px;
+  top: -90px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 34px solid var(--dourado);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.cfg-perfil__avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--dourado);
+  color: var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.cfg-perfil__textos {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cfg-perfil__nome {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--esc-texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cfg-perfil__plano {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--esc-texto-apagado);
+}
+
+.cfg-perfil__chips {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cfg-perfil__chips span {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--esc-chip);
+  color: var(--esc-texto-suave);
+  font-size: 13px;
+}
+
+.cfg-perfil__chips b {
+  color: var(--esc-dourado);
+}
+
+.cfg-perfil__editar {
+  position: relative;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid var(--esc-linha);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--esc-texto);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cfg-perfil__editar:hover {
+  border-color: var(--dourado);
+}
+
+/* ===== Grupos e linhas ===== */
+.cfg-grupo__titulo {
+  margin: 0 0 8px 18px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--cinza);
+}
+
+.cfg-grupo__lista {
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.cfg-linha {
+  width: 100%;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border: none;
+  border-bottom: 1px solid var(--borda);
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: var(--preto);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.cfg-linha:last-child {
+  border-bottom: none;
+}
+
+.cfg-linha:hover {
+  background: var(--fundo-painel);
+}
+
+.cfg-linha:focus-visible,
+.cfg-linha:focus-within {
+  outline: none;
+  background: var(--fundo-painel);
+}
+
+.cfg-linha--desligada {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.cfg-linha__icone {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cfg-linha__icone--perigo {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.cfg-linha__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cfg-linha__titulo {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cfg-linha__titulo--perigo {
+  color: var(--negativo);
+}
+
+.cfg-linha__sub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.cfg-linha__valor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--cinza);
+  flex-shrink: 0;
+}
+
+.cfg-linha__email {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Lista de opções com cara de texto (abre a lista do aparelho ao tocar) */
+.cfg-linha__valor select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 6px 2px 6px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--cinza);
+  text-align: right;
+  cursor: pointer;
+}
+
+.cfg-linha__valor select:focus-visible {
+  outline: 2px solid var(--dourado);
+}
+
+.cfg-linha__valor select:disabled {
+  cursor: default;
+}
+
+.cfg-linha__seta {
+  display: flex;
+  color: #b5ab9a;
+}
+
+/* Interruptor liga/desliga */
+.cfg-interruptor {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cfg-interruptor input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cfg-interruptor__trilho {
+  width: 44px;
+  height: 26px;
+  padding: 3px;
+  border-radius: 999px;
+  background: #d8cfc0;
+  display: flex;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+.cfg-interruptor__bola {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--branco);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.cfg-interruptor input:checked + .cfg-interruptor__trilho {
+  background: var(--preto);
+}
+
+.cfg-interruptor input:checked + .cfg-interruptor__trilho .cfg-interruptor__bola {
+  transform: translateX(18px);
+  background: var(--dourado);
+}
+
+.cfg-interruptor input:focus-visible + .cfg-interruptor__trilho {
+  outline: 2px solid var(--dourado);
+  outline-offset: 2px;
+}
+
+.cfg__versao {
+  text-align: center;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+/* Mensagem rápida no rodapé */
+.cfg-mensagem {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  max-width: calc(100% - 32px);
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: var(--esc-fundo);
+  color: var(--esc-texto);
+  font-size: 14px;
+  font-weight: 600;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.cfg-mensagem--visivel {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ===== Janelas (editar perfil, categorias) ===== */
+.cfg-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cfg-janela {
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: -6px 6px 0 var(--preto);
+}
+
+.cfg-janela__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cfg-janela__topo h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.cfg-janela__fechar {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--fundo-painel);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.cfg-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.cfg-campo input {
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+}
+
+.cfg-campo input:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.cfg-campo span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cinza);
+}
+
+.cfg-janela__acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.cfg-botao {
+  flex: 1;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.cfg-botao:hover {
+  border-color: var(--preto);
+}
+
+.cfg-botao--principal {
+  border-color: var(--dourado);
+  background: var(--dourado);
+}
+
+.cfg-categorias {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cfg-categorias li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.cfg-categorias__icone {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.cfg-categorias__nome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cfg-categorias__nome small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cinza);
+}
+
+.cfg-categorias__qtd {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.cfg-janela__nota {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+/* ===== Celular ===== */
+@media (max-width: 560px) {
+  .cfg-perfil {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 22px 20px;
+  }
+
+  .cfg-perfil__avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+
+  .cfg-perfil__nome {
+    font-size: 22px;
+  }
+
+  .cfg-perfil__editar {
+    width: 100%;
+  }
+
+  .cfg-linha {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .cfg-linha__email {
+    max-width: 110px;
+  }
+
+  .cfg-grupo__titulo {
+    margin-left: 14px;
+  }
+}
+
+.cfg-janela__nota a {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* Campo de texto dentro da linha (número do WhatsApp) */
+.cfg-linha__campo {
+  width: 170px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 14px;
+  color: var(--texto);
+  text-align: right;
+}
+
+.cfg-linha__campo:focus {
+  outline: none;
+  border-color: var(--dourado);
+  background: var(--branco);
+}
+
+.cfg-linha__campo:disabled {
+  cursor: default;
+}
+
+@media (max-width: 560px) {
+  .cfg-linha__campo {
+    width: 140px;
+  }
+}
+
+/* Escolha do tema (Escuro / Claro) */
+.cfg-tema {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+}
+
+.cfg-tema__opcao {
+  min-height: 34px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.cfg-tema__opcao--ativa {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.cfg-tema__amostra {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  border: 1.5px solid var(--preto);
+}
+
+.cfg-tema__amostra--escuro {
+  background: linear-gradient(90deg, var(--preto) 50%, var(--creme) 50%);
+}
+
+.cfg-tema__amostra--claro {
+  background: var(--branco);
+}
+
+@media (max-width: 560px) {
+  .cfg-tema__opcao {
+    padding: 0 9px;
+  }
+}

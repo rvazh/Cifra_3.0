@@ -1,0 +1,132 @@
+/* ===== Hero ===== */
+.hero {
+  padding-top: 56px;
+  padding-bottom: 96px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 56px;
+}
+
+.hero__texto {
+  flex: 1 1 440px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.hero__titulo {
+  font-size: clamp(40px, 5.2vw, 66px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.hero__descricao {
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--texto-suave);
+  max-width: 480px;
+}
+
+.hero__botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 0 10px 0 28px;
+  border-radius: 14px;
+  background: var(--preto);
+  color: var(--branco);
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 14px 30px rgba(20, 20, 20, 0.22);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hero__botao:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(20, 20, 20, 0.3);
+}
+
+.hero__botao-seta {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Recursos ===== */
+.recursos {
+  background: var(--branco);
+  padding: 96px 0;
+}
+
+.recursos__conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.recursos__cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+}
+
+.recursos__rotulo {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dourado-escuro);
+}
+
+.recursos__titulo {
+  font-size: clamp(30px, 3.4vw, 42px);
+  line-height: 1.15;
+  letter-spacing: -1px;
+  font-weight: 800;
+}
+
+.recursos__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.recurso {
+  background: var(--creme-card);
+  border-radius: 18px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recurso__icone {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recurso__titulo {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.recurso__texto {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--texto-suave);
+}

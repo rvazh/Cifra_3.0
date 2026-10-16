@@ -1,0 +1,87 @@
+/* Avisos de vencimento no canto da tela (quando o navegador não mostra notificação) */
+.alertas {
+  position: fixed;
+  right: 20px;
+  bottom: 92px; /* acima do botão de atendimento */
+  z-index: 70;
+  width: min(360px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alerta {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+  border-radius: 16px;
+  background: var(--esc-fundo);
+  color: var(--esc-texto-suave);
+  box-shadow: 0 16px 34px rgba(20, 20, 20, 0.28);
+  animation: alerta-entrar 0.3s ease;
+}
+
+@keyframes alerta-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alerta {
+    animation: none;
+  }
+}
+
+.alerta__icone {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--dourado);
+  color: var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.alerta__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+}
+
+.alerta__textos b {
+  font-size: 14px;
+  color: var(--esc-texto);
+}
+
+.alerta__link {
+  margin-top: 4px;
+  font-weight: 700;
+  color: var(--esc-dourado);
+  text-decoration: underline;
+}
+
+.alerta__fechar {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: var(--esc-chip);
+  color: var(--esc-texto);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .alertas {
+    right: 16px;
+    bottom: 16px;
+  }
+}

@@ -1,0 +1,162 @@
+/* Moldura do celular, levemente inclinada */
+.celular {
+  position: relative;
+  width: 300px;
+  max-width: 100%;
+  border-radius: 42px;
+  background: var(--branco);
+  padding: 10px;
+  border: 1px solid var(--borda);
+  box-shadow: 0 40px 80px rgba(20, 20, 20, 0.18);
+  transform: rotate(-4deg);
+}
+
+.celular__tela {
+  border-radius: 34px;
+  overflow: hidden;
+  background: var(--fundo-painel);
+}
+
+.celular__topo {
+  background: var(--preto);
+  color: var(--branco);
+  padding: 30px 18px 46px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.celular__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--dourado);
+  color: var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.celular__saudacao {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.celular__saudacao-pequena {
+  font-size: 11px;
+  color: #cfc6b6;
+}
+
+.celular__nome {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.celular__sino {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #2e2a24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.celular__card {
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: 16px;
+}
+
+.celular__card--saldo {
+  position: relative;
+  margin: -30px 12px 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.celular__card--pagar {
+  margin: 12px;
+  padding: 14px 16px;
+}
+
+.celular__legenda {
+  font-size: 11px;
+  color: var(--cinza);
+}
+
+.celular__saldo {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.celular__divisor {
+  height: 1px;
+  background: var(--borda);
+}
+
+.celular__subtitulo {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.celular__conta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.celular__conta-bolinha {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.celular__conta-nome {
+  flex: 1;
+  font-weight: 600;
+}
+
+.celular__conta-valor {
+  font-weight: 700;
+}
+
+.celular__gerenciar {
+  margin-top: 2px;
+  padding: 10px 0;
+  border-radius: 10px;
+  border: 1.5px solid var(--preto);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.celular__pagar {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--negativo);
+}
+
+.celular__menu {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 14px 16px;
+  border-top: 1px solid var(--borda);
+  background: var(--branco);
+}
+
+.celular__mais {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

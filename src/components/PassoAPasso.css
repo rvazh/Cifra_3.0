@@ -1,0 +1,139 @@
+.passos {
+  background: var(--creme);
+  padding: 104px 0;
+}
+
+.passos__conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 64px;
+}
+
+/* ===== Cabeçalho centralizado ===== */
+.passos__cabecalho {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.passos__rotulo {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dourado-escuro);
+}
+
+.passos__titulo {
+  font-size: clamp(34px, 4vw, 50px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  font-weight: 800;
+}
+
+.passos__subtitulo {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--texto-suave);
+}
+
+/* ===== Lista de passos ===== */
+.passos__lista {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 40px 24px;
+}
+
+.passo {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Círculo + linha dourada ao lado */
+.passo__marcador {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.passo__circulo {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--preto);
+  color: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.passo__circulo--final {
+  background: var(--dourado);
+}
+
+.passo__linha {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--dourado);
+}
+
+.passo__titulo {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.passo__texto {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--texto-suave);
+  max-width: 260px;
+}
+
+/* ===== Botão ===== */
+.passos__botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 56px;
+  padding: 0 10px 0 26px;
+  border-radius: 14px;
+  background: var(--preto);
+  color: var(--branco);
+  font-size: 17px;
+  font-weight: 700;
+  transition: transform 0.2s;
+}
+
+.passos__botao:hover {
+  transform: translateY(-2px);
+}
+
+.passos__botao-seta {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Celular: texto ocupa a largura toda */
+@media (max-width: 600px) {
+  .passo__texto {
+    max-width: none;
+  }
+}

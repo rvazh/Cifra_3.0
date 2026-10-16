@@ -1,0 +1,586 @@
+/* ===== Tela de Relatórios (usa a base do Painel: .pp, .cartao, .legenda...) ===== */
+
+.rel__acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.rel__acao {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.rel__acao:hover {
+  border-color: var(--preto);
+}
+
+.rel__acao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rel__acao--escura {
+  border-color: var(--preto);
+  background: var(--preto);
+  color: var(--creme);
+}
+
+/* Barra de período */
+.rel__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rel__periodos {
+  display: flex;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.rel__periodo {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.rel__periodo--ativo {
+  background: var(--preto);
+  color: var(--dourado);
+}
+
+.rel__navegacao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rel__navegacao b {
+  min-width: 150px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.rel__seta {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.rel__seta:hover {
+  border-color: var(--preto);
+}
+
+/* ===== Números principais ===== */
+.rel__numeros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.rel-numero {
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.rel-numero--destaque {
+  background: var(--esc-fundo);
+  border-color: var(--esc-borda);
+}
+
+.rel-numero__rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.rel-numero--destaque .rel-numero__rotulo {
+  color: var(--esc-texto-apagado);
+}
+
+.rel-numero__valor {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--preto);
+}
+
+.rel-numero--destaque .rel-numero__valor {
+  color: var(--esc-dourado);
+}
+
+.rel__nota {
+  margin-top: -10px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+/* Seta de variação */
+.rel-var {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rel-var--boa {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.rel-var--ruim {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.rel-var--neutra {
+  background: #f1ede6;
+  color: var(--cinza);
+}
+
+.rel-numero--destaque .rel-var--neutra {
+  background: var(--esc-chip);
+  color: var(--esc-texto-apagado);
+}
+
+.rel__vazio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.rel__vazio a {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* ===== Linhas de cartões ===== */
+.rel__linha {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+.rel__linha--grafico {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.rel__linha--categorias {
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+}
+
+.rel__coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rel__dica {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.rel__sem {
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--cinza);
+}
+
+/* Tabela mês a mês */
+.rel-tabela {
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.rel-tabela__linha {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.rel-tabela__linha span:not(:first-child),
+.rel-tabela__linha b {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rel-tabela__linha--titulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--cinza);
+}
+
+.rel-tabela__vazio {
+  color: var(--cinza);
+}
+
+.rel-tabela__linha--periodo {
+  background: var(--dourado-claro);
+  font-weight: 600;
+}
+
+/* Destaques */
+.rel-destaques {
+  height: 100%;
+  padding: 24px;
+  border-radius: 20px;
+  background: var(--esc-fundo);
+  color: var(--esc-texto-suave);
+}
+
+.rel-destaques__titulo {
+  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--esc-texto);
+}
+
+.rel-destaques ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rel-destaques li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rel-destaques li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--dourado);
+}
+
+.rel-destaques b {
+  color: var(--esc-dourado);
+}
+
+.rel-destaques__vazio {
+  font-size: 14px;
+}
+
+/* Categorias */
+.rel-categorias {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.rel-categorias__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rel-cat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rel-cat__icone {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.rel-cat__meio {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rel-cat__topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.rel-cat__pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cinza);
+}
+
+.rel-cat__trilho {
+  height: 8px;
+  border-radius: 8px;
+  background: #f1ede6;
+  overflow: hidden;
+}
+
+.rel-cat__trilho span {
+  display: block;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.rel-cat__valores {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Receitas e contas */
+.rel-simples,
+.rel-contas {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.rel-simples li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+  font-size: 14px;
+}
+
+.rel-simples li:last-child {
+  border-bottom: none;
+}
+
+.rel-contas {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rel-contas__topo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+/* Maiores despesas */
+.rel-maiores {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  column-gap: 32px;
+}
+
+.rel-maiores li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda);
+  font-size: 14px;
+}
+
+.rel-maiores__posicao {
+  width: 18px;
+  font-weight: 800;
+  color: var(--dourado-escuro);
+}
+
+.rel-maiores__icone {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.rel-maiores__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rel-maiores__textos span {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.rel-maiores li > b {
+  white-space: nowrap;
+}
+
+/* ===== Telas menores ===== */
+@media (max-width: 1180px) {
+  .rel__numeros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rel__linha--grafico,
+  .rel__linha--categorias {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .rel-categorias {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rel-categorias__rosca {
+    display: flex;
+    justify-content: center;
+  }
+
+  .rel-cat__valores {
+    width: auto;
+  }
+
+  .rel-maiores {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Gráfico com rolagem lateral para os nomes dos meses não ficarem minúsculos */
+  .rel .cartao__grafico {
+    overflow-x: auto;
+  }
+
+  .rel .cartao__grafico svg {
+    min-width: 520px;
+  }
+}
+
+@media (max-width: 560px) {
+  .rel__acoes {
+    width: 100%;
+  }
+
+  .rel__acao {
+    flex: 1;
+  }
+
+  .rel__barra,
+  .rel__periodos,
+  .rel__navegacao {
+    width: 100%;
+  }
+
+  .rel__periodo {
+    flex: 1;
+    padding: 9px 4px;
+  }
+
+  .rel__navegacao b {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rel__numeros {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rel-tabela__linha {
+    grid-template-columns: 1.2fr 1fr 1fr;
+  }
+
+  /* No celular a tabela mostra só mês, despesas e resultado */
+  .rel-tabela__linha > :nth-child(2) {
+    display: none;
+  }
+}
+
+/* ===== Impressão: só o relatório, sem menu e sem botões ===== */
+@media print {
+  .lateral,
+  .rel__acoes,
+  .rel__barra .rel__seta,
+  .rel__periodos {
+    display: none !important;
+  }
+
+  .pp-app {
+    display: block;
+    background: #ffffff;
+  }
+
+  .pp {
+    padding: 0;
+  }
+
+  .cartao,
+  .rel-numero,
+  .rel-destaques {
+    break-inside: avoid;
+  }
+
+  .rel-destaques,
+  .rel-numero--destaque {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

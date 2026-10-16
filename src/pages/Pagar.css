@@ -1,0 +1,10 @@
+/* ===== Tela "A pagar": usa o visual de Receber.css, com alguns toques próprios ===== */
+.pgr-avatar {
+  background: #fdf3f1;
+  border-color: #e7a59d;
+  color: var(--negativo);
+}
+
+.pgr-pagar {
+  background: #fdf3f1;
+}

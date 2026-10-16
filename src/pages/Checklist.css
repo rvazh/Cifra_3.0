@@ -1,0 +1,494 @@
+/* ===== Tela de Checklist do mês (usa a base do Painel: .pp, .cartao...) ===== */
+
+.chk__navegacao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chk__navegacao b {
+  min-width: 130px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.chk__seta {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.chk__seta:hover {
+  border-color: var(--preto);
+}
+
+/* ===== Resumo ===== */
+.chk-resumo {
+  padding: 22px 24px;
+  border-radius: 22px;
+  background: var(--esc-fundo);
+  color: var(--esc-texto-suave);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chk-resumo__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.chk-resumo__rotulo {
+  display: block;
+  font-size: 13px;
+  color: var(--esc-texto-apagado);
+}
+
+.chk-resumo__total {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--esc-dourado);
+}
+
+.chk-resumo__contador {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--esc-texto);
+}
+
+.chk-barra {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--esc-linha);
+  display: flex;
+  overflow: hidden;
+}
+
+.chk-barra span {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.chk-barra__pago {
+  background: #2e9d5b;
+}
+
+.chk-barra__guardado {
+  background: var(--dourado);
+}
+
+.chk-resumo__legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  font-size: 13px;
+}
+
+.chk-resumo__legenda span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chk-resumo__legenda b {
+  color: var(--esc-texto);
+}
+
+.chk-ponto {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.chk-ponto--pago {
+  background: #2e9d5b;
+}
+
+.chk-ponto--guardado {
+  background: var(--dourado);
+}
+
+.chk-ponto--pendente {
+  background: #6b6355;
+}
+
+.chk-resumo__dica {
+  font-size: 12px;
+  color: var(--esc-texto-apagado);
+}
+
+.chk-resumo__dica b {
+  color: var(--esc-dourado);
+}
+
+/* ===== Grupos ===== */
+.chk__grupos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chk-grupo__qtd {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  font-size: 12px;
+}
+
+.chk-grupo__sub {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.chk-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chk-item {
+  display: grid;
+  grid-template-columns: 52px 38px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.chk-item:last-child {
+  border-bottom: none;
+}
+
+.chk-item__data {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.chk-item__data b {
+  font-size: 18px;
+  color: var(--preto);
+}
+
+.chk-item__icone {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.chk-item__textos {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chk-item__nome {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chk-item--pago .chk-item__nome {
+  color: var(--cinza);
+  text-decoration: line-through;
+}
+
+.chk-item__detalhe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.chk-item__atrasada {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #f8e4e1;
+  color: var(--negativo);
+  font-weight: 700;
+}
+
+.chk-item__valor {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Link "Reajustar" da conta fixa */
+.chk-item__reajustar {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Botões Pago / Guardado / Pendente */
+.chk-situacao {
+  display: flex;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+}
+
+.chk-situacao__botao {
+  min-height: 34px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.chk-situacao__botao:hover {
+  color: var(--preto);
+}
+
+.chk-situacao__botao--pago {
+  background: #2e9d5b;
+  color: var(--branco);
+}
+
+.chk-situacao__botao--guardado {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.chk-situacao__botao--pendente {
+  background: var(--preto);
+  color: var(--creme);
+}
+
+.chk-situacao__botao--pago:hover,
+.chk-situacao__botao--pendente:hover {
+  color: var(--branco);
+}
+
+.chk-vazio {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.chk-vazio a {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* ===== Parcelamentos ===== */
+.chk-parc__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+  gap: 14px;
+}
+
+.chk-parc {
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--borda);
+  background: var(--fundo-painel);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.chk-parc--quitado {
+  opacity: 0.7;
+}
+
+.chk-parc__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chk-parc__icone {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.chk-parc__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chk-parc__nome {
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chk-parc__detalhe {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.chk-parc__contagem {
+  font-size: 12px;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+.chk-parc__contagem b {
+  font-size: 18px;
+  color: var(--preto);
+}
+
+.chk-parc__selo {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #dff2e6;
+  color: #1f7a45;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.chk-parc__barra {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--borda);
+  overflow: hidden;
+}
+
+.chk-parc__barra span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #2e9d5b;
+  transition: width 0.3s;
+}
+
+.chk-parc__dados {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.chk-parc__dados div {
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--branco);
+}
+
+.chk-parc__dados dt {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--cinza);
+}
+
+.chk-parc__dados dd {
+  margin: 2px 0 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.chk-parc__dados small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+.chk-parc__atrasada {
+  color: var(--negativo);
+  font-weight: 700;
+}
+
+.chk-parc__nota {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dourado-escuro);
+}
+
+/* ===== Celular ===== */
+@media (max-width: 760px) {
+  .chk-item {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    row-gap: 10px;
+  }
+
+  .chk-item__icone {
+    display: none;
+  }
+
+  .chk-situacao {
+    grid-column: 1 / -1;
+  }
+
+  .chk-situacao__botao {
+    flex: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .chk__navegacao {
+    width: 100%;
+  }
+
+  .chk__navegacao b {
+    flex: 1;
+  }
+
+  .chk-parc__lista {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chk-parc__dados {
+    gap: 6px;
+  }
+
+  .chk-parc__dados div {
+    padding: 8px;
+  }
+
+  .chk-parc__dados dd {
+    font-size: 14px;
+  }
+}

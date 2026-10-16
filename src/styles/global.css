@@ -1,0 +1,134 @@
+/* ===== Cores e medidas do CIFRA (mude aqui e muda no site todo) ===== */
+:root {
+  /* Cores tiradas da logo */
+  --preto: #141414;          /* cor principal: botões, títulos, barra do painel */
+  --dourado: #eaaf5a;        /* destaque: igual ao dourado da logo */
+  --dourado-escuro: #8c5a10; /* dourado legível para textos pequenos */
+  --dourado-claro: #fbebd2;  /* fundos suaves de ícones */
+  --creme: #fbf6ec;          /* fundo geral */
+  --creme-card: #fbf6ec;
+  --fundo-painel: #faf8f4;
+
+  --texto: #141414;
+  --texto-suave: #4a4337;
+  --cinza: #6b6355;
+  --borda: #eee6d8;
+  --branco: #ffffff;
+
+  /* Cores com significado financeiro (continuam verde/vermelho) */
+  --positivo: #1e7b45;       /* receitas */
+  --negativo: #c2362b;       /* despesas */
+
+  --rodape: #111111;
+  --rodape-texto: #d9d2c5;
+
+  --largura-max: 1200px;
+  --fonte: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* ===== Tema do painel =====
+     As partes escuras do sistema (menu lateral, cartões de destaque, formulário de lançamento, avisos)
+     usam estas cores. No tema "Escuro" (padrão) elas ficam pretas; no tema "Claro" ficam brancas. */
+  --esc-fundo: var(--preto);
+  --esc-borda: var(--preto);
+  --esc-campo: #1f1c18;
+  --esc-chip: #2e2a24;
+  --esc-linha: #3a342a;
+  --esc-linha-forte: #5a5246;
+  --esc-texto: var(--creme);
+  --esc-texto-suave: #d9d2c5;
+  --esc-texto-apagado: #bdb4a4;
+  --esc-placeholder: #8f877a;
+  --esc-positivo: #6fd39a;
+  --esc-negativo: #f08a80;
+  --esc-dourado: var(--dourado);
+  --esc-transf: #2e2a3d;
+  --esc-transf-texto: #d6cff5;
+  --esc-esquema: dark;
+}
+
+/* Tema claro: escolhido em Configurações > Preferências > Tema */
+:root[data-tema='claro'] {
+  --esc-fundo: var(--branco);
+  --esc-borda: var(--borda);
+  --esc-campo: var(--fundo-painel);
+  --esc-chip: #f3ede2;
+  --esc-linha: var(--borda);
+  --esc-linha-forte: #d8ccb7;
+  --esc-texto: var(--preto);
+  --esc-texto-suave: var(--texto-suave);
+  --esc-texto-apagado: var(--cinza);
+  --esc-placeholder: #9a907f;
+  --esc-positivo: var(--positivo);
+  --esc-negativo: var(--negativo);
+  --esc-dourado: var(--dourado-escuro);
+  --esc-transf: #ece8f8;
+  --esc-transf-texto: #4b3f8f;
+  --esc-esquema: light;
+}
+
+/* No tema claro, as caixas que eram pretas ganham a borda dos outros cartões */
+:root[data-tema='claro'] :is(.lateral, .novo, .resumo--destaque, .ct-total, .chk-resumo, .comp-envio, .cfg-perfil, .cal-resumo--destaque, .rel-numero--destaque, .rel-destaques, .not-cartao--destaque, .pp__alerta--teste, .lanc-resultado, .ofx__resumo, .rsm__detalhe, .alerta) {
+  border: 1px solid var(--borda);
+}
+
+:root[data-tema='claro'] .lateral {
+  border-width: 0 1px 0 0;
+}
+
+/* O cartão de destaque (ex.: Saldo geral) continua se destacando com a borda dourada */
+:root[data-tema='claro'] :is(.resumo--destaque, .ct-total, .chk-resumo, .cfg-perfil, .cal-resumo--destaque, .rel-numero--destaque, .not-cartao--destaque) {
+  border: 2px solid var(--dourado);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  color: var(--texto);
+  background: var(--creme);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app main {
+  flex: 1;
+}
+
+/* Centraliza o conteúdo com largura máxima */
+.container {
+  width: 100%;
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Contorno visível para quem navega pelo teclado */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--dourado-escuro);
+  outline-offset: 3px;
+  border-radius: 8px;
+}

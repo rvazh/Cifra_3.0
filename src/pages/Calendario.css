@@ -1,0 +1,587 @@
+/* ===== Tela de Calendário (usa a base do Painel: .pp, .cartao, .vencimento...) ===== */
+
+/* Navegação entre meses */
+.cal__navegacao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cal__mes {
+  min-width: 130px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.cal__seta,
+.cal__hoje {
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cal__seta {
+  width: 40px;
+  font-size: 20px;
+}
+
+.cal__hoje {
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cal__seta:hover,
+.cal__hoje:hover {
+  border-color: var(--preto);
+}
+
+/* ===== Resumo do mês ===== */
+.cal__resumos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cal-resumo {
+  padding: 16px 20px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-resumo--destaque {
+  background: var(--esc-fundo);
+  border-color: var(--esc-borda);
+}
+
+.cal-resumo__rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.cal-resumo--destaque .cal-resumo__rotulo {
+  color: var(--esc-texto-apagado);
+}
+
+.cal-resumo__valor {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.cal-resumo--destaque .cal-resumo__valor {
+  color: var(--esc-dourado);
+}
+
+.cal-resumo__alerta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--esc-negativo);
+}
+
+/* ===== Colunas: calendário + lado ===== */
+.cal__colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+  align-items: start;
+}
+
+.cal__lado {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ===== Grade do mês ===== */
+.cal-grade {
+  padding: 18px;
+}
+
+.cal-grade__semana,
+.cal-grade__dias {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.cal-grade__semana {
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--cinza);
+}
+
+.cal-quadro {
+  min-height: 76px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.cal-quadro:hover {
+  border-color: #d8ccb7;
+  background: var(--branco);
+}
+
+.cal-quadro--vazio {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.cal-quadro--escolhido,
+.cal-quadro--escolhido:hover {
+  border-color: var(--preto);
+  background: var(--branco);
+  box-shadow: -3px 3px 0 var(--preto);
+}
+
+.cal-quadro__numero {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.cal-quadro--hoje .cal-quadro__numero {
+  background: var(--dourado);
+}
+
+/* ===== Dia escolhido ===== */
+.cal-dia__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.cal-dia__saldo {
+  font-size: 14px;
+}
+
+.cal-dia__vazio {
+  padding: 14px 0;
+  font-size: 14px;
+  color: var(--cinza);
+}
+
+.cal-dia__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.cal-item__icone {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cal-item__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.cal-item__nome {
+  font-size: 14px;
+  color: var(--preto);
+}
+
+.cal-item__detalhe {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.cal-item__direita {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.cal-item__valor {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.cal-item__acao {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cal-item__acao:hover {
+  border-color: var(--preto);
+  color: var(--preto);
+}
+
+/* Selo de situação */
+.cal-selo {
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cal-selo--pago {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.cal-selo--pendente {
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+}
+
+.cal-selo--guardado {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.cal-selo--previsto {
+  background: #f1ede6;
+  color: var(--cinza);
+}
+
+.cal-selo--atrasado {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+/* Adicionar neste dia */
+/* ===== Novo evento ===== */
+.cal-evento__abrir {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px dashed #d8ccb7;
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.cal-evento__abrir:hover {
+  border-color: var(--dourado);
+  background: var(--fundo-painel);
+}
+
+.cal-evento__ok {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #e3f1e8;
+  color: var(--positivo);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cal-evento {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cal-evento__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.cal-evento__fechar {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--branco);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cal-evento__opcoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.cal-evento__opcao {
+  min-height: 36px;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.cal-evento__opcao--despesa {
+  background: #d9544a;
+  color: var(--branco);
+}
+
+.cal-evento__opcao--receita {
+  background: #2e9d5b;
+  color: var(--branco);
+}
+
+.cal-evento__opcao--ativa {
+  background: var(--preto);
+  color: var(--dourado);
+}
+
+.cal-evento__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.cal-evento__campo input,
+.cal-evento__campo select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+}
+
+.cal-evento__campo input:focus,
+.cal-evento__campo select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.cal-evento__dupla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 10px;
+}
+
+.cal-evento__dica {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cinza);
+}
+
+.cal-evento__salvar {
+  min-height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: var(--dourado);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.cal-evento__salvar:hover {
+  filter: brightness(1.05);
+}
+
+.cal-dia__erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+/* ===== Próximos vencimentos ===== */
+.cal-proximos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cal-proximo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1px solid var(--borda);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cal-proximo:hover .cal-proximo__nome {
+  text-decoration: underline;
+}
+
+.cal-proximo__data--atrasado {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.cal-proximo__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cal-proximo__nome {
+  font-size: 14px;
+  color: var(--preto);
+}
+
+.cal-proximo__quando {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.cal-proximo__valor {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* ===== Telas médias ===== */
+@media (max-width: 1280px) {
+  .cal__colunas {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+
+  .cal-quadro {
+    min-height: 68px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cal__colunas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cal__resumos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ===== Celular: dias viram quadradinhos com bolinhas ===== */
+@media (max-width: 700px) {
+  .cal-grade {
+    padding: 12px;
+  }
+
+  .cal-grade__semana,
+  .cal-grade__dias {
+    gap: 4px;
+  }
+
+  .cal-grade__semana {
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .cal-quadro {
+    min-height: 46px;
+    padding: 4px 2px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 10px;
+  }
+
+  .cal-quadro--escolhido,
+  .cal-quadro--escolhido:hover {
+    box-shadow: -2px 2px 0 var(--preto);
+  }
+
+}
+
+@media (max-width: 560px) {
+  .cal__navegacao {
+    width: 100%;
+  }
+
+  .cal__mes {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cal-resumo {
+    padding: 14px 16px;
+  }
+
+  .cal-resumo__valor {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,78 @@
+.footer {
+  background: var(--branco);
+  border-top: 1px solid var(--borda);
+  padding: 40px 0 28px;
+}
+
+/* ===== Linha de cima ===== */
+.footer__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+}
+
+.footer__link {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--texto-suave);
+  transition: color 0.2s;
+}
+
+.footer__link:hover {
+  color: var(--dourado-escuro);
+}
+
+/* Mesmo botão dourado com sombra preta do resto do site */
+.footer__botao {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: var(--dourado);
+  color: var(--preto);
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: -4px 3px 0 var(--preto);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.footer__botao:hover {
+  transform: translate(-2px, 2px);
+  box-shadow: -2px 1px 0 var(--preto);
+}
+
+/* ===== Linha de baixo ===== */
+.footer__base {
+  padding-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.footer__copy {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.footer__legais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.footer__link--pequeno {
+  font-size: 13px;
+}

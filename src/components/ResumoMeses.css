@@ -1,0 +1,260 @@
+/* ===== Resumo rápido dos meses (Relatórios) ===== */
+.rsm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rsm__sub {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.rsm__meses {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rsm-mes {
+  padding: 10px 8px;
+  border-radius: 14px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.rsm-mes:hover {
+  border-color: var(--dourado);
+}
+
+.rsm-mes--ativo {
+  border-color: var(--preto);
+  background: var(--branco);
+  box-shadow: -3px 3px 0 var(--dourado);
+}
+
+.rsm-mes__nome {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rsm-mes__nome small {
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  font-size: 10px;
+  text-transform: none;
+}
+
+.rsm-mes__barras {
+  height: 44px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.rsm-mes__barra {
+  width: 10px;
+  min-height: 2px;
+  border-radius: 3px;
+}
+
+.rsm-mes__barra--entrou {
+  background: #2e9d5b;
+}
+
+.rsm-mes__barra--saiu {
+  background: #d9544a;
+}
+
+.rsm-mes__sobra {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.rsm__detalhe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--esc-fundo);
+  color: var(--esc-texto-suave);
+}
+
+.rsm__texto {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.rsm__rotulo {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--dourado);
+}
+
+.rsm__texto ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rsm__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rsm__whatsapp,
+.rsm__copiar {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rsm__whatsapp {
+  background: #25d366;
+  color: #0b3d1f;
+}
+
+.rsm__whatsapp:hover {
+  background: #1fbd5a;
+}
+
+.rsm__whatsapp--desligado {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.rsm__copiar {
+  border: 1.5px solid var(--esc-linha);
+  background: none;
+  color: var(--esc-texto);
+}
+
+.rsm__copiar:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rsm__lembrete {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 12px 20px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--dourado-claro);
+}
+
+.rsm__chave {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.rsm__chave input {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  accent-color: var(--preto);
+}
+
+.rsm__chave span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rsm__chave b {
+  font-size: 14px;
+  color: var(--preto);
+}
+
+.rsm__chave small {
+  font-size: 13px;
+}
+
+.rsm__chave a {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+.rsm__numero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rsm__numero input {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid #f0d7a8;
+  background: var(--branco);
+  font: inherit;
+  font-size: 14px;
+}
+
+.rsm__numero small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+@media (max-width: 760px) {
+  .rsm__meses {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rsm__lembrete {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rsm__botoes,
+  .rsm__whatsapp,
+  .rsm__copiar {
+    flex: 1;
+  }
+}
+
+@media print {
+  .rsm__botoes,
+  .rsm__lembrete {
+    display: none;
+  }
+}

@@ -1,0 +1,336 @@
+/* ===== Destaque (fundo branco) ===== */
+.qs-hero {
+  background: var(--branco);
+  overflow: hidden;
+}
+
+.qs-hero__conteudo {
+  padding-top: 48px;
+  padding-bottom: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 56px;
+}
+
+.qs-hero__texto {
+  flex: 1 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.qs-hero__titulo {
+  font-size: clamp(42px, 5.4vw, 64px);
+  line-height: 1;
+  letter-spacing: -2px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.qs-hero__descricao {
+  max-width: 500px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #2e2a24;
+}
+
+.qs-hero__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.qs-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--preto);
+  color: var(--creme);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Cartão preto com a logo */
+.qs-marca {
+  flex: 0 0 380px;
+  height: 340px;
+  border-radius: 32px;
+  background: var(--preto);
+  box-shadow: -10px 10px 0 var(--creme);
+  transform: rotate(3deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.qs-marca__fundo {
+  width: 170px;
+  height: 170px;
+  border-radius: 40px;
+  background: var(--creme);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qs-marca__fundo img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+}
+
+.qs-marca__nome {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--creme);
+}
+
+.qs-marca__frase {
+  font-size: 14px;
+  color: #bdb4a4;
+}
+
+/* ===== Nossa história ===== */
+.historia {
+  padding-bottom: 80px;
+  display: flex;
+  gap: 64px;
+}
+
+.historia__texto {
+  flex: 1 1 480px;
+  min-width: 0;
+  padding-top: 32px;
+  border-top: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Rótulo com linha preta embaixo */
+.historia__rotulo {
+  display: block;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--preto);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dourado-escuro);
+}
+
+.historia__titulo {
+  font-size: 34px;
+  letter-spacing: -0.6px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.historia__texto p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--texto-suave);
+}
+
+.historia__texto strong {
+  color: var(--preto);
+}
+
+.historia__texto .historia__abertura {
+  font-size: 19px;
+  line-height: 1.5;
+  font-weight: 800;
+  color: var(--dourado-escuro);
+}
+
+/* Linha do tempo (cartão branco, mais abaixo) */
+.linha {
+  flex: 1 1 480px;
+  min-width: 0;
+  align-self: flex-start;
+  margin: 200px 0 0;
+  padding: 32px;
+  list-style: none;
+  border-radius: 22px;
+  background: var(--branco);
+  border: 1.5px solid var(--borda);
+}
+
+.linha__etapa {
+  display: flex;
+  gap: 18px;
+}
+
+.linha__marcador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.linha__ponto {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--preto);
+  border: 3px solid var(--dourado);
+  flex-shrink: 0;
+}
+
+.linha__etapa--ultima .linha__ponto {
+  background: var(--dourado);
+  border-color: var(--preto);
+}
+
+.linha__traco {
+  width: 2px;
+  flex: 1;
+  background: #e3d9c6;
+}
+
+.linha__conteudo {
+  margin-top: -4px;
+  padding-bottom: 28px;
+}
+
+.linha__etapa--ultima .linha__conteudo {
+  padding-bottom: 0;
+}
+
+.linha__titulo {
+  margin-bottom: 6px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.linha__texto {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--texto-suave);
+}
+
+/* ===== Citação + contato ===== */
+.qs-final {
+  padding-bottom: 88px;
+}
+
+.qs-citacao {
+  position: relative;
+  overflow: hidden;
+  padding: 44px 48px;
+  border-radius: 24px;
+  background: var(--preto);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.qs-citacao__enfeite {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 40px;
+  background: var(--dourado);
+  right: -60px;
+  top: -70px;
+  transform: rotate(16deg);
+}
+
+.qs-citacao__frase {
+  position: relative;
+  max-width: 760px;
+  font-size: 30px;
+  line-height: 1.25;
+  font-weight: 800;
+  color: var(--creme);
+}
+
+.qs-citacao__aspas {
+  color: var(--dourado);
+}
+
+.qs-citacao__rodape {
+  position: relative;
+  padding-top: 24px;
+  border-top: 1px solid #3a342a;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.qs-citacao__texto {
+  font-size: 15px;
+  color: var(--rodape-texto);
+}
+
+.qs-citacao__texto b {
+  color: var(--branco);
+}
+
+.qs-citacao__botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: var(--dourado);
+  color: var(--preto);
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform 0.15s;
+}
+
+.qs-citacao__botao:hover {
+  transform: translateY(-2px);
+}
+
+/* ===== Telas menores ===== */
+@media (max-width: 960px) {
+  .historia {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .linha {
+    margin-top: 0;
+    align-self: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .qs-marca {
+    flex-basis: 100%;
+    height: 280px;
+    transform: rotate(2deg);
+  }
+
+  .qs-marca__fundo {
+    width: 130px;
+    height: 130px;
+  }
+
+  .qs-marca__fundo img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .linha {
+    padding: 24px 20px;
+  }
+
+  .qs-citacao {
+    padding: 32px 24px;
+  }
+
+  .qs-citacao__frase {
+    font-size: 23px;
+  }
+}

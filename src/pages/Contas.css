@@ -1,0 +1,990 @@
+/* ===== Tela de Contas (usa a base do Painel: .pp, .pp__novo...) ===== */
+
+.ct__novo {
+  border: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+
+/* ===== Saldo total + mini cartões ===== */
+.ct__resumo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.ct-total {
+  position: relative;
+  overflow: hidden;
+  padding: 26px 28px;
+  border-radius: 22px;
+  background: var(--esc-fundo);
+  color: var(--esc-texto);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Enfeite dourado no canto */
+.ct-total::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 26px solid var(--dourado);
+  opacity: 0.18;
+}
+
+.ct-total__rotulo {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--esc-texto-apagado);
+}
+
+.ct-total__valor {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--esc-dourado);
+}
+
+.ct-total__previsto {
+  font-size: 14px;
+  color: var(--esc-texto-apagado);
+}
+
+.ct-total__previsto b {
+  color: var(--esc-texto);
+}
+
+.ct-total__barra {
+  margin-top: 18px;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  gap: 3px;
+  background: var(--esc-chip);
+}
+
+.ct-total__barra span {
+  height: 100%;
+}
+
+.ct-total__legenda {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 13px;
+  color: var(--esc-texto-suave);
+}
+
+.ct-total__legenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ct-total__legenda b {
+  color: var(--esc-texto);
+}
+
+.ct-total__cor {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.ct__mini {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ct-mini {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.ct-mini div {
+  display: flex;
+  flex-direction: column;
+}
+
+.ct-mini__icone {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 800;
+}
+
+.ct-mini__icone--entrada {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.ct-mini__icone--saida {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.ct-mini__icone--contas {
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  font-size: 17px;
+}
+
+.ct-mini__rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.ct-mini__valor {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+/* ===== Grade de contas ===== */
+.ct__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.ct-conta {
+  position: relative;
+  padding: 22px;
+  padding-top: 26px;
+  border-radius: 20px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+/* Faixa com a cor da conta no topo */
+.ct-conta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--cor);
+}
+
+.ct-conta__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ct-conta__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--cor);
+  color: var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.ct-conta__titulos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ct-conta__nome {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--preto);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ct-conta__tipo {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.ct-conta__fora {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f1ede6;
+  color: var(--cinza);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ct-conta__saldo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ct-conta__saldo span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.ct-conta__saldo b {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--preto);
+}
+
+.ct-conta__saldo b.valor--saida {
+  color: var(--negativo);
+}
+
+.ct-conta__linha {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--fundo-painel);
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.ct-conta__mes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.ct-conta__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ct-conta__chip--entrada {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.ct-conta__chip--saida {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.ct-conta__chip-legenda {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.ct-conta__ultimos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ct-conta__subtitulo {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--cinza);
+}
+
+.ct-conta__ultimos ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ct-conta__ultimos li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--borda);
+  font-size: 13px;
+}
+
+.ct-conta__ultimos li:last-child {
+  border-bottom: none;
+}
+
+.ct-conta__data {
+  font-size: 12px;
+  color: var(--cinza);
+  flex-shrink: 0;
+}
+
+.ct-conta__desc {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ct-conta__ultimos li b {
+  white-space: nowrap;
+}
+
+.ct-conta__vazio {
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.ct-conta__acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.ct-conta__botao {
+  flex: 1;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.ct-conta__botao:hover {
+  border-color: var(--preto);
+}
+
+.ct-conta__botao--excluir {
+  color: var(--negativo);
+}
+
+.ct-conta__botao--excluir:hover {
+  border-color: var(--negativo);
+}
+
+/* Cartão "Adicionar conta" */
+.ct-adicionar {
+  min-height: 200px;
+  padding: 22px;
+  border-radius: 20px;
+  border: 2px dashed #d8ccb7;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ct-adicionar:hover {
+  border-color: var(--dourado);
+  background: var(--branco);
+}
+
+.ct-adicionar small {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--cinza);
+}
+
+.ct-adicionar__mais {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+/* ===== Formulário em janela ===== */
+.ct-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ct-form {
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: -6px 6px 0 var(--preto);
+}
+
+.ct-form__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ct-form__topo h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.ct-form__fechar {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--fundo-painel);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.ct-form__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.ct-form__campo input,
+.ct-form__campo select {
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+}
+
+.ct-form__campo input:focus,
+.ct-form__campo select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.ct-form__dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ct-form__dica {
+  margin-top: -4px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.ct-form__cores {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ct-form__cores legend {
+  width: 100%;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.ct-form__cor {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.ct-form__cor input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.ct-form__cor:has(input:checked) {
+  box-shadow: 0 0 0 3px var(--branco), 0 0 0 5px var(--preto);
+}
+
+.ct-form__cor:has(input:focus-visible) {
+  outline: 2px solid var(--dourado);
+  outline-offset: 4px;
+}
+
+.ct-form__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ct-form__check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--preto);
+}
+
+.ct-form__erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+.ct-form__acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.ct-form__salvar,
+.ct-form__cancelar {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ct-form__salvar {
+  border: none;
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.ct-form__cancelar {
+  border: 1px solid var(--borda);
+  background: var(--branco);
+}
+
+/* ===== Telas menores ===== */
+@media (max-width: 1100px) {
+  .ct__resumo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ct__mini {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .ct-mini {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 560px) {
+  .ct-total {
+    padding: 22px 20px;
+  }
+
+  .ct-total__valor {
+    font-size: 32px;
+  }
+
+  .ct-mini {
+    min-width: 100%;
+  }
+
+  .ct__grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ct-adicionar {
+    min-height: 160px;
+  }
+
+  .ct-form__dupla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Dica para quem ainda não tem conta */
+.ct__dica {
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.ct__dica a {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* Botão "Importar OFX" (ao lado de "Nova conta") */
+.ct__importar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--preto);
+  background: var(--branco);
+  color: var(--preto);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ct__importar:hover {
+  background: var(--preto);
+  color: var(--dourado);
+}
+
+/* Aviso depois de importar */
+.ct__aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ct__aviso--ok {
+  background: #e3f1e8;
+  color: #1e7b45;
+}
+
+.ct__aviso--erro {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.ct__aviso button {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .ct__importar {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ===== Cartões de crédito ===== */
+.ct-form__tripla {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ct-cartoes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ct-cartoes__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.ct-cartoes__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ct-cartoes__titulo {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.ct-cartoes__sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.ct-cartoes__vazio {
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1.5px dashed var(--borda);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.ct-cartoes__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 16px;
+}
+
+.ct-cartao {
+  padding: 14px;
+  border-radius: 22px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* O "plástico" do cartão */
+.ct-cartao__plastico {
+  position: relative;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--preto);
+  box-shadow: inset 0 -5px 0 var(--cor, var(--dourado));
+  color: var(--creme);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.ct-cartao__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ct-cartao__topo b {
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ct-cartao__chip {
+  width: 34px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f2cf8f, var(--dourado));
+}
+
+.ct-cartao__rotulo {
+  font-size: 12px;
+  color: #bdb4a4;
+}
+
+.ct-cartao__fatura {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--dourado);
+}
+
+.ct-cartao__limite {
+  margin-top: 10px;
+  height: 6px;
+  border-radius: 999px;
+  background: #3a342a;
+  overflow: hidden;
+}
+
+.ct-cartao__limite span {
+  display: block;
+  height: 100%;
+  background: var(--dourado);
+}
+
+.ct-cartao__limite-texto {
+  font-size: 12px;
+  color: #bdb4a4;
+}
+
+.ct-cartao__limite-texto b {
+  color: var(--creme);
+}
+
+.ct-cartao__fechada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--fundo-painel);
+}
+
+.ct-cartao__fechada > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ct-cartao__fechada b {
+  font-size: 17px;
+}
+
+.ct-cartao__rotulo-escuro {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.ct-cartao__situacao {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ct-cartao__situacao--paga {
+  background: #e3f1e8;
+  color: #1e7b45;
+}
+
+.ct-cartao__situacao--apagar {
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+}
+
+.ct-cartao__situacao--vencida {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.ct-cartao__situacao--vazia {
+  background: var(--borda);
+  color: var(--cinza);
+}
+
+.ct-cartao__configurar {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--dourado-claro);
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.ct-cartao__configurar button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 800;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ct-cartao__proximas {
+  list-style: none;
+  margin: 0;
+  padding: 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.ct-cartao__proximas li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ct-conta__botao--pagar {
+  flex: 1.3;
+  white-space: nowrap;
+  border-color: var(--preto);
+  background: var(--preto);
+  color: var(--dourado);
+}
+
+@media (max-width: 560px) {
+  .ct-form__tripla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ct-form__tripla > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .pp__acoes:has(.ct__importar) {
+    flex-wrap: wrap;
+  }
+}

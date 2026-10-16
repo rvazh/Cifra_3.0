@@ -1,0 +1,238 @@
+.seg {
+  background: var(--branco);
+  padding: 104px 0;
+}
+
+/* Rótulo com linha preta em toda a largura */
+.seg__rotulo {
+  display: block;
+  padding-bottom: 6px;
+  margin-bottom: 30px;
+  border-bottom: 3px solid var(--preto);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dourado-escuro);
+}
+
+.seg__conteudo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 56px;
+}
+
+/* ===== Lado do texto ===== */
+.seg__texto {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* Título em toda a largura, acima das duas colunas */
+.seg__titulo {
+  max-width: 615px;
+  margin-bottom: 26px;
+  font-size: clamp(30px, 4vw, 45px);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  font-weight: 800;
+}
+
+.seg__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.seg__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.seg__item--destaque {
+  color: var(--texto);
+  font-weight: 700;
+}
+
+.seg__check {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--dourado-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seg__check--destaque {
+  background: var(--preto);
+}
+
+/* Mesmo botão dourado das outras seções */
+.seg__botao {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: var(--dourado);
+  color: var(--preto);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  box-shadow: -4px 3px 0 var(--preto);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.seg__botao:hover {
+  transform: translate(-2px, 2px);
+  box-shadow: -2px 1px 0 var(--preto);
+}
+
+.seg__plataformas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 16px;
+  padding-top: 6px;
+}
+
+.seg__plataforma-texto {
+  font-size: 15px;
+  color: var(--texto);
+}
+
+.seg__plataforma-icone {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--creme);
+  border: 1px solid var(--borda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ===== Lado do painel ===== */
+.seg__visual {
+  flex: 1 1 560px;
+  min-width: 0;
+  position: relative;
+  padding: 28px 0 28px 28px;
+}
+
+/* Quadrados flutuantes */
+.seg__selo {
+  position: absolute;
+  z-index: 1;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seg__selo--grafico {
+  top: -40px;
+  right: 16px;
+  width: 64px;
+  height: 64px;
+  background: var(--dourado);
+  transform: rotate(12deg);
+}
+
+.seg__selo--cadeado {
+  bottom: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  background: var(--preto);
+  transform: rotate(-10deg);
+}
+
+.seg__selo--cartao {
+  bottom: -60px;
+  right: -10px;
+  width: 106px;
+  height: 105px;
+  background: var(--dourado);
+  transform: rotate(12deg);
+}
+
+/* ===== Painel do computador ===== */
+.painel-pc {
+  position: relative;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: 18px;
+  box-shadow: 0 30px 60px rgba(20, 20, 20, 0.12);
+  overflow: hidden;
+}
+
+.painel-pc__barra {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--preto);
+}
+
+.painel-pc__barra span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a342a;
+}
+
+.painel-pc__barra span:first-child {
+  background: var(--dourado);
+}
+
+.painel-pc__imagem {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 600px) {
+  .seg__visual {
+    padding: 24px 0;
+  }
+
+
+  .seg__selo--grafico {
+    top: -24px;
+    right: 0;
+  }
+
+  .seg__selo--cartao {
+    width: 72px;
+    height: 72px;
+    bottom: -30px;
+    right: 0;
+  }
+
+  .seg__botao {
+    letter-spacing: 1px;
+    padding: 0 18px;
+  }
+
+  .seg__selo--cartao svg {
+    width: 38px;
+    height: 38px;
+  }
+}

@@ -1,0 +1,175 @@
+/* ===== Janela "Transferir entre contas" ===== */
+.trf-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trf {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  box-shadow: -6px 6px 0 var(--preto);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.trf__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trf__topo h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.trf__topo p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.trf__fechar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--fundo-painel);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.trf__contas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 8px;
+}
+
+.trf__trocar {
+  width: 40px;
+  height: 46px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.trf__trocar:hover {
+  border-color: var(--preto);
+}
+
+.trf__dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.trf__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.trf__campo input,
+.trf__campo select {
+  height: 46px;
+  min-width: 0;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.trf__campo input:focus,
+.trf__campo select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.trf__resumo {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f1eefb;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5b4ea3;
+}
+
+.trf__resumo b {
+  color: var(--preto);
+}
+
+.trf__aviso {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--dourado-claro);
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.trf__erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+.trf__acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.trf__cancelar,
+.trf__salvar {
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trf__cancelar {
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+}
+
+.trf__salvar {
+  border: none;
+  background: var(--dourado);
+  color: var(--preto);
+  box-shadow: -4px 3px 0 var(--preto);
+}
+
+@media (max-width: 480px) {
+  .trf__dupla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .trf__acoes > * {
+    flex: 1;
+  }
+}

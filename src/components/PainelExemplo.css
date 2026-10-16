@@ -1,0 +1,116 @@
+.painel {
+  flex: 1 1 520px;
+  min-width: 0;
+  position: relative;
+  /* espaço embaixo para o cartão flutuante não cobrir a última conta */
+  padding: 24px 0 90px 32px;
+}
+
+.painel__janela {
+  position: relative;
+  background: var(--branco);
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(20, 20, 20, 0.12);
+  overflow: hidden;
+}
+
+/* Barrinha de "janela" em cima da imagem */
+.painel__barra {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--preto);
+}
+
+.painel__barra span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a342a;
+}
+
+.painel__barra span:first-child {
+  background: var(--dourado);
+}
+
+/* Imagem real do Painel principal */
+.painel__imagem {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Cartão flutuante "Últimos lançamentos" */
+.painel__ultimos {
+  position: absolute;
+  width: 230px;
+  background: var(--branco);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(20, 20, 20, 0.16);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Entradas: à esquerda, saindo para fora do painel */
+.painel__ultimos--entrada {
+  left: -70px;
+  bottom: -31px;
+}
+
+/* Saídas: no canto inferior direito */
+.painel__ultimos--saida {
+  right: -36px;
+  bottom: 7px;
+}
+
+.painel__ultimos-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cinza);
+}
+
+.lancamento {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.lancamento__nome {
+  font-weight: 600;
+}
+
+.lancamento__valor {
+  font-weight: 700;
+}
+
+.lancamento__valor--saida {
+  color: var(--negativo);
+}
+
+.lancamento__valor--entrada {
+  color: var(--positivo);
+}
+
+/* Celular: painel sem recuo e cartão flutuante embaixo, sem sobrepor */
+@media (max-width: 600px) {
+  .painel {
+    flex-basis: 100%;
+    padding: 16px 0 0;
+  }
+
+
+  .painel__ultimos {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    margin: 12px 16px 0;
+  }
+
+  .painel__ultimos--entrada {
+    margin-top: -24px;
+  }
+}

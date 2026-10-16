@@ -1,0 +1,279 @@
+/* ===== Tela de Cursos (usa a base do Painel: .pp...) ===== */
+
+/* Selos pequenos */
+.cur-selo {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f1ede6;
+  color: var(--cinza);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cur-selo--livre {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.cur-selo--plano {
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+}
+
+/* ===== Curso disponível ===== */
+.cur-destaque {
+  padding: 26px;
+  border-radius: 24px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cur-destaque__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+
+.cur-destaque__textos {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 560px;
+}
+
+.cur-destaque__textos h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.cur-destaque__textos p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.cur-progresso {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.cur-progresso__trilho {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--dourado-claro);
+  overflow: hidden;
+}
+
+.cur-progresso__trilho span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--dourado);
+  transition: width 0.3s;
+}
+
+/* Aulas (abre e fecha) */
+.cur-aulas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--borda);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.cur-aula {
+  border-bottom: 1px solid var(--borda);
+}
+
+.cur-aula:last-child {
+  border-bottom: none;
+}
+
+.cur-aula--aberta {
+  background: var(--fundo-painel);
+}
+
+.cur-aula__cabecalho {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cur-aula__numero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.cur-aula__numero--feita {
+  border-color: var(--positivo);
+  background: var(--positivo);
+  color: var(--branco);
+}
+
+.cur-aula__titulo {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--preto);
+}
+
+.cur-aula__seta {
+  font-size: 22px;
+  color: var(--cinza);
+}
+
+.cur-aula__corpo {
+  padding: 0 18px 18px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cur-aula__corpo p {
+  max-width: 640px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--texto-suave);
+}
+
+.cur-aula__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cur-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.cur-botao:hover {
+  border-color: var(--preto);
+}
+
+.cur-botao--escuro {
+  border-color: var(--preto);
+  background: var(--preto);
+  color: var(--creme);
+}
+
+/* ===== Em breve ===== */
+.cur__secao {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.cur__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.cur-cartao {
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cur-cartao__icone {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--dourado-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.cur-cartao h3 {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.cur-cartao p {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--cinza);
+}
+
+.cur-cartao__selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cur__nota {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.cur__nota a {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* ===== Celular ===== */
+@media (max-width: 560px) {
+  .cur-destaque {
+    padding: 20px;
+  }
+
+  .cur-progresso {
+    width: 100%;
+  }
+
+  .cur-aula__cabecalho {
+    padding: 14px;
+  }
+
+  .cur-aula__corpo {
+    padding: 0 14px 16px;
+  }
+}

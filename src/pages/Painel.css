@@ -1,0 +1,587 @@
+/* ===== Conteúdo ===== */
+.pp {
+  flex: 1;
+  min-width: 0;
+  padding: 28px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.pp__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pp__titulo {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--preto);
+}
+
+.pp__subtitulo {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 14px;
+  color: var(--cinza);
+}
+
+.pp__data::first-letter {
+  text-transform: uppercase;
+}
+
+.pp__exemplo {
+  margin-left: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pp__acoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pp__icone {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  color: var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pp__aviso {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dourado);
+}
+
+.pp__novo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: var(--dourado);
+  color: var(--preto);
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: -4px 3px 0 var(--preto);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pp__novo:hover {
+  transform: translate(-2px, 2px);
+  box-shadow: -2px 1px 0 var(--preto);
+}
+
+/* ===== Aviso de contas a vencer ===== */
+.pp__alerta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--dourado-claro);
+  border: 1px solid #f3d9ad;
+}
+
+.pp__alerta-icone {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--dourado);
+  color: var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pp__alerta-textos {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.pp__alerta-textos span {
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.pp__alerta-link {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* Aviso do teste grátis acabando */
+.pp__alerta--teste {
+  background: var(--esc-fundo);
+  border-color: var(--esc-borda);
+  color: var(--branco);
+}
+
+.pp__alerta--teste .pp__alerta-textos span {
+  color: var(--esc-texto-apagado);
+}
+
+.pp__alerta--teste .pp__alerta-link {
+  color: var(--esc-dourado);
+}
+
+/* Primeiros passos (usuário novo) */
+.pp-comeco {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+  gap: 18px 28px;
+  align-items: center;
+  border: 2px solid var(--dourado);
+}
+
+.pp-comeco__texto {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--texto-suave);
+}
+
+.pp-comeco__passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pp-comeco__passos li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--fundo-painel);
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.pp-comeco__passos li > span:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pp-comeco__passos b {
+  font-size: 14px;
+  color: var(--preto);
+}
+
+.pp-comeco__numero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--preto);
+  color: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.pp-comeco__link {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--dourado);
+  color: var(--preto);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pp-comeco__link:hover {
+  background: var(--preto);
+  color: var(--dourado);
+}
+
+@media (max-width: 900px) {
+  .pp-comeco {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ===== Cartões de resumo ===== */
+.pp__resumos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.resumo {
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resumo--destaque {
+  background: var(--esc-fundo);
+  border-color: var(--esc-borda);
+}
+
+.resumo__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resumo__rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.resumo--destaque .resumo__rotulo {
+  color: var(--esc-texto-apagado);
+}
+
+.resumo__icone {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resumo__icone--dourado {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.resumo__icone--positivo {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.resumo__icone--negativo {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.resumo__icone--claro {
+  background: var(--dourado-claro);
+  color: var(--preto);
+}
+
+.resumo__valor {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--preto);
+}
+
+.resumo--destaque .resumo__valor {
+  color: var(--esc-texto);
+}
+
+.resumo__variacao {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--esc-positivo);
+}
+
+/* ===== Linhas de cartões ===== */
+.pp__linha--listas {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+}
+
+.pp__vazio {
+  padding: 16px 0;
+  font-size: 14px;
+  color: var(--cinza);
+}
+
+.pp__vazio a,
+.resumo__link {
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+.resumo--destaque .resumo__link {
+  font-size: 13px;
+  color: var(--esc-dourado);
+}
+
+.resumo__variacao--queda {
+  color: var(--esc-negativo);
+}
+
+.vencimento--atrasado {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.pp__linha {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+
+
+.cartao {
+  height: 100%;
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.cartao__titulo-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cartao__titulo {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.cartao__link {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dourado-escuro);
+}
+
+.cartao__link:hover {
+  text-decoration: underline;
+}
+
+.cartao__grafico {
+  margin-top: 12px;
+}
+
+.cartao__total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  font-size: 14px;
+}
+
+/* Legenda do gráfico de colunas */
+.legenda {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.legenda__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legenda__cor {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legenda__cor--receita {
+  background: #2e9d5b;
+}
+
+.legenda__cor--despesa {
+  background: #d9544a;
+}
+
+/* Listas (contas a pagar e lançamentos) */
+.lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lista__linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.lista__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lista__nome {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--preto);
+}
+
+.lista__detalhe {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.lista__valor {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.valor--entrada {
+  color: var(--positivo);
+}
+
+/* Transferência entre contas: nem entrada nem saída */
+.valor--transf {
+  color: #5b4ea3;
+}
+
+.valor--saida {
+  color: var(--negativo);
+}
+
+.vencimento {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.vencimento b {
+  font-size: 16px;
+}
+
+.seta {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.seta--entrada {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.seta--saida {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== Telas médias ===== */
+@media (max-width: 1180px) {
+  .pp__resumos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+/* ===== Tablet e celular: menu vira uma barra no topo ===== */
+@media (max-width: 900px) {
+  .pp__linha--listas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Celular: o gráfico ganha rolagem lateral para os meses não ficarem minúsculos */
+@media (max-width: 700px) {
+  .pp__grafico {
+    overflow-x: auto;
+  }
+
+  .pp__grafico svg {
+    min-width: 520px;
+  }
+}
+
+@media (max-width: 560px) {
+  .pp {
+    padding: 20px 16px 32px;
+  }
+
+  .pp__resumos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pp__acoes {
+    width: 100%;
+  }
+
+  .pp__novo {
+    flex: 1;
+    justify-content: center;
+  }
+}

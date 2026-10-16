@@ -1,0 +1,646 @@
+/* ===== Tela de Objetivos (usa a base do Painel: .pp, .pp__novo...) ===== */
+
+.obj__novo {
+  border: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ===== Como funciona ===== */
+.obj-passos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.obj-passo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.obj-passo__numero {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--preto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.obj-passo div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cinza);
+}
+
+.obj-passo b {
+  font-size: 14px;
+  color: var(--preto);
+}
+
+/* ===== Total ===== */
+.obj-total {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px 24px;
+  border-radius: 20px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+.obj-total__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.obj-total__texto span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.obj-total__texto b {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.obj-total__texto small {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.obj-total__barra {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: #f1ede6;
+  overflow: hidden;
+}
+
+.obj-total__barra span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--preto);
+}
+
+.obj-total__porcento {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+
+
+/* ===== Cartões ===== */
+.obj__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.obj-cartao {
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.obj-cartao--ok {
+  border-color: #a8d5a2;
+}
+
+.obj-cartao__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.obj-cartao__icone {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--dourado-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.obj-cartao__titulos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.obj-cartao__titulos h2 {
+  font-size: 16px;
+  font-weight: 800;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.obj-cartao__titulos span {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.obj-cartao__editar {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.obj-cartao__editar:hover {
+  background: var(--fundo-painel);
+  color: var(--preto);
+}
+
+.obj-cartao__valores {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.obj-cartao__valores b {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.obj-cartao__valores span {
+  font-size: 14px;
+  color: var(--cinza);
+}
+
+.obj-cartao__progresso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.obj-cartao__progresso b {
+  width: 42px;
+  text-align: right;
+  font-size: 14px;
+}
+
+.obj-cartao__trilho {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--dourado-claro);
+  overflow: hidden;
+}
+
+.obj-cartao__trilho span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--dourado);
+}
+
+.obj-cartao--ok .obj-cartao__trilho span {
+  background: var(--positivo);
+}
+
+.obj-cartao__frase {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.obj-cartao__frase--ok {
+  font-weight: 700;
+  color: var(--positivo);
+}
+
+.obj-cartao__frase--alerta {
+  color: var(--negativo);
+}
+
+.obj-cartao__acoes {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* Botões da tela */
+.obj-botao {
+  flex: 1;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.obj-botao:hover {
+  border-color: var(--preto);
+}
+
+.obj-botao:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.obj-botao--principal {
+  border-color: var(--dourado);
+  background: var(--dourado);
+}
+
+.obj-botao--principal:hover {
+  border-color: var(--dourado);
+  filter: brightness(1.05);
+}
+
+/* Guardar / retirar */
+.obj-movimento {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.obj-movimento label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.obj-movimento__linha {
+  display: flex;
+  gap: 8px;
+}
+
+.obj-movimento__linha input {
+  flex: 1.3;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--dourado);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+}
+
+.obj-movimento__linha input:focus {
+  outline: none;
+  border-color: var(--preto);
+}
+
+.obj-movimento__linha .obj-botao {
+  flex: 1;
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+/* Cartão "Novo objetivo" */
+.obj-adicionar {
+  min-height: 200px;
+  border-radius: 22px;
+  border: 2px dashed #d8ccb7;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.obj-adicionar:hover {
+  border-color: var(--dourado);
+  color: var(--preto);
+  background: var(--branco);
+}
+
+/* Sem objetivos */
+.obj-vazio {
+  padding: 48px 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.obj-vazio__icone {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--dourado-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+}
+
+.obj-vazio h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.obj-vazio p {
+  max-width: 420px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cinza);
+}
+
+.obj-vazio__botao {
+  margin-top: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 12px;
+  background: var(--dourado);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.obj__nota {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--cinza);
+}
+
+/* ===== Formulário em janela ===== */
+.obj-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.obj-form {
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: -6px 6px 0 var(--preto);
+}
+
+.obj-form__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.obj-form__topo h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.obj-form__fechar {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--fundo-painel);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.obj-form__icones {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.obj-form__icones legend {
+  width: 100%;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.obj-form__icone {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--fundo-painel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.obj-form__icone input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.obj-form__icone:has(input:checked) {
+  background: var(--dourado-claro);
+  box-shadow: 0 0 0 2px var(--dourado);
+}
+
+.obj-form__icone:has(input:focus-visible) {
+  outline: 2px solid var(--preto);
+  outline-offset: 2px;
+}
+
+.obj-form__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.obj-form__campo input {
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+}
+
+.obj-form__campo input:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.obj-form__dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.obj-form__erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+.obj-form__acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.obj-form__acoes .obj-botao {
+  min-height: 46px;
+  font-size: 15px;
+}
+
+.obj-form__excluir {
+  align-self: center;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--negativo);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ===== Telas menores ===== */
+@media (max-width: 900px) {
+  .obj-passos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .obj-total {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px;
+  }
+
+  .obj-total__texto {
+    width: 100%;
+  }
+
+  .obj__grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .obj-cartao {
+    padding: 20px;
+  }
+
+  .obj-adicionar {
+    min-height: 120px;
+  }
+
+  .obj-form__dupla {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* De qual conta sai (ou para qual volta) o dinheiro do objetivo */
+.obj-movimento__conta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.obj-movimento__conta select {
+  height: 42px;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--preto);
+}
+
+.obj-movimento__conta select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.obj-movimento__erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+.obj__aviso {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #e3f1e8;
+  color: var(--positivo);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.obj-cartao__conta {
+  font-size: 12.5px;
+  color: var(--cinza);
+}

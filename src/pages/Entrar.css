@@ -1,0 +1,517 @@
+/* Tela cheia: formulário à esquerda, vitrine do app à direita */
+.entrar {
+  min-height: 100vh;
+  display: flex;
+  background: var(--creme);
+}
+
+/* ===== Lado esquerdo ===== */
+.entrar__lado {
+  flex: 1 1 460px;
+  min-width: 0;
+  padding: 32px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.entrar__voltar {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.entrar__voltar:hover {
+  color: var(--dourado-escuro);
+}
+
+.entrar__voltar-seta {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(180deg);
+}
+
+.entrar__form {
+  width: 100%;
+  max-width: 380px;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Só a logo, centralizada acima dos campos */
+.entrar__logo {
+  width: 142px;
+  height: 167px;
+  object-fit: contain;
+  align-self: center;
+  margin-bottom: 12px;
+}
+
+.entrar__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entrar__rotulo-linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.entrar__rotulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+/* Campo branco com linha preta embaixo */
+.entrar__input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: none;
+  border-bottom: 2px solid var(--preto);
+  border-radius: 12px 12px 0 0;
+  background: var(--branco);
+  font: inherit;
+  font-size: 16px;
+  color: var(--texto);
+  transition: border-color 0.2s;
+}
+
+.entrar__input:focus {
+  outline: none;
+  border-bottom-color: var(--dourado);
+}
+
+/* Campo de senha com o botão do olho dentro */
+.entrar__senha {
+  position: relative;
+}
+
+.entrar__senha .entrar__input {
+  padding-right: 52px;
+}
+
+.entrar__olho {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--cinza);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.entrar__olho:hover {
+  color: var(--texto);
+}
+
+.entrar__link-pequeno {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dourado-escuro);
+}
+
+.entrar__link-pequeno:hover {
+  text-decoration: underline;
+}
+
+/* Botão "Entrar com o Google": branco com borda */
+.entrar__google {
+  margin-top: 8px;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1.5px solid var(--borda);
+  border-radius: 12px;
+  background: var(--branco);
+  color: var(--texto);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.entrar__google:hover {
+  border-color: var(--preto);
+}
+
+.entrar__google-icone {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mesmo botão dourado com sombra preta do site */
+.entrar__botao {
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: 12px;
+  background: var(--dourado);
+  color: var(--preto);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  box-shadow: -4px 3px 0 var(--preto);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.entrar__botao:hover {
+  transform: translate(-2px, 2px);
+  box-shadow: -2px 1px 0 var(--preto);
+}
+
+.entrar__cadastro {
+  text-align: center;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.entrar__link-forte {
+  font-weight: 700;
+  color: var(--texto);
+  box-shadow: inset 0 -2px 0 var(--dourado);
+}
+
+.entrar__rodape {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+/* ===== Lado direito: vitrine ===== */
+.entrar__vitrine {
+  flex: 1 1 560px;
+  min-width: 0;
+  margin: 16px;
+  border-radius: 32px;
+  position: relative;
+  overflow: hidden;
+  background: var(--dourado-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 40px;
+}
+
+.entrar__enfeite {
+  position: absolute;
+  pointer-events: none;
+}
+
+.entrar__enfeite--dourado {
+  width: 260px;
+  height: 260px;
+  border-radius: 56px;
+  background: var(--dourado);
+  top: -90px;
+  right: -70px;
+  transform: rotate(18deg);
+}
+
+.entrar__enfeite--linha {
+  width: 140px;
+  height: 140px;
+  border-radius: 32px;
+  border: 2px solid var(--preto);
+  bottom: 40px;
+  left: -50px;
+  transform: rotate(-14deg);
+  opacity: 0.15;
+}
+
+/* Mini painel do app */
+.vitrine {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: var(--branco);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(20, 20, 20, 0.16);
+}
+
+.vitrine__topo {
+  background: var(--preto);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vitrine__marca {
+  color: var(--dourado);
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+
+.vitrine__abas {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #bdb4a4;
+}
+
+.vitrine__aba--ativa {
+  color: var(--branco);
+  box-shadow: inset 0 -2px 0 var(--dourado);
+  padding-bottom: 3px;
+}
+
+.vitrine__corpo {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--fundo-painel);
+}
+
+.vitrine__saldo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.vitrine__legenda {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.vitrine__saldo-valor {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.vitrine__selo {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #e3f1e8;
+  color: var(--positivo);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vitrine__resumo {
+  display: flex;
+  gap: 12px;
+}
+
+.vitrine__resumo .vitrine__cartao {
+  flex: 1;
+}
+
+.vitrine__cartao {
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.vitrine__valor {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.vitrine__valor--positivo {
+  color: var(--positivo);
+}
+
+.vitrine__valor--negativo {
+  color: var(--negativo);
+}
+
+.vitrine__grafico-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.vitrine__grafico {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 90px;
+}
+
+.vitrine__barra {
+  flex: 1;
+  border-radius: 6px;
+  background: var(--borda);
+}
+
+.vitrine__barra--dourado {
+  background: var(--dourado);
+}
+
+.vitrine__barra--preto {
+  background: var(--preto);
+}
+
+/* Cartõezinhos soltos por cima */
+.vitrine__flutuante {
+  position: absolute;
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.vitrine__flutuante--salario {
+  left: 28px;
+  top: 70px;
+  background: var(--preto);
+  color: var(--branco);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: rotate(-11deg);
+  box-shadow: 0 16px 30px rgba(20, 20, 20, 0.25);
+}
+
+.vitrine__check {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--dourado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vitrine__flutuante-legenda {
+  font-size: 12px;
+  color: #bdb4a4;
+}
+
+.vitrine__flutuante-valor {
+  font-size: 15px;
+  font-weight: 800;
+  color: #6fd39a;
+}
+
+.vitrine__flutuante--meta {
+  right: 28px;
+  bottom: 60px;
+  width: 190px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: rotate(14deg);
+  box-shadow: 0 16px 30px rgba(20, 20, 20, 0.18);
+}
+
+/* Meta "Guardar", mais para a esquerda */
+.vitrine__flutuante--guardar {
+  right: 400px;
+  bottom: 178px;
+  width: 170px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: rotate(-8deg);
+  box-shadow: 0 16px 30px rgba(20, 20, 20, 0.18);
+}
+
+.vitrine__meta-linha {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vitrine__meta-trilho {
+  height: 8px;
+  border-radius: 8px;
+  background: var(--dourado-claro);
+}
+
+.vitrine__meta-barra {
+  width: 68%;
+  height: 100%;
+  border-radius: 8px;
+  background: var(--dourado);
+}
+
+/* Telas menores: a vitrine some e o formulário ocupa tudo */
+@media (max-width: 960px) {
+  .entrar__vitrine {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .entrar__lado {
+    padding: 24px 20px;
+  }
+
+  .entrar__logo {
+    width: 112px;
+    height: 132px;
+  }
+
+  .entrar__botao {
+    letter-spacing: 1px;
+  }
+}
+
+/* Mensagem de usuário ou senha incorretos */
+.entrar__erro {
+  margin: -4px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f8e4e1;
+  color: var(--negativo);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.entrar__botao:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Aviso de quem veio da página "Teste grátis" */
+.entrar__teste {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--dourado-claro);
+  border: 1px solid var(--dourado);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.entrar__teste b {
+  color: var(--preto);
+}

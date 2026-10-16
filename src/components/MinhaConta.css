@@ -1,0 +1,101 @@
+/* ===== Janelas de "Minha conta" (usam a base .cfg-janela das Configurações) ===== */
+.mc-janela--larga {
+  max-width: 620px;
+}
+
+.mc-grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.mc-inteiro {
+  grid-column: 1 / -1;
+}
+
+.mc-grade .cfg-campo input:disabled {
+  color: var(--cinza);
+  cursor: not-allowed;
+}
+
+.mc-select {
+  height: 46px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-painel);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--preto);
+}
+
+.mc-erro {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8e4e1;
+  color: var(--negativo);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mc-regras {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.mc-regra--ok {
+  color: var(--positivo);
+}
+
+.mc-mostrar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.mc-mostrar input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--preto);
+  flex-shrink: 0;
+}
+
+.mc-aviso {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8e4e1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.mc-aviso b {
+  color: var(--negativo);
+}
+
+.mc-botao--perigo {
+  border-color: var(--negativo);
+  background: var(--negativo);
+  color: #fff;
+}
+
+.mc-botao--perigo:hover {
+  border-color: #8f2018;
+}
+
+@media (max-width: 560px) {
+  .mc-grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

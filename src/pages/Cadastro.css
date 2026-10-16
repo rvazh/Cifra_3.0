@@ -1,0 +1,347 @@
+/* ===== Tela "Criar conta" ===== */
+/* Usa os mesmos campos e botões da tela de login (Entrar.css) */
+.cad {
+  min-height: 100vh;
+  padding: 24px 32px 32px;
+  background: var(--creme);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cad__topo {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.cad__ja {
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.cad__form {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 36px 40px 32px;
+  border-radius: 28px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  box-shadow: -8px 8px 0 var(--preto);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cad__cabeca {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.cad__logo {
+  width: 64px;
+  height: 75px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.cad__titulo {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.cad__sub {
+  margin-top: 6px;
+  font-size: 15px;
+  color: var(--texto-suave);
+}
+
+/* Cada parte do formulário */
+.cad__bloco {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.cad__legenda {
+  margin-bottom: 16px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--preto);
+}
+
+.cad__numero {
+  min-width: 36px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: var(--dourado);
+  border: 1.5px solid var(--preto);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cad__grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+/* Endereço em 8 colunas:  CEP(2) Rua(5) Nº(1)  /  Complemento(2) Bairro(2) Cidade(3) UF(1) */
+.cad__grade--endereco {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.cad__campo--cep,
+.cad__campo--dobro,
+.cad__campo--bairro {
+  grid-column: span 2;
+}
+
+.cad__campo--rua {
+  grid-column: span 5;
+}
+
+.cad__campo--cidade {
+  grid-column: span 3;
+}
+
+.cad__campo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cad__campo--inteiro {
+  grid-column: 1 / -1;
+}
+
+.cad__rotulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.cad__rotulo small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cinza);
+}
+
+.cad .entrar__input {
+  min-height: 50px;
+  background: var(--fundo-painel);
+}
+
+.cad .entrar__input:focus {
+  background: var(--branco);
+}
+
+.cad .entrar__input[aria-invalid='true'] {
+  border-bottom-color: var(--negativo);
+  background: #fdf3f1;
+}
+
+.cad__select {
+  padding-right: 8px;
+  cursor: pointer;
+}
+
+.cad__erro {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+.cad__dica {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.cad__dica--achou {
+  color: var(--positivo);
+}
+
+.cad__dica--nao-achou {
+  color: var(--dourado-escuro);
+}
+
+/* Regras da senha */
+.cad__regras {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.cad__regra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.cad__regra-bola {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cad__regra--ok {
+  color: var(--positivo);
+}
+
+.cad__regra--ok .cad__regra-bola {
+  border-color: var(--positivo);
+  background: var(--positivo);
+}
+
+/* Aceite e botão */
+.cad__final {
+  padding-top: 24px;
+  border-top: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cad__aceite {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.cad__aceite input {
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  accent-color: var(--preto);
+  cursor: pointer;
+}
+
+.cad__botao {
+  align-self: flex-start;
+  min-width: 260px;
+  padding: 0 28px;
+  letter-spacing: 1px;
+}
+
+.cad__aviso {
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.cad__rodape {
+  text-align: center;
+}
+
+.cad .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ===== Tablet ===== */
+@media (max-width: 760px) {
+  .cad__grade--endereco {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cad__campo--cep,
+  .cad__campo--rua,
+  .cad__campo--bairro {
+    grid-column: 1 / -1;
+  }
+
+  .cad__campo--numero,
+  .cad__campo--uf {
+    grid-column: span 1;
+  }
+
+  .cad__campo--dobro {
+    grid-column: span 3;
+  }
+
+  .cad__campo--cidade {
+    grid-column: span 3;
+  }
+}
+
+/* ===== Celular ===== */
+@media (max-width: 560px) {
+  .cad {
+    padding: 16px 16px 24px;
+    gap: 16px;
+  }
+
+  .cad__form {
+    padding: 24px 18px;
+    border-radius: 22px;
+    box-shadow: -5px 5px 0 var(--preto);
+    gap: 24px;
+  }
+
+  .cad__cabeca {
+    gap: 14px;
+  }
+
+  .cad__logo {
+    width: 48px;
+    height: 56px;
+  }
+
+  .cad__titulo {
+    font-size: 24px;
+  }
+
+  .cad__grade {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* o endereço continua em 4 colunas (Número ao lado do Complemento, UF ao lado da Cidade) */
+  .cad__grade.cad__grade--endereco {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cad__botao {
+    align-self: stretch;
+    min-width: 0;
+  }
+}
