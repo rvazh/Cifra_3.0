@@ -54,6 +54,7 @@ const FORM_VAZIO = {
   jaRecebidoTexto: '',
   observacao: '',
   temJuros: false,
+  noCalendario: true,
   jurosMesTexto: '1,00',
   multaTexto: '2,00',
 };
@@ -120,6 +121,7 @@ export default function Receber() {
       whatsapp: d.whatsapp || '',
       observacao: d.observacao || '',
       temJuros: Boolean(d.juros?.ativo),
+      noCalendario: d.noCalendario !== false,
       jurosMesTexto: d.juros ? paraTexto(d.juros.mes) || '0,00' : '1,00',
       multaTexto: d.juros ? paraTexto(d.juros.multa) || '0,00' : '2,00',
     });
@@ -136,6 +138,9 @@ export default function Receber() {
     if (jaRecebido < 0 || jaRecebido > valor) return setErro('O valor já recebido não pode passar do total.');
     const jurosMes = lerNumero(formulario.jurosMesTexto) || 0;
     const multa = lerNumero(formulario.multaTexto) || 0;
+    if (formulario.noCalendario && !formulario.primeiroVencimento) {
+      return setErro('Para aparecer no Calendário e no Checklist, coloque a data da 1ª parcela (ou marque "Não").');
+    }
     if (formulario.temJuros) {
       if (!formulario.primeiroVencimento) return setErro('Para cobrar juros, coloque a data de vencimento (é dela que o atraso começa a contar).');
       if (jurosMes < 0 || jurosMes > 30 || multa < 0 || multa > 50) return setErro('Confira os juros: até 30% ao mês e multa até 50%.');
@@ -153,6 +158,7 @@ export default function Receber() {
       whatsapp: formulario.whatsapp.trim(),
       observacao: formulario.observacao.trim(),
       juros: formulario.temJuros ? { ativo: true, mes: jurosMes, multa } : null,
+      noCalendario: formulario.noCalendario,
     };
 
     if (formulario.id) {
@@ -573,6 +579,24 @@ export default function Receber() {
                   {formulario.primeiroVencimento ? `, todo dia ${Number(formulario.primeiroVencimento.slice(8))}` : ''}.
                 </p>
               )}
+
+              {/* ===== Calendário e Checklist ===== */}
+              <div className="rcb-form__juros">
+                <span className="rcb-form__pergunta">
+                  Mostrar no Calendário e no Checklist?
+                  <small className="rcb-form__sub">Cada parcela aparece no dia em que vence. Lá dá para mudar o dia de uma parcela.</small>
+                </span>
+                <div className="rcb-form__simnao" role="radiogroup" aria-label="Mostrar no Calendário e no Checklist?">
+                  {[
+                    [true, 'Sim'],
+                    [false, 'Não'],
+                  ].map(([valor, texto]) => (
+                    <button key={texto} type="button" role="radio" aria-checked={formulario.noCalendario === valor} className={formulario.noCalendario === valor ? 'rcb-simnao rcb-simnao--ativo' : 'rcb-simnao'} onClick={() => atualizar({ noCalendario: valor })}>
+                      {texto}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* ===== Juros por atraso ===== */}
               <div className="rcb-form__juros">

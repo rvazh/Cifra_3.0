@@ -18,6 +18,8 @@ import {
   lancamentosDoMes,
   semTransferencias,
 } from '../dados/lancamentos.js';
+import ParcelaDivida from '../components/ParcelaDivida.jsx';
+import { parcelasDoMes, parcelasProximas, totaisDasParcelas } from '../dados/parcelas.js';
 import './Painel.css';
 import './Calendario.css';
 
@@ -77,6 +79,15 @@ export default function Calendario() {
   useEffect(() => salvar(lista), [lista]);
 
   const itensDoMes = useMemo(() => lancamentosDoMes(lista, mes), [lista, mes]);
+  // Parcelas de "A receber" e "A pagar" (ficam guardadas à parte; "versao" recarrega depois de uma mudança)
+  const [versao, setVersao] = useState(0);
+  const parcelas = useMemo(() => parcelasDoMes(mes), [mes, versao, lista]); // eslint-disable-line react-hooks/exhaustive-deps
+  const totaisParcelas = useMemo(() => totaisDasParcelas(mes), [mes, versao, lista]); // eslint-disable-line react-hooks/exhaustive-deps
+  function parcelaMudou(texto) {
+    setLista(carregar()); // registrar uma parcela pode criar lançamentos nas contas
+    setVersao((v) => v + 1);
+    setAviso(texto);
+  }
 
   // Agrupa os lançamentos por dia: { "2026-10-05": [...] }
   const porDia = useMemo(() => {
@@ -102,10 +113,11 @@ export default function Calendario() {
 
   // Resumo do mês
   const movimentos = semTransferencias(itensDoMes); // transferência entre contas não é entrada nem saída
-  const entradas = movimentos.filter((l) => l.valor > 0).reduce((s, l) => s + l.valor, 0);
-  const saidas = movimentos.filter((l) => l.valor < 0).reduce((s, l) => s - l.valor, 0);
-  const aPagar = movimentos.filter((l) => l.valor < 0 && !l.pago).reduce((s, l) => s - l.valor, 0);
-  const atrasadas = itensDoMes.filter((l) => !l.pago && l.data < hoje).length;
+  // Parcelas em aberto de "A receber"/"A pagar" entram no que ainda vai entrar e sair (as já pagas viraram lançamentos)
+  const entradas = movimentos.filter((l) => l.valor > 0).reduce((s, l) => s + l.valor, 0) + totaisParcelas.aReceber;
+  const saidas = movimentos.filter((l) => l.valor < 0).reduce((s, l) => s - l.valor, 0) + totaisParcelas.aPagar;
+  const aPagar = movimentos.filter((l) => l.valor < 0 && !l.pago).reduce((s, l) => s - l.valor, 0) + totaisParcelas.aPagar;
+  const atrasadas = itensDoMes.filter((l) => !l.pago && l.data < hoje).length + parcelas.filter((p) => p.tipo === 'pagar' && p.atrasada).length;
 
   // Próximos vencimentos: contas em aberto deste mês e do próximo (as atrasadas primeiro)
   const proximos = useMemo(() => {
@@ -113,12 +125,24 @@ export default function Calendario() {
     return [...lancamentosDoMes(lista, mesAtual), ...lancamentosDoMes(lista, mudarMes(mesAtual, 1))]
       .filter((l) => l.valor < 0 && !l.pago && !l.transferencia)
       .filter((l) => diasAte(l.data) <= 30)
+      .concat(
+        // Parcelas das suas dívidas ("A pagar") também vencem
+        parcelasProximas(30, 'pagar').map((p) => ({
+          id: p.chave,
+          data: p.vence,
+          descricao: `${p.divida.pessoa}${p.total > 1 ? ` (${p.numero}/${p.total})` : ''}`,
+          valor: -p.aPagarAgora,
+        }))
+      )
       .sort((a, b) => a.data.localeCompare(b.data))
       .slice(0, 5);
-  }, [lista, hoje]);
+  }, [lista, hoje, versao]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doDia = (diaEscolhido.startsWith(mes) && porDia[diaEscolhido]) || [];
-  const saldoDoDia = doDia.reduce((s, l) => s + l.valor, 0);
+  const parcelasDoDia = parcelas.filter((p) => p.vence === diaEscolhido);
+  const saldoDoDia =
+    doDia.reduce((s, l) => s + l.valor, 0) +
+    parcelasDoDia.filter((p) => p.estado !== 'paga').reduce((s, p) => s + (p.tipo === 'receber' ? p.aPagarAgora : -p.aPagarAgora), 0);
 
   function irPara(data) {
     setMes(data.slice(0, 7));
@@ -301,16 +325,16 @@ export default function Calendario() {
             <section className="cartao cal-dia" aria-live="polite">
               <div className="cal-dia__topo">
                 <h2 className="cartao__titulo">{diaPorExtenso(diaEscolhido)}</h2>
-                {doDia.length > 0 && (
+                {doDia.length + parcelasDoDia.length > 0 && (
                   <b className={saldoDoDia >= 0 ? 'cal-dia__saldo valor--entrada' : 'cal-dia__saldo valor--saida'}>
                     {valorComSinal(saldoDoDia)}
                   </b>
                 )}
               </div>
 
-              {doDia.length === 0 ? (
+              {doDia.length === 0 && parcelasDoDia.length === 0 ? (
                 <p className="cal-dia__vazio">Nada marcado para este dia.</p>
-              ) : (
+              ) : doDia.length === 0 ? null : (
                 <ul className="cal-dia__lista">
                   {doDia.map((l) => {
                     const s = situacao(l, hoje);
@@ -337,6 +361,14 @@ export default function Calendario() {
                       </li>
                     );
                   })}
+                </ul>
+              )}
+
+              {parcelasDoDia.length > 0 && (
+                <ul className="cal-dia__lista cal-dia__parcelas">
+                  {parcelasDoDia.map((p) => (
+                    <ParcelaDivida key={p.chave} p={p} aoMudar={parcelaMudou} />
+                  ))}
                 </ul>
               )}
 
@@ -452,6 +484,52 @@ export default function Calendario() {
                 </form>
               )}
             </section>
+
+            {/* ===== Parcelas de A receber e A pagar neste mês ===== */}
+            {parcelas.length > 0 && (
+              <section className="cartao">
+                <div className="cartao__titulo-linha">
+                  <h2 className="cartao__titulo">Parcelas do mês</h2>
+                  <span className="cal-parcelas__links">
+                    <Link to="/painel/receber" className="cartao__link">
+                      A receber
+                    </Link>
+                    <Link to="/painel/pagar" className="cartao__link">
+                      A pagar
+                    </Link>
+                  </span>
+                </div>
+                <ul className="cal-proximos">
+                  {parcelas.map((p) => {
+                    const [, m, d] = p.vence.split('-');
+                    const receber = p.tipo === 'receber';
+                    return (
+                      <li key={p.chave}>
+                        <button type="button" className="cal-proximo" onClick={() => irPara(p.vence)}>
+                          <span className={p.atrasada ? 'vencimento cal-proximo__data--atrasado' : 'vencimento'}>
+                            <b>{Number(d)}</b>
+                            {MESES_CURTOS[Number(m) - 1]}
+                          </span>
+                          <span className="cal-proximo__textos">
+                            <b className="cal-proximo__nome">
+                              {receber ? '🤝 ' : '🧾 '}
+                              {p.divida.pessoa}
+                              {p.total > 1 ? ` (${p.numero}/${p.total})` : ''}
+                            </b>
+                            <span className={p.atrasada ? 'cal-proximo__quando valor--saida' : 'cal-proximo__quando'}>
+                              {p.estado === 'paga' ? (receber ? 'Recebida' : 'Paga') : `${receber ? 'A receber' : 'A pagar'} · ${quandoVence(p.vence)}`}
+                            </span>
+                          </span>
+                          <b className={receber ? 'cal-proximo__valor valor--entrada' : 'cal-proximo__valor'}>
+                            {reais(p.estado === 'paga' ? p.valor : p.aPagarAgora)}
+                          </b>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
 
             {/* ===== Próximos vencimentos ===== */}
             <section className="cartao">

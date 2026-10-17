@@ -48,7 +48,13 @@ export function temJuros(d) {
   return Boolean(d.juros?.ativo && d.primeiroVencimento && ((d.juros.mes || 0) > 0 || (d.juros.multa || 0) > 0));
 }
 
-function valoresDasParcelas(d) {
+// Data de vencimento de uma parcela: a pessoa pode mudar o dia de uma parcela no Calendário ou no Checklist
+export function vencimentoDaParcela(d, numero) {
+  if (!d.primeiroVencimento) return null;
+  return d.datasAjustadas?.[numero] || somarMeses(d.primeiroVencimento, numero - 1);
+}
+
+export function valoresDasParcelas(d) {
   const n = Math.max(1, d.parcelas || 1);
   const cada = centavos(d.valor / n);
   return Array.from({ length: n }, (_, i) => (i < n - 1 ? cada : centavos(d.valor - cada * (n - 1))));
@@ -57,7 +63,7 @@ function valoresDasParcelas(d) {
 // Simula a dívida do começo até "ate" (hoje) e devolve quanto do que foi pago foi para juros e quanto para as parcelas
 export function simularJuros(d, recebimentos = d.recebimentos || [], ate = dataDeHoje()) {
   const parcelas = valoresDasParcelas(d);
-  const vencimentos = parcelas.map((_, i) => somarMeses(d.primeiroVencimento, i));
+  const vencimentos = parcelas.map((_, i) => vencimentoDaParcela(d, i + 1));
   const aberto = [...parcelas];
   const multaAplicada = parcelas.map(() => false);
   const taxaDia = (d.juros?.mes || 0) / 100 / 30;
@@ -139,7 +145,7 @@ export function situacaoDaDivida(d) {
   let proxima = null;
   if (!quitada) {
     const numero = Math.min(parcelasPagas + 1, parcelas);
-    const vence = d.primeiroVencimento ? somarMeses(d.primeiroVencimento, numero - 1) : null;
+    const vence = vencimentoDaParcela(d, numero);
     // O que falta desta parcela (se já recebeu uma parte dela, mostra só o resto)
     const valor = centavos(Math.max(0, Math.min(falta, valorParcela * numero - recebido)));
     const dias = vence ? diasAte(vence) : null;

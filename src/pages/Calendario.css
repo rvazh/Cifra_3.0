@@ -585,3 +585,13 @@
     font-size: 18px;
   }
 }
+
+/* Parcelas de A receber / A pagar */
+.cal-parcelas__links {
+  display: flex;
+  gap: 12px;
+}
+
+.cal-dia__parcelas {
+  margin-top: 4px;
+}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IconeMais } from './Icones.jsx';
 import { EMAIL_CONTATO } from '../config.js';
+import fotoPerguntas from '../assets/perguntas-foto.webp';
 import './Perguntas.css';
 
 const perguntas = [
@@ -57,6 +58,8 @@ export default function Perguntas() {
           <h2 className="faq__titulo">Perguntas frequentes</h2>
         </div>
 
+        <div className="faq__corpo">
+          <div className="faq__coluna">
         <div className="faq__lista">
           {perguntas.map((item, indice) => {
             const estaAberta = aberta === indice;
@@ -95,6 +98,13 @@ export default function Perguntas() {
           <Link to="/quem-somos" className="faq__ajuda-botao">
             Fale conosco
           </Link>
+        </div>
+          </div>
+
+          {/* Foto ao lado direito das perguntas */}
+          <figure className="faq__foto">
+            <img src={fotoPerguntas} alt="Mulher sorrindo enquanto usa o celular" width="736" height="1308" loading="lazy" />
+          </figure>
         </div>
       </div>
     </section>

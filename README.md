@@ -3,6 +3,8 @@
 Gestão financeira pessoal — versão web.
 Feito com **React + React Router**, empacotado com **Vite**.
 
+![Tela inicial da CIFRA](docs/tela-inicial.png)
+
 ## Rodar no seu computador
 
 Precisa do [Node.js](https://nodejs.org) 18 ou mais novo.

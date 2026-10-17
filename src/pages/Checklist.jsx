@@ -16,6 +16,8 @@ import {
   modeloDaFixa,
 } from '../dados/lancamentos.js';
 import ReajustarFixa from '../components/ReajustarFixa.jsx';
+import ParcelaDivida from '../components/ParcelaDivida.jsx';
+import { parcelasDoMes } from '../dados/parcelas.js';
 import './Painel.css';
 import './Checklist.css';
 
@@ -222,12 +224,26 @@ export default function Checklist() {
   const fixas = contas.filter((l) => tipoDaConta(l) === 'fixa');
   const parceladas = contas.filter((l) => tipoDaConta(l) === 'parcelada');
 
+  // Parcelas de "A pagar" e "A receber" do mês (ficam guardadas à parte; "versao" recarrega depois de uma mudança)
+  const [versao, setVersao] = useState(0);
+  const [aviso, setAviso] = useState('');
+  const parcelas = useMemo(() => parcelasDoMes(mes), [mes, versao]); // eslint-disable-line react-hooks/exhaustive-deps
+  const aPagarDoMes = parcelas.filter((p) => p.tipo === 'pagar');
+  const aReceberDoMes = parcelas.filter((p) => p.tipo === 'receber');
+  function parcelaMudou(texto) {
+    setLista(carregar()); // registrar uma parcela pode criar lançamentos nas contas
+    setVersao((v) => v + 1);
+    setAviso(texto);
+  }
+
+  // As parcelas das suas dívidas entram nas contas do mês (pagas ou pendentes)
   const soma = (s) => contas.filter((l) => situacaoDe(l) === s).reduce((t, l) => t - l.valor, 0);
-  const total = contas.reduce((t, l) => t - l.valor, 0);
-  const pago = soma('pago');
+  const total = contas.reduce((t, l) => t - l.valor, 0) + aPagarDoMes.reduce((t, p) => t + p.valor, 0);
+  const pago = soma('pago') + aPagarDoMes.reduce((t, p) => t + (p.valor - p.falta), 0);
   const guardado = soma('guardado');
-  const pendente = soma('pendente');
-  const feitas = contas.filter((l) => situacaoDe(l) !== 'pendente').length;
+  const pendente = soma('pendente') + aPagarDoMes.reduce((t, p) => t + p.falta, 0);
+  const feitas = contas.filter((l) => situacaoDe(l) !== 'pendente').length + aPagarDoMes.filter((p) => p.estado === 'paga').length;
+  const quantidade = contas.length + aPagarDoMes.length;
   const pct = (v) => (total > 0 ? (v / total) * 100 : 0);
 
   const [reajustando, setReajustando] = useState(null);
@@ -265,7 +281,7 @@ export default function Checklist() {
               <b className="chk-resumo__total">{reais(total)}</b>
             </div>
             <span className="chk-resumo__contador">
-              {feitas} de {contas.length} {contas.length === 1 ? 'conta resolvida' : 'contas resolvidas'}
+              {feitas} de {quantidade} {quantidade === 1 ? 'conta resolvida' : 'contas resolvidas'}
             </span>
           </div>
           <div className="chk-barra" aria-hidden="true">
@@ -288,7 +304,41 @@ export default function Checklist() {
           </p>
         </section>
 
-        {contas.length === 0 ? (
+        {aviso && (
+          <p className="chk__aviso" role="status">
+            {aviso}
+          </p>
+        )}
+
+        {/* ===== Parcelas de A pagar e A receber ===== */}
+        {parcelas.length > 0 && (
+          <div className="chk__grupos">
+            {[
+              ['A pagar', 'Parcelas das suas dívidas', aPagarDoMes, '/painel/pagar'],
+              ['A receber', 'Parcelas que te devem', aReceberDoMes, '/painel/receber'],
+            ]
+              .filter(([, , itens]) => itens.length > 0)
+              .map(([titulo, sub, itens, rota]) => (
+                <section key={titulo} className="cartao chk-grupo">
+                  <div className="cartao__titulo-linha">
+                    <h2 className="cartao__titulo">
+                      {titulo} <span className="chk-grupo__qtd">{itens.length}</span>
+                    </h2>
+                    <Link to={rota} className="chk-grupo__sub chk-grupo__link">
+                      {sub} ›
+                    </Link>
+                  </div>
+                  <ul className="chk-lista">
+                    {itens.map((p) => (
+                      <ParcelaDivida key={p.chave} p={p} aoMudar={parcelaMudou} mostrarData />
+                    ))}
+                  </ul>
+                </section>
+              ))}
+          </div>
+        )}
+
+        {contas.length === 0 && parcelas.length > 0 ? null : contas.length === 0 ? (
           <section className="cartao chk-vazio">
             <b>Nenhuma conta fixa ou parcelada em {nomeDoMes(mes)}.</b>
             <span>

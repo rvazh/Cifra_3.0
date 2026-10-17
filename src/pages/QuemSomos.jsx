@@ -1,4 +1,4 @@
-import logoCifra from '../assets/cifra-logo.png';
+import fotoQuemSomos from '../assets/quem-somos-foto.webp';
 import { IconeCalendario, IconeBandeira, IconeSeta } from '../components/Icones.jsx';
 import { EMAIL_CONTATO } from '../config.js';
 import './QuemSomos.css';
@@ -50,14 +50,10 @@ export default function QuemSomos() {
             </div>
           </div>
 
-          {/* Cartão preto com a logo */}
-          <div className="qs-marca" aria-hidden="true">
-            <span className="qs-marca__fundo">
-              <img src={logoCifra} alt="" />
-            </span>
-            <span className="qs-marca__nome">CIFRA</span>
-            <span className="qs-marca__frase">Gerenciador financeiro de verdade</span>
-          </div>
+          {/* Foto ao lado do texto */}
+          <figure className="qs-foto">
+            <img src={fotoQuemSomos} alt="Homem sorrindo enquanto organiza as finanças pelo celular" width="736" height="1104" />
+          </figure>
         </div>
       </section>
 

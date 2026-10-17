@@ -1,0 +1,295 @@
+/* ===== Parcela de "A receber" / "A pagar" no Calendário e no Checklist ===== */
+.pcl {
+  list-style: none;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda);
+}
+
+.pcl:last-child {
+  border-bottom: none;
+}
+
+.pcl__linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pcl__data {
+  width: 44px;
+  flex-shrink: 0;
+  padding-top: 8px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.pcl__data b {
+  font-size: 18px;
+  color: var(--preto);
+}
+
+.pcl__icone {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: #e3f1e8;
+}
+
+.pcl--pagar .pcl__icone {
+  background: #f8e4e1;
+}
+
+.pcl__textos {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.pcl__nome {
+  font-size: 14.5px;
+  color: var(--preto);
+}
+
+.pcl__parcela {
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.pcl__detalhe {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--cinza);
+}
+
+.pcl__tag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.pcl__tag--receber {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.pcl__tag--pagar {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.pcl__selo {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  background: var(--fundo-painel);
+  color: var(--cinza);
+}
+
+.pcl__selo--ok {
+  background: #e3f1e8;
+  color: var(--positivo);
+}
+
+.pcl__selo--atrasada {
+  background: #f8e4e1;
+  color: var(--negativo);
+}
+
+.pcl__selo--hoje,
+.pcl__selo--parcial {
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+}
+
+.pcl__direita {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.pcl__valor {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.pcl--ok .pcl__valor {
+  opacity: 0.6;
+}
+
+.pcl__juros {
+  margin-top: -4px;
+  font-size: 11.5px;
+  color: var(--negativo);
+}
+
+.pcl__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.pcl__botao {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--preto);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pcl__botao:hover {
+  border-color: var(--preto);
+}
+
+.pcl__botao--principal {
+  border-color: var(--dourado);
+  background: var(--dourado);
+}
+
+.pcl__botao--principal:hover {
+  border-color: var(--dourado);
+  filter: brightness(1.05);
+}
+
+.pcl__link {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--dourado-escuro);
+  text-decoration: underline;
+}
+
+/* Formulário (registrar / mudar dia) */
+.pcl__form {
+  margin: 10px 0 0 52px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--dourado-claro);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.pcl__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  min-width: 0;
+}
+
+.pcl__form input,
+.pcl__form select {
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--borda);
+  background: var(--branco);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--preto);
+  min-width: 0;
+}
+
+.pcl__form input:focus,
+.pcl__form select:focus {
+  outline: none;
+  border-color: var(--dourado);
+}
+
+.pcl__nota,
+.pcl__erro,
+.pcl__acoes {
+  grid-column: 1 / -1;
+}
+
+.pcl__nota {
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+.pcl__erro {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--negativo);
+}
+
+.pcl__acoes {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 560px) {
+  .pcl__linha {
+    flex-wrap: wrap;
+  }
+
+  .pcl__direita {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 10px;
+    padding-left: 0;
+  }
+
+  .pcl__juros {
+    margin-top: 0;
+  }
+
+  .pcl__form {
+    margin-left: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* No painel do dia do Calendário (coluna estreita): valor e botões vão para baixo do nome */
+.cal-dia .pcl__linha {
+  flex-wrap: wrap;
+}
+
+.cal-dia .pcl__direita {
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 52px;
+}
+
+.cal-dia .pcl__form {
+  margin-left: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cal-dia .pcl__form label:nth-of-type(3) {
+  grid-column: 1 / -1;
+}

@@ -492,3 +492,22 @@
     font-size: 14px;
   }
 }
+
+/* Aviso depois de registrar uma parcela e link do grupo */
+.chk__aviso {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #e3f1e8;
+  color: var(--positivo);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.chk-grupo__link {
+  color: var(--dourado-escuro);
+  font-weight: 700;
+}
+
+.chk-grupo__link:hover {
+  text-decoration: underline;
+}

@@ -842,3 +842,15 @@
   color: var(--texto-suave);
   line-height: 1.5;
 }
+
+.rcb-form__pergunta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rcb-form__sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cinza);
+}

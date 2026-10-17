@@ -35,7 +35,8 @@ export default function BotaoAtendimento() {
   }, [aberto]);
 
   const linkWhatsApp = `https://wa.me/${WHATSAPP_ATENDIMENTO.numero}?text=${encodeURIComponent(MENSAGEM)}`;
-  const linkEmail = `mailto:${EMAIL_SUPORTE}?subject=${encodeURIComponent('Atendimento CIFRA')}`;
+  // E-mail: abre o Gmail já com o e-mail de suporte, o assunto e uma mensagem inicial
+  const linkEmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(EMAIL_SUPORTE)}&su=${encodeURIComponent('Atendimento CIFRA')}&body=${encodeURIComponent(MENSAGEM)}`;
 
   return (
     <div className="atd">
@@ -54,7 +55,7 @@ export default function BotaoAtendimento() {
               <small>{WHATSAPP_ATENDIMENTO.texto}</small>
             </span>
           </a>
-          <a className="atd__opcao atd__opcao--email" href={linkEmail} onClick={() => setAberto(false)}>
+          <a className="atd__opcao atd__opcao--email" href={linkEmail} target="_blank" rel="noopener noreferrer" onClick={() => setAberto(false)}>
             <span className="atd__icone">
               <IconeEmail tamanho={20} espessura={2} />
             </span>
