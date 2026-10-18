@@ -36,8 +36,9 @@ import { pedirPermissaoDeAviso } from '../dados/alertas.js';
 import { apagarTodosComprovantes } from '../dados/comprovantes.js';
 import './Painel.css';
 import { situacaoDoPlano } from '../dados/plano.js';
-import { chave, chavesDoUsuario, nomeDaChave, usuarioAtualId } from '../dados/armazenamento.js';
-import { encerrarSessao, irPara } from '../dados/acesso.js';
+import { chave, chavesDoUsuario, nomeDaChave } from '../dados/armazenamento.js';
+import { irPara } from '../dados/acesso.js';
+import { enviarPendentes } from '../dados/nuvem.js';
 import './Configuracoes.css';
 
 const VERSAO = '1.0';
@@ -50,7 +51,7 @@ function lerNome() {
   }
 }
 
-// Todas as informações da pessoa logada guardadas neste navegador
+// Todas as informações da pessoa logada (cópia local da conta na nuvem)
 // (cada pessoa tem as suas; as de outras contas não entram)
 function chavesDaCifra() {
   return chavesDoUsuario();
@@ -111,7 +112,7 @@ export default function Configuracoes() {
   const local = useLocation();
   // O Painel pode pedir para abrir uma janela direto (ex.: "Ajustar limites" do orçamento)
   const [janela, setJanela] = useState(local.state?.abrir || null); // 'perfil' | 'categorias' | 'dados' | 'senha' | 'excluir' | 'orcamento' | 'fixas'
-  const [conta, setConta] = useState(usuarioAtual); // quem criou conta (null no acesso de teste)
+  const [conta, setConta] = useState(usuarioAtual); // a pessoa logada (perfil guardado no Supabase)
   const [qtdOrcamentos, setQtdOrcamentos] = useState(() => Object.keys(carregarOrcamentos()).length);
   const [qtdFixas, setQtdFixas] = useState(() => listarFixas(carregar()).filter((f) => !f.encerradaEm).length);
   const [rascunho, setRascunho] = useState({ nome: '', email: '' });
@@ -155,7 +156,7 @@ export default function Configuracoes() {
   }, [janela]);
 
   function abrirPerfil() {
-    // Quem criou conta edita o cadastro completo; o acesso de teste edita só nome e e-mail
+    // Abre o cadastro completo (a janela simples "perfil" só aparece se o cadastro não carregou)
     if (conta) {
       setJanela('dados');
       return;
@@ -165,7 +166,7 @@ export default function Configuracoes() {
   }
 
   // Depois de salvar "Meus dados": atualiza o nome do painel e o e-mail das preferências
-  function dadosSalvos(novo) {
+  function dadosSalvos(novo, emailPendente) {
     setConta(novo);
     try {
       localStorage.setItem(chave('usuario'), novo.nome);
@@ -173,9 +174,8 @@ export default function Configuracoes() {
       /* sem acesso ao armazenamento */
     }
     setNome(novo.nome);
-    mudar('email', novo.email);
     setJanela(null);
-    setMensagem('Dados atualizados.');
+    setMensagem(emailPendente ? 'Dados salvos. Confirme o novo e-mail pelo link que enviamos.' : 'Dados atualizados.');
   }
 
   function salvarPerfil(evento) {
@@ -241,17 +241,23 @@ export default function Configuracoes() {
         setMensagem('Esse arquivo não é um backup da CIFRA.');
         return;
       }
-      if (!window.confirm('Restaurar este backup? Os dados atuais deste aparelho serão substituídos pelos do arquivo.')) return;
+      if (!window.confirm('Restaurar este backup? Os dados atuais da sua conta serão substituídos pelos do arquivo (em todos os aparelhos).')) return;
       try {
-        chavesDaCifra().forEach((k) => localStorage.removeItem(k));
+        // O cadastro e a lista de comprovantes (arquivos na nuvem) continuam como estão
+        const manter = [chave('perfil'), chave('comprovantes')];
+        chavesDaCifra()
+          .filter((k) => !manter.includes(k))
+          .forEach((k) => localStorage.removeItem(k));
         Object.entries(conteudo.dados)
           .filter(([k]) => k.startsWith('cifra:') && !k.startsWith('cifra:u:') && !['cifra:sessao', 'cifra:usuarios'].includes(k))
+          .filter(([k]) => !['cifra:comprovantes', 'cifra:perfil'].includes(k)) // arquivos e cadastro não vêm no backup
           .forEach(([k, v]) => localStorage.setItem(chave(k.slice('cifra:'.length)), typeof v === 'string' ? v : JSON.stringify(v)));
       } catch {
         setMensagem('Não foi possível restaurar neste navegador.');
         return;
       }
-      window.location.reload();
+      setMensagem('Restaurando…');
+      enviarPendentes().finally(() => window.location.reload());
     };
     leitor.readAsText(arquivo);
   }
@@ -259,14 +265,14 @@ export default function Configuracoes() {
   // ----- Apagar -----
   async function apagarTudo() {
     const certeza = window.confirm(
-      'Apagar todos os dados da sua conta neste aparelho?\n\nContas, lançamentos, objetivos, comprovantes e preferências serão apagados. Não tem volta.'
+      'Apagar todos os dados da sua conta?\n\nContas, lançamentos, objetivos, comprovantes e preferências serão apagados em todos os aparelhos. A conta continua existindo. Não tem volta.'
     );
     if (!certeza) return;
     try {
-      // Quem criou conta continua com o nome do cadastro; o resto é apagado
-      const manter = usuarioAtualId() ? chave('usuario') : null;
+      // Continua com o nome e o cadastro; o resto é apagado (aqui e na nuvem)
+      const manter = [chave('usuario'), chave('perfil'), chave('comprovantes')];
       chavesDaCifra()
-        .filter((k) => k !== manter)
+        .filter((k) => !manter.includes(k))
         .forEach((k) => localStorage.removeItem(k));
     } catch {
       /* sem acesso ao armazenamento */
@@ -276,8 +282,8 @@ export default function Configuracoes() {
     salvarContas([]);
     salvarObjetivos([]);
     await apagarTodosComprovantes();
-    encerrarSessao();
-    irPara('/entrar');
+    await enviarPendentes();
+    irPara('/painel');
   }
 
   const diasDeAviso = [1, 3, 5, 7];
@@ -562,7 +568,7 @@ export default function Configuracoes() {
               </Linha>
             </button>
             <button type="button" className="cfg-linha" onClick={() => arquivoBackup.current?.click()}>
-              <Linha Icone={IconeEnviar} titulo="Restaurar backup" sub="Substitui os dados deste aparelho pelos do arquivo">
+              <Linha Icone={IconeEnviar} titulo="Restaurar backup" sub="Substitui os dados da sua conta pelos do arquivo">
                 <Seta />
               </Linha>
             </button>
@@ -610,7 +616,7 @@ export default function Configuracoes() {
               </button>
             ) : (
               <div className="cfg-linha cfg-linha--desligada">
-                <Linha Icone={IconeUsuario} titulo="Excluir minha conta" sub="O acesso de teste não pode ser excluído" perigo />
+                <Linha Icone={IconeUsuario} titulo="Excluir minha conta" sub="Entre de novo para poder excluir a conta" perigo />
               </div>
             )}
           </Grupo>
@@ -653,7 +659,7 @@ export default function Configuracoes() {
                   value={rascunho.email}
                   onChange={(e) => setRascunho({ ...rascunho, email: e.target.value })}
                 />
-                <span>Fica só neste aparelho. A CIFRA não envia e-mails.</span>
+                <span>Usado nos lembretes e no resumo mensal.</span>
               </label>
               <div className="cfg-janela__acoes">
                 <button type="submit" className="cfg-botao cfg-botao--principal">
@@ -671,7 +677,6 @@ export default function Configuracoes() {
         {janela === 'dados' && conta && <EditarDados usuario={conta} aoSalvar={dadosSalvos} aoFechar={() => setJanela(null)} />}
         {janela === 'senha' && conta && (
           <TrocarSenha
-            usuario={conta}
             aoFechar={() => setJanela(null)}
             aoSalvar={() => {
               setJanela(null);
@@ -679,7 +684,7 @@ export default function Configuracoes() {
             }}
           />
         )}
-        {janela === 'excluir' && conta && <ExcluirConta usuario={conta} aoFechar={() => setJanela(null)} />}
+        {janela === 'excluir' && conta && <ExcluirConta aoFechar={() => setJanela(null)} />}
 
         {janela === 'orcamento' && (
           <OrcamentoCategorias

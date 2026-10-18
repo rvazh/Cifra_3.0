@@ -345,3 +345,38 @@
     min-width: 0;
   }
 }
+
+/* Tela "Confirme o seu e-mail" (depois de criar a conta) */
+.cad__confirmar {
+  text-align: center;
+  align-items: center;
+}
+
+.cad__confirmar .cad__sub b {
+  color: inherit;
+}
+
+.cad__confirmar-acoes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 8px;
+}
+
+/* Telas curtas (Esqueci minha senha / Nova senha) usam o mesmo cartão, mais estreito */
+.cad__form--estreito {
+  max-width: 460px;
+  gap: 18px;
+}
+
+.cad__form--estreito > .entrar__link-forte,
+.cad__confirmar .entrar__link-forte {
+  align-self: flex-start;
+}
+
+.cad__confirmar .entrar__link-forte {
+  align-self: center;
+}

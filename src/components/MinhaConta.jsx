@@ -6,13 +6,11 @@ import {
   emailValido,
   excluirUsuario,
   mascaraCEP,
-  mascaraCPF,
   regrasDaSenha,
   soNumeros,
   trocarSenha,
 } from '../dados/usuarios.js';
-import { encerrarSessao, irPara } from '../dados/acesso.js';
-import { apagarTodosComprovantes } from '../dados/comprovantes.js';
+import { irPara } from '../dados/acesso.js';
 import './MinhaConta.css';
 
 // Moldura das janelas (fundo escuro + caixa branca)
@@ -54,7 +52,7 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
   const [f, setF] = useState({
     nome: usuario.nome,
     sobrenome: usuario.sobrenome,
-    email: usuario.email,
+    email: usuario.emailNovo || usuario.email,
     cep: mascaraCEP(e.cep),
     rua: e.rua || '',
     numero: e.numero || '',
@@ -64,6 +62,7 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
     uf: e.uf || '',
   });
   const [erro, setErro] = useState('');
+  const [salvando, setSalvando] = useState(false);
   const mudar = (campo, valor) => {
     setF((atual) => ({ ...atual, [campo]: valor }));
     setErro('');
@@ -79,21 +78,23 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
     }
   }
 
-  function salvar(evento) {
+  async function salvar(evento) {
     evento.preventDefault();
     if (!f.nome.trim() || !f.sobrenome.trim()) return setErro('Preencha o nome e o sobrenome.');
     if (!emailValido(f.email)) return setErro('Este e-mail não parece certo. Ex.: nome@email.com');
     if (soNumeros(f.cep).length !== 8) return setErro('O CEP tem 8 números.');
     if (!f.rua.trim() || !f.numero.trim() || !f.bairro.trim() || !f.cidade.trim() || !f.uf) return setErro('Preencha o endereço completo (só o complemento é opcional).');
+    setSalvando(true);
     try {
-      const novo = atualizarUsuario(usuario.id, {
+      const { usuario: novo, emailPendente } = await atualizarUsuario({
         nome: f.nome,
         sobrenome: f.sobrenome,
         email: f.email,
         endereco: { cep: f.cep, rua: f.rua, numero: f.numero, complemento: f.complemento, bairro: f.bairro, cidade: f.cidade, uf: f.uf },
       });
-      aoSalvar(novo);
+      aoSalvar(novo, emailPendente);
     } catch (falha) {
+      setSalvando(false);
       setErro(falha.message);
     }
     return undefined;
@@ -112,11 +113,11 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
         {campo('Nome', 'nome', { props: { autoFocus: true, autoComplete: 'given-name' } })}
         {campo('Sobrenome', 'sobrenome', { props: { autoComplete: 'family-name' } })}
         {campo('E-mail', 'email', { classe: 'mc-inteiro', props: { type: 'email', autoComplete: 'email' } })}
-        <label className="cfg-campo">
-          CPF
-          <input value={mascaraCPF(usuario.cpf)} disabled />
-          <span>O CPF não muda. Se estiver errado, fale com a gente.</span>
-        </label>
+        {usuario.emailNovo && usuario.emailNovo !== usuario.email && (
+          <p className="mc-inteiro mc-nota">
+            Troca para <b>{usuario.emailNovo}</b> esperando confirmação pelo link enviado. Até lá, entre com {usuario.email}.
+          </p>
+        )}
         <label className="cfg-campo">
           CEP
           <input value={f.cep} inputMode="numeric" onChange={(ev) => mudarCEP(ev.target.value)} />
@@ -140,8 +141,8 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
       </div>
       <Erro texto={erro} />
       <div className="cfg-janela__acoes">
-        <button type="submit" className="cfg-botao cfg-botao--principal">
-          Salvar
+        <button type="submit" className="cfg-botao cfg-botao--principal" disabled={salvando}>
+          {salvando ? 'Salvando…' : 'Salvar'}
         </button>
         <button type="button" className="cfg-botao" onClick={aoFechar}>
           Cancelar
@@ -152,7 +153,7 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
 }
 
 // ===== Trocar a senha =====
-export function TrocarSenha({ usuario, aoSalvar, aoFechar }) {
+export function TrocarSenha({ aoSalvar, aoFechar }) {
   const [atual, setAtual] = useState('');
   const [nova, setNova] = useState('');
   const [confirmar, setConfirmar] = useState('');
@@ -168,7 +169,13 @@ export function TrocarSenha({ usuario, aoSalvar, aoFechar }) {
     if (nova !== confirmar) return setErro('A confirmação não é igual à nova senha.');
     if (nova === atual) return setErro('A nova senha precisa ser diferente da atual.');
     setSalvando(true);
-    const certo = await trocarSenha(usuario.id, atual, nova);
+    let certo = false;
+    try {
+      certo = await trocarSenha(atual, nova);
+    } catch (falha) {
+      setSalvando(false);
+      return setErro(falha.message);
+    }
     setSalvando(false);
     if (!certo) {
       setAtual('');
@@ -217,7 +224,7 @@ export function TrocarSenha({ usuario, aoSalvar, aoFechar }) {
 }
 
 // ===== Excluir a conta =====
-export function ExcluirConta({ usuario, aoFechar }) {
+export function ExcluirConta({ aoFechar }) {
   const [senha, setSenha] = useState('');
   const [entendi, setEntendi] = useState(false);
   const [erro, setErro] = useState('');
@@ -229,13 +236,18 @@ export function ExcluirConta({ usuario, aoFechar }) {
     if (!senha) return setErro('Digite a sua senha para confirmar.');
     setExcluindo(true);
     // Confere a senha antes de apagar qualquer coisa
-    const certo = await excluirUsuario(usuario.id, senha, async () => apagarTodosComprovantes());
+    let certo = false;
+    try {
+      certo = await excluirUsuario(senha);
+    } catch (falha) {
+      setExcluindo(false);
+      return setErro(falha.message);
+    }
     if (!certo) {
       setExcluindo(false);
       setSenha('');
       return setErro('Senha incorreta. Nada foi apagado.');
     }
-    encerrarSessao();
     irPara('/');
     return undefined;
   }

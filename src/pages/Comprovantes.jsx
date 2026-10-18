@@ -133,7 +133,7 @@ export default function Comprovantes() {
         <div className="pp__topo">
           <div>
             <h1 className="pp__titulo">Comprovantes</h1>
-            <p className="pp__subtitulo">Fotos e PDFs dos seus pagamentos, guardados neste aparelho</p>
+            <p className="pp__subtitulo">Fotos e PDFs dos seus pagamentos, guardados na sua conta</p>
           </div>
         </div>
 
@@ -242,8 +242,8 @@ export default function Comprovantes() {
         )}
 
         <p className="comp__nota">
-          Os comprovantes ficam só neste navegador e não entram no backup de Configurações. Para guardar uma cópia, use o
-          botão de baixar.
+          Os comprovantes ficam guardados na sua conta (aparecem em todos os seus aparelhos), mas não entram no arquivo de
+          backup de Configurações. Para guardar uma cópia no computador, use o botão de baixar.
         </p>
 
         {/* ===== Janela: ver comprovante ===== */}

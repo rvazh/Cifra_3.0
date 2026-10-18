@@ -67,12 +67,19 @@ export default function Privacidade() {
         </h2>
         <p>
           A CIFRA valoriza a simplicidade, a transparência e a privacidade de quem usa a
-          plataforma. Para criar a sua conta, pedimos: nome e sobrenome, e-mail, CPF, idade,
-          endereço e uma senha. O e-mail ou o CPF servem para você entrar na conta; o CPF e a idade
-          servem para confirmar que a conta é de uma pessoa real e maior de idade; o endereço é
-          usado para a cobrança dos planos pagos. A sua senha nunca é guardada como você a digitou:
-          ela é salva embaralhada, de um jeito que não dá para desfazer. Não pedimos senhas de
-          banco nem fotos de documentos.
+          plataforma. Para criar a sua conta, pedimos: nome e sobrenome, e-mail, idade, endereço e
+          uma senha. O e-mail serve para você entrar na conta e receber os links de confirmação e de
+          troca de senha; a idade serve para confirmar que a conta é de uma pessoa maior de idade; o
+          endereço será usado para a cobrança dos planos pagos. Não pedimos CPF, senhas de banco nem
+          fotos de documentos. A sua senha nunca é guardada como você a digitou: ela é salva
+          embaralhada, de um jeito que não dá para desfazer.
+        </p>
+        <p>
+          A sua conta e as informações que você registra ficam guardadas no Supabase, o serviço de
+          banco de dados que a CIFRA usa, em servidores nos Estados Unidos. Cada conta só consegue ler
+          e alterar as próprias informações. Uma cópia fica também no navegador do aparelho em que você
+          está logado, para o app abrir rápido e funcionar sem internet; ela é apagada quando você sai
+          da conta.
         </p>
         <p>
           As informações financeiras que você registra, como ganhos, gastos e outros lançamentos,

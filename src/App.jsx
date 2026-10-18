@@ -26,10 +26,13 @@ import TesteGratis from './pages/TesteGratis.jsx';
 import Cadastro from './pages/Cadastro.jsx';
 import Receber from './pages/Receber.jsx';
 import Pagar from './pages/Pagar.jsx';
+import RecuperarSenha from './pages/RecuperarSenha.jsx';
+import NovaSenha from './pages/NovaSenha.jsx';
+import AvisoNuvem from './components/AvisoNuvem.jsx';
 import BotaoAtendimento from './components/BotaoAtendimento.jsx';
 
 // Páginas que aparecem sem o cabeçalho e o rodapé do site
-const telasSemMenu = ['/entrar', '/cadastro', '/privacidade', '/termos'];
+const telasSemMenu = ['/entrar', '/cadastro', '/recuperar-senha', '/nova-senha', '/privacidade', '/termos'];
 
 // O painel (e tudo dentro de /painel) também aparece sem o menu do site
 function semMenu(caminho) {
@@ -82,7 +85,8 @@ export default function App() {
             element={<EmBreve titulo="Em construção" voltarPara="/painel" voltarTexto="Voltar para o painel" />}
           />
           <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/recuperar-senha" element={<EmBreve titulo="Recuperar senha" />} />
+          <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+          <Route path="/nova-senha" element={<NovaSenha />} />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/termos" element={<Termos />} />
           <Route path="*" element={<EmBreve titulo="Página não encontrada" />} />
@@ -90,6 +94,7 @@ export default function App() {
       </main>
       {mostrarMenu && <Footer />}
       <AlertasDeVencimento />
+      {pathname.startsWith('/painel') && <AvisoNuvem />}
       <BotaoAtendimento />
     </div>
   );

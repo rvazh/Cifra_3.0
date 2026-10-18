@@ -1,12 +1,12 @@
 // ===== Onde cada pessoa guarda as suas informações =====
-// Cada pessoa que cria conta tem as suas próprias chaves no navegador:
-//   cifra:u:<id da pessoa>:lancamentos, cifra:u:<id>:contas ...
-// O acesso de teste (o primeiro login da CIFRA) continua usando as chaves antigas:
-//   cifra:lancamentos, cifra:contas ...
-// Assim ninguém vê os dados de outra pessoa, mesmo usando o mesmo navegador.
+// Cada pessoa logada tem as suas próprias chaves no navegador:
+//   cifra:u:<id da pessoa no Supabase>:lancamentos, cifra:u:<id>:contas ...
+// Essas chaves são uma cópia local: o arquivo nuvem.js envia cada mudança para o Supabase
+// e baixa tudo de volta ao abrir o site (assim funciona em vários aparelhos).
+// As chaves antigas sem id (cifra:lancamentos...) eram do antigo acesso de teste; só são lidas
+// uma vez, para levar esses dados para uma conta de verdade.
 
 export const CHAVE_SESSAO = 'cifra:sessao';
-const SESSAO_TESTE = 'ativa'; // valor da sessão do acesso de teste
 const PREFIXO_PESSOA = 'u:'; // valor da sessão de quem criou conta: "u:<id>"
 
 // Chaves que são do navegador inteiro, não de uma pessoa
@@ -20,21 +20,21 @@ function lerSessao() {
   }
 }
 
-// id de quem está logado com conta criada (ou null para o acesso de teste / ninguém)
+// id de quem está logado (ou null se ninguém)
 export function usuarioAtualId() {
   const sessao = lerSessao();
   return sessao && sessao.startsWith(PREFIXO_PESSOA) ? sessao.slice(PREFIXO_PESSOA.length) : null;
 }
 
 export function temSessao() {
-  const sessao = lerSessao();
-  return sessao === SESSAO_TESTE || Boolean(usuarioAtualId());
+  return Boolean(usuarioAtualId());
 }
 
-// Abre a sessão: sem id = acesso de teste; com id = pessoa que criou conta
-export function gravarSessao(id = null) {
+// Abre a sessão da pessoa (o login de verdade é feito pelo Supabase, em nuvem.js)
+export function gravarSessao(id) {
+  if (!id) return;
   try {
-    localStorage.setItem(CHAVE_SESSAO, id ? `${PREFIXO_PESSOA}${id}` : SESSAO_TESTE);
+    localStorage.setItem(CHAVE_SESSAO, `${PREFIXO_PESSOA}${id}`);
   } catch {
     /* sem acesso ao armazenamento */
   }

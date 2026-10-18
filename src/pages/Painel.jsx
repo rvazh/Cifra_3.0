@@ -29,7 +29,7 @@ function saudacao() {
   return 'Boa noite';
 }
 
-// Nome digitado na tela de login (fica salvo só neste aparelho)
+// Nome da pessoa (vem do cadastro e é sincronizado com a conta)
 function nomeDoUsuario() {
   try {
     return localStorage.getItem(chave('usuario')) || '';

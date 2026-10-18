@@ -1,0 +1,44 @@
+/* Faixa de aviso da sincronização (sem internet / novidades de outro aparelho) */
+.aviso-nuvem {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 60;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px 10px 16px;
+  border-radius: 14px;
+  background: var(--esc-fundo);
+  border: 1px solid var(--esc-linha-forte);
+  color: var(--esc-texto);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.aviso-nuvem--erro {
+  border-color: var(--dourado);
+}
+
+.aviso-nuvem__botao {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--dourado);
+  color: #141414;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .aviso-nuvem {
+    bottom: 84px; /* acima do botão de atendimento */
+    width: calc(100vw - 32px);
+    font-size: 13px;
+  }
+}

@@ -496,6 +496,27 @@
   font-weight: 600;
 }
 
+/* Aviso neutro (ex.: link de e-mail expirado, e-mail reenviado) */
+.entrar__aviso {
+  margin: -4px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f6efd9;
+  color: #5c4a12;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.entrar__reenviar {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .entrar__botao:disabled {
   opacity: 0.7;
   cursor: wait;

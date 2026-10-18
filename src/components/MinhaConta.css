@@ -99,3 +99,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Troca de e-mail esperando confirmação */
+.mc-nota {
+  margin: -4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}

@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
 import { IconeSeta, IconeCheck } from '../components/Icones.jsx';
-import { conferirAcesso, iniciarSessao, irPara } from '../dados/acesso.js';
-import { entrarComUsuario, pareceEmailOuCPF } from '../dados/usuarios.js';
+import { irPara } from '../dados/acesso.js';
+import { entrarComUsuario, reenviarConfirmacao, emailValido } from '../dados/usuarios.js';
+import { lerAvisoDoEntrar } from '../dados/nuvem.js';
 import { iniciarTeste, DIAS_DE_TESTE } from '../dados/plano.js';
 import './Entrar.css';
 
@@ -39,40 +40,40 @@ export default function Entrar() {
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
+  const [aviso, setAviso] = useState(lerAvisoDoEntrar); // ex.: "Este link expirou" (vindo de um link de e-mail)
+  const [faltaConfirmar, setFaltaConfirmar] = useState(false);
   const [conferindo, setConferindo] = useState(false);
   const local = useLocation();
 
   async function enviar(evento) {
     evento.preventDefault(); // impede a página de recarregar
+    setAviso('');
+    setFaltaConfirmar(false);
     if (!usuario.trim() || !senha) {
-      setErro('Preencha o e-mail ou CPF e a senha.');
+      setErro('Preencha o e-mail e a senha.');
+      return;
+    }
+    if (!emailValido(usuario)) {
+      setErro('Digite o e-mail da sua conta. Ex.: nome@email.com');
       return;
     }
     setConferindo(true);
-    let idDaPessoa = null;
-    let certo = false;
+    let pessoa = null;
     try {
-      // 1) acesso de teste da CIFRA  2) contas criadas na tela "Criar conta" (e-mail ou CPF)
-      certo = await conferirAcesso(usuario, senha);
-      if (!certo && pareceEmailOuCPF(usuario)) {
-        const pessoa = await entrarComUsuario(usuario, senha);
-        if (pessoa) {
-          certo = true;
-          idDaPessoa = pessoa.id;
-        }
-      }
-    } catch {
+      // O Supabase confere o e-mail e a senha
+      pessoa = await entrarComUsuario(usuario, senha);
+    } catch (e) {
       setConferindo(false);
-      setErro('Não foi possível conferir o acesso neste navegador. Abra o site pelo endereço com https.');
+      setFaltaConfirmar(e.codigo === 'email_not_confirmed');
+      setErro(e.message || 'Não foi possível entrar agora. Tente de novo.');
       return;
     }
-    setConferindo(false);
-    if (!certo) {
-      setErro('E-mail/CPF ou senha incorretos.');
+    if (!pessoa) {
+      setConferindo(false);
+      setErro('E-mail ou senha incorretos.');
       setSenha('');
       return;
     }
-    iniciarSessao(idDaPessoa);
     // Veio da página "Teste grátis": o teste do Essencial começa agora
     if (local.state?.teste) iniciarTeste();
     // Volta para a tela que a pessoa tentou abrir, ou vai para o painel
@@ -80,9 +81,20 @@ export default function Entrar() {
     irPara(local.state?.de || '/painel');
   }
 
+  async function reenviar() {
+    try {
+      await reenviarConfirmacao(usuario);
+      setErro('');
+      setFaltaConfirmar(false);
+      setAviso('Enviamos um novo link de confirmação. Confira a caixa de entrada (e o spam).');
+    } catch (e) {
+      setErro(e.message);
+    }
+  }
+
   function entrarComGoogle() {
     // O login com o Google ainda não está ligado
-    setErro('Entrar com o Google ainda não está disponível. Use o e-mail ou CPF e a senha.');
+    setErro('Entrar com o Google ainda não está disponível. Use o e-mail e a senha.');
   }
 
   return (
@@ -96,7 +108,7 @@ export default function Entrar() {
           Voltar para o site
         </Link>
 
-        <form className="entrar__form" onSubmit={enviar}>
+        <form className="entrar__form" onSubmit={enviar} noValidate>
           <img className="entrar__logo" src={logoCifra} alt="CIFRA" />
 
           {local.state?.teste && (
@@ -107,15 +119,15 @@ export default function Entrar() {
 
           <div className="entrar__campo">
             <label htmlFor="usuario" className="entrar__rotulo">
-              E-mail ou CPF
+              E-mail
             </label>
             <input
               id="usuario"
               className="entrar__input"
-              type="text"
+              type="email"
               autoComplete="username"
               inputMode="email"
-              placeholder="seu@email.com ou 000.000.000-00"
+              placeholder="seu@email.com"
               value={usuario}
               onChange={(e) => {
                 setUsuario(e.target.value);
@@ -161,9 +173,23 @@ export default function Entrar() {
             </div>
           </div>
 
+          {aviso && (
+            <p className="entrar__aviso" role="status">
+              {aviso}
+            </p>
+          )}
+
           {erro && (
             <p id="erro-acesso" className="entrar__erro" role="alert">
               {erro}
+              {faltaConfirmar && (
+                <>
+                  {' '}
+                  <button type="button" className="entrar__reenviar" onClick={reenviar}>
+                    Reenviar o e-mail
+                  </button>
+                </>
+              )}
             </p>
           )}
 

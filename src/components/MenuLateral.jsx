@@ -113,9 +113,9 @@ export default function MenuLateral() {
     }
   }
 
-  // Sai da conta (os dados continuam salvos neste aparelho)
-  function sair() {
-    encerrarSessao();
+  // Sai da conta (os dados ficam na nuvem; a cópia deste aparelho é apagada)
+  async function sair() {
+    await encerrarSessao(); // envia o que falta para a nuvem e encerra o login
     irPara('/entrar'); // recarrega: a próxima pessoa não vê nada da anterior
   }
 

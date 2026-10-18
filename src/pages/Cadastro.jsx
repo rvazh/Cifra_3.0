@@ -2,19 +2,16 @@ import { useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
 import { IconeSeta, IconeCheck } from '../components/Icones.jsx';
-import { iniciarSessao, irPara } from '../dados/acesso.js';
+import { irPara } from '../dados/acesso.js';
 import { iniciarTeste, DIAS_DE_TESTE } from '../dados/plano.js';
 import {
   ESTADOS,
   IDADE_MINIMA,
   buscarCEP,
-  cpfJaUsado,
-  cpfValido,
   criarUsuario,
-  emailJaUsado,
   emailValido,
   mascaraCEP,
-  mascaraCPF,
+  reenviarConfirmacao,
   regrasDaSenha,
   soNumeros,
 } from '../dados/usuarios.js';
@@ -25,7 +22,6 @@ const VAZIO = {
   nome: '',
   sobrenome: '',
   email: '',
-  cpf: '',
   idade: '',
   cep: '',
   rua: '',
@@ -40,7 +36,7 @@ const VAZIO = {
 };
 
 // Ordem em que os campos aparecem (para levar o cursor ao primeiro erro)
-const ORDEM = ['nome', 'sobrenome', 'email', 'cpf', 'idade', 'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf', 'senha', 'confirmar', 'termos'];
+const ORDEM = ['nome', 'sobrenome', 'email', 'idade', 'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf', 'senha', 'confirmar', 'termos'];
 
 function IconeOlho({ aberto }) {
   return (
@@ -59,10 +55,6 @@ function conferir(f) {
   if (!f.sobrenome.trim()) erros.sobrenome = 'Digite o seu sobrenome.';
   if (!f.email.trim()) erros.email = 'Digite o seu e-mail.';
   else if (!emailValido(f.email)) erros.email = 'Este e-mail não parece certo. Ex.: nome@email.com';
-  else if (emailJaUsado(f.email)) erros.email = 'Já existe uma conta com este e-mail.';
-  if (!soNumeros(f.cpf)) erros.cpf = 'Digite o seu CPF.';
-  else if (!cpfValido(f.cpf)) erros.cpf = 'CPF inválido. Confira os números.';
-  else if (cpfJaUsado(f.cpf)) erros.cpf = 'Já existe uma conta com este CPF.';
   const idade = Number(f.idade);
   if (!f.idade) erros.idade = 'Digite a sua idade.';
   else if (!Number.isInteger(idade) || idade > 120) erros.idade = 'Idade inválida.';
@@ -87,6 +79,8 @@ export default function Cadastro() {
   const [cep, setCep] = useState({ estado: 'parado', texto: '' }); // parado | buscando | achou | nao-achou
   const [enviando, setEnviando] = useState(false);
   const [erroGeral, setErroGeral] = useState('');
+  const [confirmar, setConfirmar] = useState(null); // e-mail para onde foi o link de confirmação
+  const [reenvio, setReenvio] = useState('');
   const local = useLocation();
   const form = useRef(null);
   const ultimoCep = useRef('');
@@ -137,25 +131,41 @@ export default function Cadastro() {
     }
     setEnviando(true);
     try {
-      const pessoa = await criarUsuario({
+      const resultado = await criarUsuario({
         nome: f.nome,
         sobrenome: f.sobrenome,
         email: f.email,
-        cpf: f.cpf,
         idade: f.idade,
         senha: f.senha,
         endereco: { cep: f.cep, rua: f.rua, numero: f.numero, complemento: f.complemento, bairro: f.bairro, cidade: f.cidade, uf: f.uf },
       });
-      iniciarSessao(pessoa.id);
+      if (resultado.precisaConfirmar) {
+        // O Supabase mandou um link para o e-mail; a conta só abre depois de confirmar
+        setEnviando(false);
+        setConfirmar(resultado.email);
+        window.scrollTo(0, 0);
+        return;
+      }
       if (local.state?.teste) iniciarTeste(); // veio do "Teste grátis"
       irPara('/painel');
     } catch (e) {
       setEnviando(false);
-      setErroGeral(
-        e.message === 'sem-crypto'
-          ? 'Não foi possível criar a conta neste navegador. Abra o site pelo endereço com https.'
-          : e.message || 'Não foi possível criar a conta. Tente de novo.'
-      );
+      if (e.message === 'Já existe uma conta com este e-mail.') {
+        setErros((atual) => ({ ...atual, email: e.message }));
+        form.current?.querySelector('#cad-email')?.focus();
+        return;
+      }
+      setErroGeral(e.message || 'Não foi possível criar a conta. Tente de novo.');
+    }
+  }
+
+  async function reenviar() {
+    setReenvio('Enviando…');
+    try {
+      await reenviarConfirmacao(confirmar);
+      setReenvio('Enviamos de novo. Pode levar alguns minutos.');
+    } catch (e) {
+      setReenvio(e.message);
     }
   }
 
@@ -193,12 +203,35 @@ export default function Cadastro() {
         </p>
       </header>
 
+      {confirmar ? (
+        <section className="cad__form cad__confirmar" aria-live="polite">
+          <img className="cad__logo" src={logoCifra} alt="CIFRA" />
+          <h1 className="cad__titulo">Confirme o seu e-mail</h1>
+          <p className="cad__sub">
+            Enviamos um link para <b>{confirmar}</b>. Abra o e-mail e clique no link para ativar a conta — você entra direto no painel.
+          </p>
+          <p className="cad__sub">Não chegou? Confira a pasta de spam ou peça de novo.</p>
+          <div className="cad__confirmar-acoes">
+            <button type="button" className="entrar__botao" onClick={reenviar}>
+              Reenviar o e-mail
+            </button>
+            <Link to="/entrar" className="entrar__link-forte">
+              Já confirmei — entrar
+            </Link>
+          </div>
+          {reenvio && (
+            <p className="cad__dica" role="status">
+              {reenvio}
+            </p>
+          )}
+        </section>
+      ) : (
       <form ref={form} className="cad__form" onSubmit={enviar} noValidate>
         <div className="cad__cabeca">
           <img className="cad__logo" src={logoCifra} alt="CIFRA" />
           <div>
             <h1 className="cad__titulo">Crie sua conta</h1>
-            <p className="cad__sub">Leva uns 2 minutos. Depois é só entrar com o seu e-mail ou CPF.</p>
+            <p className="cad__sub">Leva uns 2 minutos. Depois é só entrar com o seu e-mail e senha, em qualquer aparelho.</p>
           </div>
         </div>
 
@@ -228,11 +261,6 @@ export default function Cadastro() {
               <span className="cad__rotulo">E-mail</span>
               <input {...ligar('email')} className="entrar__input" type="email" inputMode="email" autoComplete="email" placeholder="nome@email.com" value={f.email} onChange={(e) => mudar('email', e.target.value)} />
               <Erro campo="email" />
-            </label>
-            <label className="cad__campo">
-              <span className="cad__rotulo">CPF</span>
-              <input {...ligar('cpf')} className="entrar__input" inputMode="numeric" placeholder="000.000.000-00" value={f.cpf} onChange={(e) => mudar('cpf', mascaraCPF(e.target.value))} />
-              <Erro campo="cpf" />
             </label>
             <label className="cad__campo">
               <span className="cad__rotulo">Idade</span>
@@ -392,6 +420,7 @@ export default function Cadastro() {
           <p className="cad__aviso">A sua senha é salva embaralhada (em código que não dá para desfazer) — nem a CIFRA consegue lê-la.</p>
         </div>
       </form>
+      )}
 
       <p className="entrar__rodape cad__rodape">© 2026 CIFRA Tech Ltda.</p>
     </div>
