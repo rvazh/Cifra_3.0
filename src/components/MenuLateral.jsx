@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
 import {
@@ -17,10 +17,12 @@ import {
   IconeChecklist,
   IconeRecibo,
   IconeJornal,
+  IconeInfo,
 } from './Icones.jsx';
 import { valoresEscondidos, alternarValores } from '../dados/preferencias.js';
 import { encerrarSessao, irPara } from '../dados/acesso.js';
 import { situacaoDoPlano, DIAS_DE_TESTE } from '../dados/plano.js';
+import RelatarProblema from './RelatarProblema.jsx';
 import './MenuLateral.css';
 
 // Itens do menu lateral do sistema (usado no Painel, Lançamentos...)
@@ -113,6 +115,8 @@ export default function MenuLateral() {
     }
   }
 
+  const [relatando, setRelatando] = useState(false); // janela "Relatar problema"
+
   // Sai da conta (os dados ficam na nuvem; a cópia deste aparelho é apagada)
   async function sair() {
     await encerrarSessao(); // envia o que falta para a nuvem e encerra o login
@@ -153,6 +157,10 @@ export default function MenuLateral() {
           <IconeOlho tamanho={18} espessura={2.2} fechado={!valoresEscondidos()} />
           <span className="lateral__texto">{valoresEscondidos() ? 'Mostrar valores' : 'Esconder valores'}</span>
         </button>
+        <button type="button" className="lateral__extra" onClick={() => setRelatando(true)} title="Relatar problema">
+          <IconeInfo tamanho={18} espessura={2.2} />
+          <span className="lateral__texto">Relatar problema</span>
+        </button>
         <NavLink to="/painel/configuracoes" className="lateral__extra" title="Configurações">
           <IconeConfig tamanho={18} espessura={2.2} />
           <span className="lateral__texto">Configurações</span>
@@ -162,6 +170,7 @@ export default function MenuLateral() {
           <span className="lateral__texto">Sair</span>
         </button>
       </div>
+      {relatando && <RelatarProblema aoFechar={() => setRelatando(false)} />}
     </aside>
   );
 }
