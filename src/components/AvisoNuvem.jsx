@@ -24,6 +24,16 @@ export default function AvisoNuvem() {
       </div>
     );
   }
+  if (estado === 'limite') {
+    return (
+      <div className="aviso-nuvem aviso-nuvem--erro" role="alert">
+        <span>
+          Sua conta chegou ao limite de espaço, e as últimas mudanças ficaram só neste aparelho. Fale com o atendimento da
+          CIFRA.
+        </span>
+      </div>
+    );
+  }
   if (estado === 'erro' && temPendentes()) {
     return (
       <div className="aviso-nuvem aviso-nuvem--erro" role="status">

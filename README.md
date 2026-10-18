@@ -29,6 +29,7 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - Cadastro com e-mail e senha, confirmação de e-mail e "Esqueci minha senha".
 - Os mesmos dados no celular e no computador (sincronização).
 - Minha conta: editar dados, trocar senha e excluir a conta (LGPD).
+- **Verificação em duas etapas** (opcional): código de 6 números de um app autenticador, pedido no login.
 - Tema escuro ou claro, lembretes e backup.
 - **Relatar problema**: botão no menu lateral, que envia o relato para o banco.
 
@@ -78,9 +79,24 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 | `perfis` | nome, sobrenome, idade, endereço (sem CPF) |
 | `dados` | os dados do app, em texto JSON, por pessoa |
 | `relatos` | problemas e sugestões enviados pelo app (só o dono do projeto lê) |
+| `auth.mfa_factors` | apps autenticadores da verificação em duas etapas (gerenciados pelo Supabase) |
 | Storage `comprovantes/` | arquivos, cada pessoa na pasta `<id>/` |
 
 O SQL de tudo isso está em [`supabase/`](supabase/), na ordem em que foi aplicado.
+
+### Segurança
+
+- **RLS:** cada pessoa só lê e grava as próprias linhas e arquivos. Isso foi testado simulando um ataque entre duas contas.
+- **Verificação em duas etapas:** quem ativou só acessa os dados com uma sessão que passou pelo código (`aal2`). A regra fica no banco, não só na tela.
+- **Limites por conta:**
+  - dados: 60 itens e 20 MB;
+  - comprovantes: 300 arquivos e 100 MB;
+  - relatos: 10 por dia.
+- **Cabeçalhos de segurança** no `vercel.json`:
+  - CSP: só carrega código do próprio site e só conversa com o Supabase e o ViaCEP;
+  - a CIFRA não pode ser aberta dentro de outro site;
+  - `nosniff`, `Referrer-Policy` e `Permissions-Policy`.
+- **Chave no código:** a chave publicável do Supabase pode ficar no site. A `service_role` nunca entra no código.
 
 ---
 
@@ -114,6 +130,7 @@ VITE_SUPABASE_ANON_KEY=sua-chave-publicavel
 ```
 cifra/
 ├── index.html                 casca da página (manifest, ícones, fonte)
+├── vercel.json                cabeçalhos de segurança do site publicado
 ├── public/
 │   ├── sw.js                  service worker: cache para abrir offline + notificações
 │   ├── manifest.webmanifest   nome, cores e ícones do app instalável

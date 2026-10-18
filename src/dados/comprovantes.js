@@ -118,9 +118,17 @@ async function reduzirFoto(arquivo) {
   }
 }
 
+// Limites por conta (o banco confere de verdade; aqui é só para avisar antes)
+export const LIMITE_DE_ARQUIVOS = 300;
+export const LIMITE_DE_ESPACO = 100 * 1000 * 1000; // 100 MB
+const AVISO_DE_LIMITE = 'Sua conta chegou ao limite de comprovantes (300 arquivos ou 100 MB). Apague alguns antigos para enviar novos.';
+
 async function enviarArquivo(id, blob, tipo) {
   const { error } = await supabase.storage.from(PASTA).upload(caminho(id), blob, { contentType: tipo, upsert: true });
-  if (error) throw new Error('Não foi possível enviar o comprovante. Confira a internet e tente de novo.');
+  if (!error) return;
+  const texto = String(error.message || '').toLowerCase();
+  if (texto.includes('row-level security') || texto.includes('policy')) throw new Error(AVISO_DE_LIMITE);
+  throw new Error('Não foi possível enviar o comprovante. Confira a internet e tente de novo.');
 }
 
 // ----- Funções usadas pelas telas -----
@@ -130,6 +138,9 @@ export async function guardarComprovante(arquivo, lancamentoId = null) {
   if (!tipoOk) throw new Error('Envie uma foto (JPG, PNG) ou um PDF.');
   const pronto = await reduzirFoto(arquivo);
   if (pronto.size > LIMITE) throw new Error('O arquivo passa de 10 MB. Tente uma foto menor ou um PDF mais leve.');
+  const lista = lerLista();
+  const ocupado = lista.reduce((s, c) => s + (c.tamanho || 0), 0);
+  if (lista.length >= LIMITE_DE_ARQUIVOS || ocupado + pronto.size > LIMITE_DE_ESPACO) throw new Error(AVISO_DE_LIMITE);
 
   const dados = {
     id: `comp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,

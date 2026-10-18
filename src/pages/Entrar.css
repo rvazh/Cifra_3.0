@@ -540,3 +540,17 @@
 .entrar__app {
   margin-top: -8px;
 }
+
+/* Segundo passo do login (verificação em duas etapas) */
+.entrar__explica {
+  margin: 0 0 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}
+
+.entrar__codigo {
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  text-align: center;
+}

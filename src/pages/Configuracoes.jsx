@@ -22,7 +22,7 @@ import {
   IconeRepetir,
   IconeMonitor,
 } from '../components/Icones.jsx';
-import { EditarDados, TrocarSenha, ExcluirConta } from '../components/MinhaConta.jsx';
+import { EditarDados, TrocarSenha, ExcluirConta, SegundoFator } from '../components/MinhaConta.jsx';
 import OrcamentoCategorias from '../components/Orcamento.jsx';
 import ContasFixas from '../components/ContasFixas.jsx';
 import { carregarOrcamentos, AVISOS_POSSIVEIS } from '../dados/orcamentos.js';
@@ -348,6 +348,20 @@ export default function Configuracoes() {
               <div className="cfg-linha cfg-linha--desligada">
                 <Linha Icone={IconeCadeado} titulo="Trocar a senha" sub="Disponível nas contas criadas em “Criar conta”" />
               </div>
+            )}
+            {conta && (
+              <button type="button" className="cfg-linha" onClick={() => setJanela('2fa')}>
+                <Linha
+                  Icone={IconeEscudo}
+                  titulo="Verificação em duas etapas"
+                  sub={conta.doisFatores ? 'Ativa: a senha e um código do celular' : 'Mais proteção: pede um código do celular ao entrar'}
+                >
+                  <span className="cfg-linha__valor">
+                    {conta.doisFatores ? 'Ativa' : 'Desativada'}
+                    <Seta />
+                  </span>
+                </Linha>
+              </button>
             )}
           </Grupo>
 
@@ -685,6 +699,15 @@ export default function Configuracoes() {
           />
         )}
         {janela === 'excluir' && conta && <ExcluirConta aoFechar={() => setJanela(null)} />}
+        {janela === '2fa' && conta && (
+          <SegundoFator
+            aoFechar={() => setJanela(null)}
+            aoMudar={(ativo) => {
+              setConta((atual) => ({ ...atual, doisFatores: ativo }));
+              setMensagem(ativo ? 'Verificação em duas etapas ativada.' : 'Verificação em duas etapas desativada.');
+            }}
+          />
+        )}
 
         {janela === 'orcamento' && (
           <OrcamentoCategorias

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
 import { IconeSeta, IconeCheck } from '../components/Icones.jsx';
 import { irPara } from '../dados/acesso.js';
-import { entrarComUsuario, reenviarConfirmacao, emailValido } from '../dados/usuarios.js';
+import { entrarComUsuario, reenviarConfirmacao, emailValido, confirmarCodigoDoLogin, cancelarLoginComCodigo } from '../dados/usuarios.js';
 import { lerAvisoDoEntrar } from '../dados/nuvem.js';
 import { abertoComoApp } from '../dados/instalar.js';
 import { iniciarTeste, DIAS_DE_TESTE } from '../dados/plano.js';
@@ -44,7 +44,40 @@ export default function Entrar() {
   const [aviso, setAviso] = useState(lerAvisoDoEntrar); // ex.: "Este link expirou" (vindo de um link de e-mail)
   const [faltaConfirmar, setFaltaConfirmar] = useState(false);
   const [conferindo, setConferindo] = useState(false);
+  const [pedindoCodigo, setPedindoCodigo] = useState(false); // 2º passo: código do app autenticador
+  const [codigo, setCodigo] = useState('');
   const local = useLocation();
+
+  function entrarNoPainel() {
+    // Veio da página "Teste grátis": o teste do Essencial começa agora
+    if (local.state?.teste) iniciarTeste();
+    // Volta para a tela que a pessoa tentou abrir, ou vai para o painel
+    // (recarregando, para cada tela ler só as informações desta pessoa)
+    irPara(local.state?.de || '/painel');
+  }
+
+  async function enviarCodigo(evento) {
+    evento.preventDefault();
+    setErro('');
+    setConferindo(true);
+    try {
+      await confirmarCodigoDoLogin(codigo);
+    } catch (e) {
+      setConferindo(false);
+      setCodigo('');
+      setErro(e.message);
+      return;
+    }
+    entrarNoPainel();
+  }
+
+  async function voltarParaSenha() {
+    await cancelarLoginComCodigo();
+    setPedindoCodigo(false);
+    setCodigo('');
+    setSenha('');
+    setErro('');
+  }
 
   async function enviar(evento) {
     evento.preventDefault(); // impede a página de recarregar
@@ -75,11 +108,13 @@ export default function Entrar() {
       setSenha('');
       return;
     }
-    // Veio da página "Teste grátis": o teste do Essencial começa agora
-    if (local.state?.teste) iniciarTeste();
-    // Volta para a tela que a pessoa tentou abrir, ou vai para o painel
-    // (recarregando, para cada tela ler só as informações desta pessoa)
-    irPara(local.state?.de || '/painel');
+    if (pessoa.precisaCodigo) {
+      // Conta com verificação em duas etapas: falta o código do app autenticador
+      setConferindo(false);
+      setPedindoCodigo(true);
+      return;
+    }
+    entrarNoPainel();
   }
 
   async function reenviar() {
@@ -109,6 +144,48 @@ export default function Entrar() {
           Voltar para o site
         </Link>
 
+        {pedindoCodigo ? (
+          <form className="entrar__form" onSubmit={enviarCodigo} noValidate>
+            <img className="entrar__logo" src={logoCifra} alt="CIFRA" />
+            <div className="entrar__campo">
+              <label htmlFor="codigo" className="entrar__rotulo">
+                Código de verificação
+              </label>
+              <p className="entrar__explica">Abra o seu app autenticador (Google Authenticator, Authy…) e digite o código de 6 números da CIFRA.</p>
+              <input
+                id="codigo"
+                className="entrar__input entrar__codigo"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                maxLength={7}
+                placeholder="000000"
+                value={codigo}
+                onChange={(e) => {
+                  setCodigo(e.target.value.replace(/[^\d ]/g, ''));
+                  setErro('');
+                }}
+                aria-invalid={erro ? 'true' : undefined}
+                aria-describedby={erro ? 'erro-acesso' : undefined}
+              />
+            </div>
+            {erro && (
+              <p id="erro-acesso" className="entrar__erro" role="alert">
+                {erro}
+              </p>
+            )}
+            <button type="submit" className="entrar__botao" disabled={conferindo}>
+              {conferindo ? 'Conferindo…' : 'Confirmar'}
+              <IconeSeta tamanho={20} cor="#141414" espessura={2.2} />
+            </button>
+            <p className="entrar__cadastro">
+              <button type="button" className="entrar__reenviar" onClick={voltarParaSenha}>
+                Voltar e entrar com outra conta
+              </button>
+            </p>
+            <p className="entrar__cadastro">Perdeu o acesso ao app autenticador? Fale com o atendimento da CIFRA.</p>
+          </form>
+        ) : (
         <form className="entrar__form" onSubmit={enviar} noValidate>
           <img className="entrar__logo" src={logoCifra} alt="CIFRA" />
 
@@ -219,6 +296,7 @@ export default function Entrar() {
             </p>
           )}
         </form>
+        )}
 
         <p className="entrar__rodape">© 2026 CIFRA Tech Ltda.</p>
       </div>

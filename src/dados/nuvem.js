@@ -42,7 +42,7 @@ let saindo = false;
 const versoes = new Map(); // quantas vezes cada chave mudou (para não perder mudança feita durante o envio)
 
 // ----- Estado (para o aviso na tela) -----
-// 'ok' | 'salvando' | 'erro' (sem internet) | 'novidades' (outro aparelho mudou algo)
+// 'ok' | 'salvando' | 'erro' (sem internet) | 'limite' (conta cheia) | 'novidades' (outro aparelho mudou algo)
 let estado = 'ok';
 function mudarEstado(novo) {
   if (estado === novo) return;
@@ -121,7 +121,7 @@ export async function enviarPendentes() {
   if (!uid) return true;
   const nomes = [...lerPendentes()];
   if (!nomes.length) {
-    if (estado === 'salvando' || estado === 'erro') mudarEstado('ok');
+    if (estado === 'salvando' || estado === 'erro' || estado === 'limite') mudarEstado('ok');
     return true;
   }
   const quem = uid;
@@ -159,10 +159,12 @@ export async function enviarPendentes() {
       mudarEstado('ok');
     }
     return true;
-  } catch {
-    mudarEstado('erro');
+  } catch (falha) {
+    // Conta cheia (limite do banco): não adianta tentar de novo logo
+    const cheia = String(falha?.message || '').includes('limite_dados');
+    mudarEstado(cheia ? 'limite' : 'erro');
     clearTimeout(relogio);
-    relogio = setTimeout(() => enviarPendentes(), 30000); // tenta de novo daqui a 30 s
+    relogio = setTimeout(() => enviarPendentes(), cheia ? 10 * 60000 : 30000); // tenta de novo depois
     return false;
   } finally {
     envioEmAndamento = null;
@@ -233,6 +235,28 @@ export function guardarPerfil(perfil, id = uid) {
   }
 }
 
+// ----- Verificação em duas etapas (2FA) -----
+// A conta tem 2FA ativo?
+export async function temSegundoFatorAtivo() {
+  try {
+    const { data } = await supabase.auth.mfa.listFactors();
+    return Boolean(data?.totp?.some((f) => f.status === 'verified'));
+  } catch {
+    return false;
+  }
+}
+
+// A sessão atual entrou com senha, mas ainda falta o código do 2FA?
+export async function faltaCodigoDoSegundoFator() {
+  try {
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error || !data) return false;
+    return data.nextLevel === 'aal2' && data.currentLevel !== 'aal2';
+  } catch {
+    return false;
+  }
+}
+
 async function buscarPerfil(usuario) {
   const { data, error } = await supabase.from('perfis').select('nome, sobrenome, idade, endereco').eq('id', usuario.id).maybeSingle();
   if (error) throw error;
@@ -244,6 +268,7 @@ async function buscarPerfil(usuario) {
     endereco: data?.endereco || meta.endereco || {},
     email: usuario.email || '',
     emailNovo: usuario.new_email || '',
+    doisFatores: await temSegundoFatorAtivo(),
   };
   guardarPerfil(perfil, usuario.id);
   return perfil;
@@ -366,6 +391,17 @@ export async function prepararNuvem() {
       mudarEstado('erro');
     } else {
       apagarSessao(); // sessão vencida, ou o antigo acesso de teste
+    }
+  } else if (await faltaCodigoDoSegundoFator()) {
+    // Entrou com a senha, mas não digitou o código do 2FA: o banco não libera os dados.
+    // Na tela "Criar senha nova" (link do e-mail) a sessão fica, para pedir o código lá.
+    apagarSessao();
+    if (!window.location.hash.startsWith('#/nova-senha')) {
+      try {
+        await supabase.auth.signOut({ scope: 'local' });
+      } catch {
+        /* sem internet */
+      }
     }
   } else {
     await comecarSincronia(sessao.user, { limite: 6000 });

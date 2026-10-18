@@ -4,7 +4,17 @@
 //   - nome, sobrenome, idade e endereço ficam na tabela "perfis", que só a própria pessoa lê.
 // O CPF não é mais pedido (pela LGPD, só guardamos o que o app usa).
 
-import { supabase, aposEntrar, enderecoDoSite, perfilGuardado, guardarPerfil, limparDesteAparelho, encerrarSincronia } from './nuvem.js';
+import {
+  supabase,
+  aposEntrar,
+  enderecoDoSite,
+  perfilGuardado,
+  guardarPerfil,
+  limparDesteAparelho,
+  encerrarSincronia,
+  faltaCodigoDoSegundoFator,
+  temSegundoFatorAtivo,
+} from './nuvem.js';
 import { usuarioAtualId, apagarSessao } from './armazenamento.js';
 
 export const IDADE_MINIMA = 18;
@@ -69,8 +79,15 @@ export function traduzirErro(erro) {
     email_not_confirmed: 'Falta confirmar o seu e-mail. Abra o link que enviamos para a sua caixa de entrada.',
     invalid_credentials: 'E-mail ou senha incorretos.',
     user_not_found: 'Conta não encontrada.',
+    mfa_verification_failed: 'Código incorreto. Confira no app autenticador e tente de novo.',
+    mfa_challenge_expired: 'O código expirou. Digite o código que aparece agora no app.',
+    mfa_factor_not_found: 'A verificação em duas etapas não está ativa nesta conta.',
+    mfa_verified_factor_exists: 'A verificação em duas etapas já está ativa.',
+    insufficient_aal: 'Confirme o código da verificação em duas etapas para continuar.',
   };
   if (mensagens[codigo]) return mensagens[codigo];
+  if (texto.includes('limite_relatos')) return 'Você já enviou 10 relatos nas últimas 24 horas. Tente de novo amanhã ou fale com o atendimento.';
+  if (texto.includes('limite_dados')) return 'Sua conta chegou ao limite de espaço. Fale com o atendimento da CIFRA.';
   if (texto.includes('already registered')) return mensagens.user_already_exists;
   if (texto.includes('rate limit')) return mensagens.over_request_rate_limit;
   return 'Não foi possível concluir agora. Tente de novo em instantes.';
@@ -125,8 +142,96 @@ export async function entrarComUsuario(email, senha) {
     falha.codigo = error.code;
     throw falha;
   }
+  // Conta com verificação em duas etapas: ainda falta o código do app autenticador
+  if (await faltaCodigoDoSegundoFator()) return { ...data.user, precisaCodigo: true };
   await aposEntrar(data.user);
   return data.user;
+}
+
+// ----- Verificação em duas etapas (código de 6 números de um app autenticador) -----
+async function fatorAtivo() {
+  const { data, error } = await supabase.auth.mfa.listFactors();
+  if (error) throw new Error(traduzirErro(error));
+  return data?.totp?.find((f) => f.status === 'verified') || null;
+}
+
+// Confere o código e "sobe" a sessão para o nível com 2FA (aal2)
+async function verificarCodigo(codigo) {
+  const fator = await fatorAtivo();
+  if (!fator) throw new Error('A verificação em duas etapas não está ativa nesta conta.');
+  const limpo = String(codigo || '').replace(/\D/g, '');
+  if (limpo.length !== 6) throw new Error('O código tem 6 números.');
+  const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: fator.id, code: limpo });
+  if (error) throw new Error(traduzirErro(error));
+}
+
+// Segundo passo do login
+export async function confirmarCodigoDoLogin(codigo) {
+  await verificarCodigo(codigo);
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) throw new Error('Não foi possível entrar agora. Tente de novo.');
+  await aposEntrar(data.user);
+  return data.user;
+}
+
+// Desistiu no meio (entrou com a senha, mas não digitou o código)
+export async function cancelarLoginComCodigo() {
+  try {
+    await supabase.auth.signOut({ scope: 'local' });
+  } catch {
+    /* sem internet */
+  }
+}
+
+// Usado na tela "Criar senha nova" (link do e-mail) por quem tem 2FA
+export { faltaCodigoDoSegundoFator, verificarCodigo as confirmarCodigo };
+
+export async function temSessaoAberta() {
+  const { data } = await supabase.auth.getSession();
+  return Boolean(data?.session);
+}
+
+// Configurações: começar a ativar. Devolve o endereço para o QR code e a chave para digitar à mão.
+export async function iniciarSegundoFator() {
+  // Tentativas anteriores que não foram confirmadas atrapalham: tira antes
+  const { data: lista } = await supabase.auth.mfa.listFactors();
+  for (const f of (lista?.all || []).filter((x) => x.status !== 'verified')) {
+    await supabase.auth.mfa.unenroll({ factorId: f.id });
+  }
+  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'CIFRA', issuer: 'CIFRA' });
+  if (error) throw new Error(traduzirErro(error));
+  return { fatorId: data.id, uri: data.totp.uri, chave: data.totp.secret };
+}
+
+// Configurações: confirmar com o primeiro código (a partir daqui o 2FA vale)
+export async function confirmarSegundoFator(fatorId, codigo) {
+  const limpo = String(codigo || '').replace(/\D/g, '');
+  if (limpo.length !== 6) throw new Error('O código tem 6 números.');
+  const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: fatorId, code: limpo });
+  if (error) throw new Error(traduzirErro(error));
+  atualizarMarcaDoSegundoFator(true);
+}
+
+// Configurações: desligar (pede um código atual, para ninguém desligar só com o celular desbloqueado)
+export async function desligarSegundoFator(codigo) {
+  await verificarCodigo(codigo);
+  const fator = await fatorAtivo();
+  const { error } = await supabase.auth.mfa.unenroll({ factorId: fator.id });
+  if (error) throw new Error(traduzirErro(error));
+  atualizarMarcaDoSegundoFator(false);
+}
+
+function atualizarMarcaDoSegundoFator(ativo) {
+  const atual = usuarioAtual();
+  if (!atual) return;
+  const { id, ...resto } = atual;
+  guardarPerfil({ ...resto, doisFatores: ativo }, id);
+}
+
+export async function segundoFatorAtivo() {
+  const ativo = await temSegundoFatorAtivo();
+  atualizarMarcaDoSegundoFator(ativo);
+  return ativo;
 }
 
 // ----- Esqueci minha senha -----
@@ -186,19 +291,24 @@ export async function atualizarUsuario(dados) {
   return { usuario: { ...novo, id }, emailPendente };
 }
 
-// Confere a senha de quem está logado (para trocar a senha ou excluir a conta)
-async function senhaConfere(senha) {
+// Confere a senha de quem está logado (para trocar a senha ou excluir a conta).
+// Entrar de novo com a senha "desce" a sessão para o nível sem 2FA; por isso, quem tem 2FA
+// também digita o código, que sobe a sessão de volta.
+async function senhaConfere(senha, codigo) {
   const atual = usuarioAtual();
   if (!atual?.email) return false;
   const { error } = await supabase.auth.signInWithPassword({ email: atual.email, password: senha });
-  if (!error) return true;
+  if (!error) {
+    if (await faltaCodigoDoSegundoFator()) await verificarCodigo(codigo);
+    return true;
+  }
   if (error.code === 'invalid_credentials' || /invalid login/i.test(error.message || '')) return false;
   throw new Error(traduzirErro(error));
 }
 
 // Troca a senha (precisa da senha atual). Devolve false se a senha atual estiver errada.
-export async function trocarSenha(senhaAtual, novaSenha) {
-  if (!(await senhaConfere(senhaAtual))) return false;
+export async function trocarSenha(senhaAtual, novaSenha, codigo) {
+  if (!(await senhaConfere(senhaAtual, codigo))) return false;
   const { error } = await supabase.auth.updateUser({ password: novaSenha });
   if (error) throw new Error(traduzirErro(error));
   return true;
@@ -206,8 +316,8 @@ export async function trocarSenha(senhaAtual, novaSenha) {
 
 // Exclui a conta e TODAS as informações dela (precisa da senha). LGPD: direito de apagar tudo.
 // Devolve false se a senha estiver errada.
-export async function excluirUsuario(senha) {
-  if (!(await senhaConfere(senha))) return false;
+export async function excluirUsuario(senha, codigo) {
+  if (!(await senhaConfere(senha, codigo))) return false;
   const id = usuarioAtualId();
   // 1) Arquivos dos comprovantes (o banco não apaga arquivos sozinho)
   const { apagarArquivosDaConta } = await import('./comprovantes.js');

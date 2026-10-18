@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import QRCode from 'qrcode';
 import {
   ESTADOS,
   atualizarUsuario,
@@ -9,6 +10,11 @@ import {
   regrasDaSenha,
   soNumeros,
   trocarSenha,
+  usuarioAtual,
+  iniciarSegundoFator,
+  confirmarSegundoFator,
+  desligarSegundoFator,
+  segundoFatorAtivo,
 } from '../dados/usuarios.js';
 import { irPara } from '../dados/acesso.js';
 import './MinhaConta.css';
@@ -153,7 +159,28 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
 }
 
 // ===== Trocar a senha =====
+// Campo do código de 6 números (verificação em duas etapas)
+function CampoCodigo({ valor, aoMudar, rotulo = 'Código do app autenticador', autoFocus = false }) {
+  return (
+    <label className="cfg-campo">
+      {rotulo}
+      <input
+        className="mc-codigo"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        autoFocus={autoFocus}
+        maxLength={7}
+        placeholder="000000"
+        value={valor}
+        onChange={(e) => aoMudar(e.target.value.replace(/[^\d ]/g, ''))}
+      />
+    </label>
+  );
+}
+
 export function TrocarSenha({ aoSalvar, aoFechar }) {
+  const comCodigo = Boolean(usuarioAtual()?.doisFatores);
+  const [codigo, setCodigo] = useState('');
   const [atual, setAtual] = useState('');
   const [nova, setNova] = useState('');
   const [confirmar, setConfirmar] = useState('');
@@ -171,7 +198,7 @@ export function TrocarSenha({ aoSalvar, aoFechar }) {
     setSalvando(true);
     let certo = false;
     try {
-      certo = await trocarSenha(atual, nova);
+      certo = await trocarSenha(atual, nova, codigo);
     } catch (falha) {
       setSalvando(false);
       return setErro(falha.message);
@@ -210,6 +237,7 @@ export function TrocarSenha({ aoSalvar, aoFechar }) {
       <label className="mc-mostrar">
         <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} /> Mostrar as senhas
       </label>
+      {comCodigo && <CampoCodigo valor={codigo} aoMudar={(v) => { setCodigo(v); setErro(''); }} />}
       <Erro texto={erro} />
       <div className="cfg-janela__acoes">
         <button type="submit" className="cfg-botao cfg-botao--principal" disabled={salvando}>
@@ -225,6 +253,8 @@ export function TrocarSenha({ aoSalvar, aoFechar }) {
 
 // ===== Excluir a conta =====
 export function ExcluirConta({ aoFechar }) {
+  const comCodigo = Boolean(usuarioAtual()?.doisFatores);
+  const [codigo, setCodigo] = useState('');
   const [senha, setSenha] = useState('');
   const [entendi, setEntendi] = useState(false);
   const [erro, setErro] = useState('');
@@ -238,7 +268,7 @@ export function ExcluirConta({ aoFechar }) {
     // Confere a senha antes de apagar qualquer coisa
     let certo = false;
     try {
-      certo = await excluirUsuario(senha);
+      certo = await excluirUsuario(senha, codigo);
     } catch (falha) {
       setExcluindo(false);
       return setErro(falha.message);
@@ -262,6 +292,7 @@ export function ExcluirConta({ aoFechar }) {
         Sua senha
         <input type="password" autoComplete="current-password" autoFocus value={senha} onChange={(e) => { setSenha(e.target.value); setErro(''); }} />
       </label>
+      {comCodigo && <CampoCodigo valor={codigo} aoMudar={(v) => { setCodigo(v); setErro(''); }} />}
       <label className="mc-mostrar">
         <input type="checkbox" checked={entendi} onChange={(e) => { setEntendi(e.target.checked); setErro(''); }} /> Entendo que a exclusão não tem
         volta.
@@ -275,6 +306,149 @@ export function ExcluirConta({ aoFechar }) {
           Cancelar
         </button>
       </div>
+    </Janela>
+  );
+}
+
+// ===== Verificação em duas etapas =====
+// Ativar: mostra um QR code para o app autenticador (Google Authenticator, Authy, Microsoft Authenticator…)
+// e pede o primeiro código. Desativar: pede um código atual.
+export function SegundoFator({ aoMudar, aoFechar }) {
+  const [etapa, setEtapa] = useState('carregando'); // carregando | desligado | ligando | ligado | pronto
+  const [fator, setFator] = useState(null); // { fatorId, uri, chave }
+  const [qr, setQr] = useState('');
+  const [codigo, setCodigo] = useState('');
+  const [erro, setErro] = useState('');
+  const [ocupado, setOcupado] = useState(false);
+
+  useEffect(() => {
+    segundoFatorAtivo()
+      .then((ativo) => setEtapa(ativo ? 'ligado' : 'desligado'))
+      .catch(() => setEtapa('desligado'));
+  }, []);
+
+  async function comecar() {
+    setErro('');
+    setOcupado(true);
+    try {
+      const novo = await iniciarSegundoFator();
+      setFator(novo);
+      setQr(await QRCode.toString(novo.uri, { type: 'svg', margin: 1, color: { dark: '#141414', light: '#ffffff' } }));
+      setEtapa('ligando');
+    } catch (e) {
+      setErro(e.message || 'Não foi possível começar agora. Tente de novo.');
+    }
+    setOcupado(false);
+  }
+
+  async function enviar(evento) {
+    evento.preventDefault();
+    setErro('');
+    setOcupado(true);
+    try {
+      if (etapa === 'ligando') {
+        await confirmarSegundoFator(fator.fatorId, codigo);
+        setEtapa('pronto');
+        aoMudar(true);
+      } else if (etapa === 'ligado') {
+        await desligarSegundoFator(codigo);
+        setEtapa('desligado');
+        aoMudar(false);
+      }
+      setCodigo('');
+    } catch (e) {
+      setErro(e.message);
+      setCodigo('');
+    }
+    setOcupado(false);
+  }
+
+  return (
+    <Janela titulo="Verificação em duas etapas" id="mc-2fa-titulo" aoFechar={aoFechar} aoEnviar={enviar}>
+      {etapa === 'carregando' && <p className="mc-texto">Carregando…</p>}
+
+      {etapa === 'desligado' && (
+        <>
+          <p className="mc-texto">
+            Com a verificação em duas etapas, além da senha a CIFRA pede um <b>código de 6 números</b> que muda a cada 30
+            segundos, gerado por um app no seu celular. Mesmo que alguém descubra a sua senha, não entra sem o seu celular.
+          </p>
+          <p className="mc-texto">
+            Você vai precisar de um app autenticador: <b>Google Authenticator</b>, <b>Microsoft Authenticator</b> ou{' '}
+            <b>Authy</b> (todos grátis).
+          </p>
+          <Erro texto={erro} />
+          <div className="cfg-janela__acoes">
+            <button type="button" className="cfg-botao cfg-botao--principal" onClick={comecar} disabled={ocupado}>
+              {ocupado ? 'Preparando…' : 'Ativar'}
+            </button>
+            <button type="button" className="cfg-botao" onClick={aoFechar}>
+              Agora não
+            </button>
+          </div>
+        </>
+      )}
+
+      {etapa === 'ligando' && (
+        <>
+          <ol className="mc-passos">
+            <li>No app autenticador, toque em <b>+</b> e escolha <b>ler QR code</b>.</li>
+            <li>Aponte a câmera para o código abaixo.</li>
+            <li>Digite o código de 6 números que aparecer para a CIFRA.</li>
+          </ol>
+          {qr && <span className="mc-qr" aria-label="QR code para o app autenticador" role="img" dangerouslySetInnerHTML={{ __html: qr }} />}
+          <p className="mc-chave">
+            Não consegue ler? Digite esta chave no app: <code>{fator?.chave}</code>
+          </p>
+          <CampoCodigo valor={codigo} aoMudar={(v) => { setCodigo(v); setErro(''); }} rotulo="Código que apareceu no app" />
+          <Erro texto={erro} />
+          <div className="cfg-janela__acoes">
+            <button type="submit" className="cfg-botao cfg-botao--principal" disabled={ocupado}>
+              {ocupado ? 'Conferindo…' : 'Confirmar e ativar'}
+            </button>
+            <button type="button" className="cfg-botao" onClick={aoFechar}>
+              Cancelar
+            </button>
+          </div>
+        </>
+      )}
+
+      {etapa === 'pronto' && (
+        <>
+          <p className="mc-texto">
+            <b>Pronto! A verificação em duas etapas está ativa.</b> Da próxima vez que entrar na CIFRA (em qualquer aparelho),
+            depois da senha vamos pedir o código do app.
+          </p>
+          <p className="mc-aviso">
+            Guarde bem o celular com o app autenticador. Se perder o acesso a ele, fale com o atendimento da CIFRA para recuperar a
+            conta.
+          </p>
+          <div className="cfg-janela__acoes">
+            <button type="button" className="cfg-botao cfg-botao--principal" onClick={aoFechar}>
+              Fechar
+            </button>
+          </div>
+        </>
+      )}
+
+      {etapa === 'ligado' && (
+        <>
+          <p className="mc-texto">
+            A verificação em duas etapas está <b>ativa</b>. Para desativar, digite o código que aparece agora no seu app
+            autenticador.
+          </p>
+          <CampoCodigo valor={codigo} aoMudar={(v) => { setCodigo(v); setErro(''); }} autoFocus />
+          <Erro texto={erro} />
+          <div className="cfg-janela__acoes">
+            <button type="submit" className="cfg-botao mc-botao--perigo" disabled={ocupado}>
+              {ocupado ? 'Conferindo…' : 'Desativar'}
+            </button>
+            <button type="button" className="cfg-botao" onClick={aoFechar}>
+              Manter ativa
+            </button>
+          </div>
+        </>
+      )}
     </Janela>
   );
 }

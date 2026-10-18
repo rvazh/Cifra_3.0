@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
 import { IconeSeta } from '../components/Icones.jsx';
-import { definirNovaSenha, regrasDaSenha } from '../dados/usuarios.js';
-import { estaLogado, irPara } from '../dados/acesso.js';
+import { definirNovaSenha, regrasDaSenha, temSessaoAberta, faltaCodigoDoSegundoFator, confirmarCodigo } from '../dados/usuarios.js';
+import { irPara } from '../dados/acesso.js';
 import './Entrar.css';
 import './Cadastro.css';
 
@@ -14,7 +14,19 @@ export default function NovaSenha() {
   const [mostrar, setMostrar] = useState(false);
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const [link, setLink] = useState('conferindo'); // conferindo | valido | invalido
+  const [pedeCodigo, setPedeCodigo] = useState(false); // conta com verificação em duas etapas
+  const [codigo, setCodigo] = useState('');
   const regras = regrasDaSenha(senha);
+
+  // O link do e-mail abre uma sessão; sem ela, o link expirou
+  useEffect(() => {
+    (async () => {
+      const aberta = await temSessaoAberta();
+      setLink(aberta ? 'valido' : 'invalido');
+      if (aberta) setPedeCodigo(await faltaCodigoDoSegundoFator());
+    })();
+  }, []);
 
   async function salvar(evento) {
     evento.preventDefault();
@@ -22,6 +34,7 @@ export default function NovaSenha() {
     if (senha !== confirmar) return setErro('As senhas não são iguais.');
     setSalvando(true);
     try {
+      if (pedeCodigo) await confirmarCodigo(codigo);
       await definirNovaSenha(senha);
       irPara('/painel');
     } catch (e) {
@@ -44,7 +57,9 @@ export default function NovaSenha() {
       <form className="cad__form cad__form--estreito" onSubmit={salvar} noValidate>
         <img className="cad__logo" src={logoCifra} alt="CIFRA" />
         <h1 className="cad__titulo">Criar uma senha nova</h1>
-        {!estaLogado() ? (
+        {link === 'conferindo' ? (
+          <p className="cad__sub">Conferindo o link…</p>
+        ) : link === 'invalido' ? (
           <>
             <p className="cad__sub">Este link expirou ou já foi usado. Peça um novo na tela de login.</p>
             <Link to="/recuperar-senha" className="entrar__link-forte">
@@ -94,6 +109,24 @@ export default function NovaSenha() {
               <input type="checkbox" checked={mostrar} onChange={(e) => setMostrar(e.target.checked)} />
               <span>Mostrar as senhas</span>
             </label>
+            {pedeCodigo && (
+              <label className="cad__campo">
+                <span className="cad__rotulo">Código do app autenticador (verificação em duas etapas)</span>
+                <input
+                  id="nova-senha-codigo"
+                  className="entrar__input"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={7}
+                  placeholder="000000"
+                  value={codigo}
+                  onChange={(e) => {
+                    setCodigo(e.target.value.replace(/[^\d ]/g, ''));
+                    setErro('');
+                  }}
+                />
+              </label>
+            )}
             {erro && (
               <p className="entrar__erro" role="alert">
                 {erro}

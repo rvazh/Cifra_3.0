@@ -107,3 +107,65 @@
   line-height: 1.45;
   color: var(--texto-suave);
 }
+
+/* Verificação em duas etapas */
+.mc-texto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--texto-suave);
+}
+
+.mc-texto b {
+  color: var(--preto);
+}
+
+.mc-passos {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.mc-qr {
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+}
+
+.mc-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mc-chave {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cinza);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.mc-chave code {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--preto);
+  letter-spacing: 0.05em;
+}
+
+.mc-codigo {
+  font-size: 20px !important;
+  letter-spacing: 0.3em;
+  text-align: center;
+}
