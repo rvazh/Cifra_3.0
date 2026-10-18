@@ -7,6 +7,7 @@ const links = [
   { para: '/quem-somos', texto: 'Quem somos' },
   { para: '/planos', texto: 'Planos' },
   { para: '/teste-gratis', texto: 'Teste grátis' },
+  { para: '/baixar', texto: 'Baixar o app' },
 ];
 
 export default function Footer() {

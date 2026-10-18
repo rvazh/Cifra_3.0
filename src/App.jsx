@@ -27,6 +27,7 @@ import Cadastro from './pages/Cadastro.jsx';
 import Receber from './pages/Receber.jsx';
 import Pagar from './pages/Pagar.jsx';
 import RecuperarSenha from './pages/RecuperarSenha.jsx';
+import BaixarApp from './pages/BaixarApp.jsx';
 import NovaSenha from './pages/NovaSenha.jsx';
 import AvisoNuvem from './components/AvisoNuvem.jsx';
 import BotaoAtendimento from './components/BotaoAtendimento.jsx';
@@ -66,6 +67,7 @@ export default function App() {
           <Route path="/quem-somos" element={<QuemSomos />} />
           <Route path="/planos" element={<Planos />} />
           <Route path="/teste-gratis" element={<TesteGratis />} />
+          <Route path="/baixar" element={<BaixarApp />} />
           <Route path="/entrar" element={<Entrar />} />
           <Route path="/painel" element={<Painel />} />
           <Route path="/painel/lancamentos" element={<Lancamentos />} />

@@ -1,0 +1,224 @@
+/* ===== Página "Baixar o app" (usa o destaque e os botões da página Teste grátis) ===== */
+
+.baixar__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--positivo);
+  font-weight: 700;
+}
+
+/* Celular + QR code (lado direito) */
+.baixar__arte {
+  position: relative;
+  align-items: center;
+  padding: 10px 0 20px;
+}
+
+.baixar__qr {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  width: 210px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  box-shadow: 0 20px 40px rgba(20, 20, 20, 0.15), 8px 8px 0 var(--dourado);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--texto-suave);
+}
+
+.baixar__qr-codigo {
+  display: block;
+  width: 120px;
+  height: 120px;
+}
+
+.baixar__qr-codigo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.baixar__qr figcaption b {
+  display: block;
+  color: var(--preto);
+}
+
+/* Abas Android / iPhone / Computador */
+.baixar__abas {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 28px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--creme);
+  border: 1px solid var(--borda);
+}
+
+.baixar__aba {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--texto-suave);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.baixar__aba--ativa {
+  background: var(--preto);
+  color: var(--branco);
+}
+
+.baixar__painel {
+  margin-top: 24px;
+  max-width: 760px;
+}
+
+.baixar__navegador {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dourado-escuro);
+}
+
+.baixar__passos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.baixar__passo {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--texto-suave);
+}
+
+.baixar__passo b {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 16px;
+  color: var(--preto);
+}
+
+.baixar__numero {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--dourado);
+  color: var(--preto);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.baixar__botao-passos {
+  margin-top: 20px;
+}
+
+/* Dúvidas */
+.baixar__duvidas {
+  background: var(--creme);
+}
+
+.baixar__perguntas {
+  margin-top: 24px;
+  max-width: 820px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.baixar__pergunta {
+  border-radius: 14px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  padding: 0 20px;
+}
+
+.baixar__pergunta summary {
+  padding: 18px 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.baixar__pergunta p {
+  margin: 0 0 18px;
+  color: var(--texto-suave);
+  line-height: 1.55;
+}
+
+.baixar__rodape {
+  margin: 28px 0 0;
+  color: var(--texto-suave);
+}
+
+.baixar__link {
+  font-weight: 700;
+  color: var(--preto);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 900px) {
+  .baixar__qr {
+    position: static;
+    margin-top: 24px;
+  }
+
+  .baixar__arte {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .baixar__abas {
+    display: flex;
+  }
+
+  .baixar__aba {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .baixar__passo {
+    padding: 16px;
+    gap: 12px;
+  }
+}
+
+/* No celular a pessoa quer o passo a passo logo: a ilustração sai */
+@media (max-width: 640px) {
+  .baixar__arte {
+    display: none;
+  }
+}

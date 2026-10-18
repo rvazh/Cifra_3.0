@@ -5,6 +5,7 @@ import { IconeSeta, IconeCheck } from '../components/Icones.jsx';
 import { irPara } from '../dados/acesso.js';
 import { entrarComUsuario, reenviarConfirmacao, emailValido } from '../dados/usuarios.js';
 import { lerAvisoDoEntrar } from '../dados/nuvem.js';
+import { abertoComoApp } from '../dados/instalar.js';
 import { iniciarTeste, DIAS_DE_TESTE } from '../dados/plano.js';
 import './Entrar.css';
 
@@ -209,6 +210,14 @@ export default function Entrar() {
               Criar conta
             </Link>
           </p>
+          {!abertoComoApp() && (
+            <p className="entrar__cadastro entrar__app">
+              Prefere usar no celular?{' '}
+              <Link to="/baixar" className="entrar__link-forte">
+                Baixar o app
+              </Link>
+            </p>
+          )}
         </form>
 
         <p className="entrar__rodape">© 2026 CIFRA Tech Ltda.</p>

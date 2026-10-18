@@ -1,7 +1,7 @@
 // ===== Parcelas de "A receber" e "A pagar" no Calendário e no Checklist =====
 // Cada dívida (sua ou de alguém com você) com data de vencimento aparece mês a mês, parcela por parcela.
 // Daqui dá para registrar o pagamento/recebimento da parcela e mudar o dia em que ela vence.
-import { dataDeHoje } from './lancamentos.js';
+import { dataDeHoje, mesFinanceiro } from './lancamentos.js';
 import { carregarContas, ehCartao } from './contas.js';
 import {
   carregarReceber,
@@ -64,6 +64,25 @@ export function parcelasDoMes(mes) {
   return todasAsParcelas()
     .filter((p) => p.vence.slice(0, 7) === mes)
     .sort((a, b) => a.vence.localeCompare(b.vence));
+}
+
+// Parcelas de "A pagar" ainda não pagas que vencem até o fim do mês financeiro "mes" (as atrasadas também).
+// Usado no painel para somar nas despesas do mês. Entram todas as dívidas com vencimento,
+// mesmo as que a pessoa escolheu não mostrar no Calendário.
+export function parcelasAPagarAte(mes) {
+  return carregarPagar()
+    .filter((d) => Boolean(d.primeiroVencimento))
+    .flatMap((d) => parcelasDe(d, 'pagar'))
+    .filter((p) => p.estado !== 'paga' && mesFinanceiro(p.vence) <= mes);
+}
+
+// Parcelas de "A receber" ainda não recebidas que vencem até o fim do mês financeiro "mes" (as atrasadas também).
+// O painel NÃO soma isto nas receitas (dinheiro incerto): mostra à parte, como "se receber".
+export function parcelasAReceberAte(mes) {
+  return carregarReceber()
+    .filter((d) => Boolean(d.primeiroVencimento))
+    .flatMap((d) => parcelasDe(d, 'receber'))
+    .filter((p) => p.estado !== 'paga' && mesFinanceiro(p.vence) <= mes);
 }
 
 // Parcelas em aberto até "dias" à frente (as atrasadas também)

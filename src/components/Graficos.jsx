@@ -15,21 +15,34 @@ export function reaisRedondo(valor) {
   return `R$ ${Math.round(valor).toLocaleString('pt-BR')}`;
 }
 
-// ===== Gráfico de colunas: receitas (verde) x despesas (vermelho) =====
+// ===== Gráfico de colunas: receitas (verde) x despesas (vermelho) x saldo geral (dourado) =====
+// Cada item de "dados": { mes, receitas, despesas, saldo? }. Sem "saldo", o gráfico fica só com 2 colunas.
+// Saldo negativo aparece como coluna vazada (só o contorno), com a altura do valor que falta.
 // "largura" e "altura" mudam a proporção do desenho (ele sempre ocupa a largura do cartão)
-export function GraficoColunas({ dados, corReceita = '#2E9D5B', corDespesa = '#D9544A', largura = 560, altura = 200 }) {
+export function GraficoColunas({
+  dados,
+  corReceita = '#2E9D5B',
+  corDespesa = '#D9544A',
+  corSaldo = '#EAAF5A',
+  largura = 560,
+  altura = 200,
+}) {
+  const comSaldo = dados.some((d) => typeof d.saldo === 'number');
   const base = altura - 24; // espaço embaixo para o nome do mês
-  const maior = Math.max(1, ...dados.flatMap((d) => [d.receitas, d.despesas])) * 1.1;
+  const maior = Math.max(1, ...dados.flatMap((d) => [d.receitas, d.despesas, comSaldo ? Math.abs(d.saldo || 0) : 0])) * 1.1;
   const grupo = largura / dados.length;
-  const coluna = Math.min(largura / 35, grupo / 4);
-  const alturaDe = (valor) => ((base - 10) * valor) / maior;
+  const qtd = comSaldo ? 3 : 2;
+  const espaco = 3;
+  const coluna = Math.min(largura / (comSaldo ? 45 : 35), grupo / (qtd + 2));
+  const alturaDe = (valor) => ((base - 10) * Math.abs(valor)) / maior;
+  const sinal = (v) => (v < 0 ? `− ${reais(-v)}` : reais(v));
 
   return (
     <svg
       width="100%"
       viewBox={`0 0 ${largura} ${altura}`}
       role="img"
-      aria-label="Receitas e despesas por mês"
+      aria-label={comSaldo ? 'Receitas, despesas e saldo geral por mês' : 'Receitas e despesas por mês'}
     >
       {[0, 1, 2, 3].map((k) => {
         const y = base - ((base - 10) * k) / 3;
@@ -37,28 +50,32 @@ export function GraficoColunas({ dados, corReceita = '#2E9D5B', corDespesa = '#D
       })}
       {dados.map((d, i) => {
         const centro = grupo * i + grupo / 2;
+        const inicio = centro - (qtd * coluna + (qtd - 1) * espaco) / 2;
+        const x = (n) => inicio + n * (coluna + espaco);
+        const negativo = comSaldo && d.saldo < 0;
         return (
-          <g key={d.mes}>
-            <rect
-              x={centro - coluna - 2}
-              y={base - alturaDe(d.receitas)}
-              width={coluna}
-              height={alturaDe(d.receitas)}
-              rx="4"
-              fill={corReceita}
-            >
+          <g key={d.chave || d.mes}>
+            <rect x={x(0)} y={base - alturaDe(d.receitas)} width={coluna} height={alturaDe(d.receitas)} rx="4" fill={corReceita}>
               <title>{`${d.mes}: receitas ${reais(d.receitas)}`}</title>
             </rect>
-            <rect
-              x={centro + 2}
-              y={base - alturaDe(d.despesas)}
-              width={coluna}
-              height={alturaDe(d.despesas)}
-              rx="4"
-              fill={corDespesa}
-            >
+            <rect x={x(1)} y={base - alturaDe(d.despesas)} width={coluna} height={alturaDe(d.despesas)} rx="4" fill={corDespesa}>
               <title>{`${d.mes}: despesas ${reais(d.despesas)}`}</title>
             </rect>
+            {comSaldo && (
+              <rect
+                x={x(2) + (negativo ? 1 : 0)}
+                y={base - alturaDe(d.saldo) + (negativo ? 1 : 0)}
+                width={negativo ? coluna - 2 : coluna}
+                height={Math.max(0, alturaDe(d.saldo) - (negativo ? 1 : 0))}
+                rx="4"
+                fill={negativo ? 'none' : corSaldo}
+                stroke={negativo ? corDespesa : 'none'}
+                strokeWidth={negativo ? 2 : 0}
+                strokeDasharray={negativo ? '4 3' : undefined}
+              >
+                <title>{`${d.mes}: saldo geral ${sinal(d.saldo)}${negativo ? ' (negativo)' : ''}`}</title>
+              </rect>
+            )}
             <text x={centro} y={altura - 6} textAnchor="middle" fontSize="12" fill="#6B6355">
               {d.mes}
             </text>

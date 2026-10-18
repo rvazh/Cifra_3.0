@@ -342,6 +342,42 @@
   text-decoration: underline;
 }
 
+.resumo__formula {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.resumo__rodape {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* "Se receber o que te devem": melhor cenário do Sobrará no mês */
+.resumo__cenario {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--texto-suave);
+  text-decoration: none;
+  border-top: 1px dashed var(--borda);
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.resumo__cenario-extra {
+  white-space: nowrap;
+}
+
+.resumo__cenario b {
+  color: var(--positivo);
+  white-space: nowrap;
+}
+
+.resumo__cenario:hover {
+  text-decoration: underline;
+}
+
 .resumo--destaque .resumo__link {
   font-size: 13px;
   color: var(--esc-dourado);
@@ -411,7 +447,8 @@
 /* Legenda do gráfico de colunas */
 .legenda {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 6px 16px;
   font-size: 12px;
   color: var(--cinza);
 }
@@ -420,6 +457,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .legenda__cor {
@@ -434,6 +472,10 @@
 
 .legenda__cor--despesa {
   background: #d9544a;
+}
+
+.legenda__cor--saldo {
+  background: #eaaf5a;
 }
 
 /* Listas (contas a pagar e lançamentos) */

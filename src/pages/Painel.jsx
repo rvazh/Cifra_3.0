@@ -5,6 +5,7 @@ import { GraficoColunas, reais } from '../components/Graficos.jsx';
 import { chave } from '../dados/armazenamento.js';
 import { CartaoOrcamento } from '../components/Orcamento.jsx';
 import { carregarPagar, situacaoDaDivida as situacaoDoPagar } from '../dados/pagar.js';
+import { parcelasAPagarAte, parcelasAReceberAte } from '../dados/parcelas.js';
 import {
   carregar,
   lancamentosDoMes,
@@ -14,8 +15,8 @@ import {
   dataCurta,
   mesFinanceiro,
 } from '../dados/lancamentos.js';
-import { carregarContas, resumoDaConta } from '../dados/contas.js';
-import { carregarPreferencias } from '../dados/preferencias.js';
+import { carregarContas, resumoDaConta, saldoGeralNoFimDo } from '../dados/contas.js';
+import { carregarPreferencias, inicioDoMes } from '../dados/preferencias.js';
 import { situacaoDoPlano } from '../dados/plano.js';
 import './Painel.css';
 
@@ -106,14 +107,41 @@ export default function Painel() {
   const saldoAnterior = saldoGeral - movimentoDoMes;
   const variacao = saldoAnterior > 0 ? ((saldoGeral - saldoAnterior) / saldoAnterior) * 100 : null;
 
-  const doMes = totais(lista.filter((l) => mesFinanceiro(l.data) === mesAtual));
-  const sobra = doMes.receitas - doMes.despesas;
+
+  // ----- Previsão do mês (cartões Receitas, Despesas e "Sobrará no mês") -----
+  // Receitas: tudo o que entra no mês, recebido ou ainda previsto (inclui as fixas que se repetem).
+  // Despesas: fixas do mês (todas, pagas ou não, inclusive as que ainda vão se repetir)
+  //         + gastos lançados no mês (pagos ou não; cada gasto novo entra assim que é lançado)
+  //         + parcelas de "A pagar" ainda não pagas que vencem no mês (e as atrasadas).
+  // Sobrará = saldo no início do mês + receitas − despesas.
+  // Transferências entre contas ficam de fora (não são ganho nem gasto).
+  const doMesComFixas = lancamentosDoMes(lista, mesAtual, inicioDoMes()).filter((l) => !l.transferencia);
+  const ehFixa = (l) => Boolean(l.repete || l.previsto || l.origem);
+  const somaDe = (itens) => itens.reduce((s, l) => s + Math.abs(l.valor), 0);
+  const previsao = {
+    inicio: saldoAnterior,
+    receitas: somaDe(doMesComFixas.filter((l) => l.valor > 0)),
+    fixas: somaDe(doMesComFixas.filter((l) => l.valor < 0 && ehFixa(l))),
+    lancadas: somaDe(doMesComFixas.filter((l) => l.valor < 0 && !ehFixa(l))),
+    parcelas: parcelasAPagarAte(mesAtual).reduce((s, p) => s + p.aPagarAgora, 0),
+  };
+  previsao.despesas = previsao.fixas + previsao.lancadas + previsao.parcelas;
+  const sobrara = previsao.inicio + previsao.receitas - previsao.despesas;
+  // O que te devem neste mês (parcelas de "A receber", com juros se atrasadas): fica fora da conta
+  // principal, porque pode não chegar. Aparece como "melhor cenário" dentro do cartão.
+  const aReceber = parcelasAReceberAte(mesAtual);
+  const totalAReceber = aReceber.reduce((s, p) => s + p.aPagarAgora, 0);
 
   // ----- Gráfico: últimos 6 meses (mais estreito no celular) -----
   const telaPequena = typeof window !== 'undefined' && window.innerWidth < 700;
   const historico = Array.from({ length: 6 }, (_, i) => {
     const m = mudarMes(mesAtual, i - 5);
-    return { mes: MESES_CURTOS[Number(m.slice(5, 7)) - 1], ...totais(lista.filter((l) => mesFinanceiro(l.data) === m)) };
+    return {
+      chave: m,
+      mes: MESES_CURTOS[Number(m.slice(5, 7)) - 1],
+      ...totais(lista.filter((l) => mesFinanceiro(l.data) === m)),
+      saldo: saldoGeralNoFimDo(m, lista, contas), // saldo geral no fim de cada mês (no mês atual, o de hoje)
+    };
   });
 
   // ----- Listas -----
@@ -240,13 +268,55 @@ export default function Painel() {
               )
             }
           />
-          <CartaoResumo rotulo="Receitas do mês" valor={reais(doMes.receitas)} Icone={IconeCima} variante="positivo" />
-          <CartaoResumo rotulo="Despesas do mês" valor={reais(doMes.despesas)} Icone={IconeBaixo} variante="negativo" />
           <CartaoResumo
-            rotulo="Sobrou no mês"
-            valor={sobra < 0 ? `− ${reais(-sobra)}` : reais(sobra)}
+            rotulo="Receitas do mês"
+            valor={reais(previsao.receitas)}
+            Icone={IconeCima}
+            variante="positivo"
+            rodape={<span className="resumo__formula">Recebidas e previstas</span>}
+          />
+          <CartaoResumo
+            rotulo="Despesas do mês"
+            valor={reais(previsao.despesas)}
+            Icone={IconeBaixo}
+            variante="negativo"
+            rodape={
+              <span
+                className="resumo__formula"
+                title={`Fixas ${reais(previsao.fixas)} + gastos lançados ${reais(previsao.lancadas)}${previsao.parcelas ? ` + parcelas a pagar ${reais(previsao.parcelas)}` : ''}`}
+              >
+                {previsao.parcelas ? 'Fixas + gastos + parcelas a pagar' : 'Fixas previstas + gastos lançados'}
+              </span>
+            }
+          />
+          <CartaoResumo
+            rotulo="Sobrará no mês"
+            valor={sobrara < 0 ? `− ${reais(-sobrara)}` : reais(sobrara)}
             Icone={IconeAlvo}
             variante="claro"
+            rodape={
+              <span className="resumo__rodape">
+                <span
+                  className="resumo__formula"
+                  title={`Início do mês ${reais(previsao.inicio)} + receitas ${reais(previsao.receitas)} − despesas ${reais(previsao.despesas)}`}
+                >
+                  Início do mês + receitas − despesas
+                </span>
+                {totalAReceber > 0 && (
+                  <Link
+                    to="/painel/receber"
+                    className="resumo__cenario"
+                    title={aReceber.map((p) => `${p.divida.pessoa}${p.total > 1 ? ` (${p.numero}/${p.total})` : ''}: ${reais(p.aPagarAgora)}`).join('\n')}
+                  >
+                    <span>Se receber o que te devem:</span>
+                    <span>
+                      <b>{sobrara + totalAReceber < 0 ? `− ${reais(-(sobrara + totalAReceber))}` : reais(sobrara + totalAReceber)}</b>{' '}
+                      <span className="resumo__cenario-extra">(+ {reais(totalAReceber)})</span>
+                    </span>
+                  </Link>
+                )}
+              </span>
+            }
           />
         </div>
 
@@ -300,7 +370,7 @@ export default function Painel() {
 
         {/* Gráfico */}
         <section className="cartao">
-          <TituloCartao titulo="Receitas x despesas" link="Relatórios" para="/painel/relatorios" />
+          <TituloCartao titulo="Receitas x despesas x saldo" link="Relatórios" para="/painel/relatorios" />
           <div className="legenda">
             <span className="legenda__item">
               <span className="legenda__cor legenda__cor--receita" />
@@ -309,6 +379,10 @@ export default function Painel() {
             <span className="legenda__item">
               <span className="legenda__cor legenda__cor--despesa" />
               Despesas
+            </span>
+            <span className="legenda__item">
+              <span className="legenda__cor legenda__cor--saldo" />
+              Saldo geral
             </span>
             <span className="legenda__item">últimos 6 meses</span>
           </div>

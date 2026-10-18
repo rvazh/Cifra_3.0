@@ -536,3 +536,7 @@
 .entrar__teste b {
   color: var(--preto);
 }
+
+.entrar__app {
+  margin-top: -8px;
+}

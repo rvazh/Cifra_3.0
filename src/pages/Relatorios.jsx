@@ -15,7 +15,7 @@ import {
   mesFinanceiro,
 } from '../dados/lancamentos.js';
 import { inicioDoMes } from '../dados/preferencias.js';
-import { carregarContas } from '../dados/contas.js';
+import { carregarContas, saldoGeralNoFimDo } from '../dados/contas.js';
 import ResumoMeses from '../components/ResumoMeses.jsx';
 import './Painel.css';
 import './Relatorios.css';
@@ -127,6 +127,7 @@ export default function Relatorios() {
   const hoje = dataDeHoje();
   // Transferências entre contas não são gasto nem ganho: ficam fora dos relatórios
   const [lista] = useState(() => semTransferencias(carregar()));
+  const [todos] = useState(carregar); // com transferências: usados só para o saldo geral
   const [contas] = useState(carregarContas);
   const [periodo, setPeriodo] = useState(PERIODOS[0]);
   const mesAtual = mesFinanceiro(hoje);
@@ -149,7 +150,7 @@ export default function Relatorios() {
   const mesesDoGrafico = periodo.id === 'mes' ? mesesDoPeriodo(referencia, PERIODOS[2]) : meses;
   const evolucao = mesesDoGrafico.map((m) => {
     const t = totais(lista.filter((l) => mesFinanceiro(l.data) === m));
-    return { chave: m, mes: mesCurto(m), ...t };
+    return { chave: m, mes: mesCurto(m), ...t, saldo: saldoGeralNoFimDo(m, todos, contas) };
   });
 
   // Despesas por categoria (com o valor do período anterior para comparar)
@@ -350,7 +351,7 @@ export default function Relatorios() {
         <div className="rel__linha rel__linha--grafico">
           <section className="cartao">
             <div className="cartao__titulo-linha">
-              <h2 className="cartao__titulo">Receitas x despesas por mês</h2>
+              <h2 className="cartao__titulo">Receitas x despesas x saldo por mês</h2>
               <div className="legenda">
                 <span className="legenda__item">
                   <span className="legenda__cor legenda__cor--receita" />
@@ -359,6 +360,10 @@ export default function Relatorios() {
                 <span className="legenda__item">
                   <span className="legenda__cor legenda__cor--despesa" />
                   Despesas
+                </span>
+                <span className="legenda__item">
+                  <span className="legenda__cor legenda__cor--saldo" />
+                  Saldo geral
                 </span>
               </div>
             </div>

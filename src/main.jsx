@@ -5,6 +5,7 @@ import App from './App.jsx';
 import './styles/global.css';
 import { aplicarTema } from './dados/preferencias.js';
 import { prepararNuvem } from './dados/nuvem.js';
+import './dados/instalar.js'; // já fica de olho no convite de instalação do navegador
 
 async function iniciar() {
   // Antes da primeira tela: confere o login no Supabase e baixa os dados da pessoa

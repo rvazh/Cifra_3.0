@@ -99,6 +99,19 @@ export function resumoDaConta(conta, lancamentos) {
   return { saldo, previsto, entradas, saidas, ultimos, quantidade: daConta.length };
 }
 
+// Saldo geral (soma das contas marcadas para entrar no total) no fim de um mês ("2026-08").
+// Mês atual (ou futuro) = saldo de hoje, igual ao cartão "Saldo geral" do painel.
+// Meses passados = saldo inicial + tudo o que foi pago/recebido até o fim daquele mês.
+export function saldoGeralNoFimDo(mes, lancamentos, contas = carregarContas()) {
+  const mesAtual = mesFinanceiro(dataDeHoje());
+  const noTotal = contas.filter((c) => c.noTotal);
+  const nomes = new Set(noTotal.map((c) => c.nome));
+  const inicial = noTotal.reduce((s, c) => s + (Number(c.saldoInicial) || 0), 0);
+  return lancamentos
+    .filter((l) => l.pago && nomes.has(l.conta) && (mes >= mesAtual || mesFinanceiro(l.data) <= mes))
+    .reduce((s, l) => s + l.valor, inicial);
+}
+
 // ===== Cartão de crédito =====
 // Cada compra cai numa fatura. A fatura "fecha" num dia do mês e "vence" alguns dias depois.
 // Compra feita no dia do fechamento ou depois vai para a fatura seguinte.
