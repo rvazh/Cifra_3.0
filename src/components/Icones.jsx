@@ -425,3 +425,11 @@ export const IconeAPagar = (p) => (
     <path d="M20.5 3.5L14 10" />
   </Svg>
 );
+
+export const IconeImagem = (p) => (
+  <Svg {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="3" />
+    <circle cx="9" cy="9" r="2" />
+    <path d="M21 15l-5-5L5 21" />
+  </Svg>
+);

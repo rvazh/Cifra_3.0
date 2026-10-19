@@ -19,6 +19,7 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - **Contas e cartões**: saldo de cada conta, saldo geral e faturas de cartão de crédito.
   - O primeiro saldo de uma conta nova entra como receita do mês; mudanças depois viram "Ajuste de saldo" (não mexem nos gráficos dos meses passados).
 - **Calendário** e **Checklist** do mês, com as parcelas de "A pagar" e "A receber".
+  - **Datas do ano** no calendário (feriados, 13º, Imposto de Renda, Black Friday, datas comemorativas): a pessoa escolhe quais aparecem.
 - **Objetivos**: guardar dinheiro tirando de uma conta.
 - **A receber** e **A pagar**: dívidas com parcelas (total ou valor da parcela), juros por atraso e data de vencimento ajustável.
 - **Comprovantes**: fotos e PDFs guardados na conta, organizados em grupos.
@@ -31,7 +32,7 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - Os mesmos dados no celular e no computador (sincronização).
 - Minha conta: editar dados, trocar senha e excluir a conta (LGPD).
 - **Verificação em duas etapas** (opcional): código de 6 números de um app autenticador, pedido no login.
-- Tema escuro ou claro, lembretes e backup.
+- Tema escuro ou claro, **fundo do painel** (cores, padrões ou uma foto), lembretes e backup.
 - **Relatar problema**: botão no menu lateral, que envia o relato para o banco.
 
 **App**

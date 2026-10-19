@@ -39,8 +39,8 @@ const planos = [
   {
     nome: 'Plano Base',
     descricao: 'Para quem quer um controle melhor das suas finanças.',
-    precoMensal: 18.9,
-    precoAnual: 15.9,
+    precoMensal: 24.9,
+    precoAnual: 18.9,
     botao: 'Quero esse plano',
     itens: [
       { texto: <>Tudo do <b>Plano Gratuito</b></>, incluso: true },
@@ -53,8 +53,8 @@ const planos = [
   {
     nome: 'Plano Essencial',
     descricao: 'Para quem quer se planejar e não ter surpresas no mês.',
-    precoMensal: 29.9,
-    precoAnual: 26.9,
+    precoMensal: 32.9,
+    precoAnual: 29.9,
     destaque: 'Mais popular',
     teste: true, // mostra o link do teste grátis
     botao: 'Quero esse plano',
@@ -65,22 +65,28 @@ const planos = [
       { texto: 'Calendário financeiro', incluso: true },
       { texto: 'Alertas e lembretes ilimitados', incluso: true },
       { texto: 'Relatórios completos e com análises', incluso: true },
-      { texto: <><b>Acesso completo</b> aos cursos</>, incluso: true },
+      { texto: <>Acesso a <b>70% dos cursos</b></>, incluso: true },
     ],
   },
   {
     nome: 'Plano Combo',
     descricao: 'Para quem quer controle total das finanças, menos distrações e mais foco.',
-    precoMensal: 32.9,
-    precoAnual: 29.9,
+    precoMensal: 35.9,
+    precoAnual: 32.9,
     emBreve: true,
     botao: 'Quero esse plano',
     itens: [
       { texto: <>Tudo do <b>Plano Essencial</b></>, incluso: true },
+      { texto: <><b>Cursos completos</b>: acesso a todos os cursos</>, incluso: true },
       { texto: <>Acesso ao app <b>“Distraction Block”</b> incluso no plano</>, incluso: true },
     ],
   },
 ];
+
+// Maior desconto do anual em relação ao mensal (ex.: 24,90 -> 18,90 = 24%)
+const DESCONTO_MAXIMO = Math.max(
+  ...planos.filter((p) => p.precoMensal > 0).map((p) => Math.floor((1 - p.precoAnual / p.precoMensal) * 100)),
+);
 
 // 9.9 -> "9,90"
 function formatarPreco(valor) {
@@ -175,7 +181,7 @@ export default function Planos() {
             <span className={anual ? 'planos__chave-texto planos__chave-texto--ativo' : 'planos__chave-texto'}>
               Anual
             </span>
-            <span className="planos__desconto">Economize até 15%</span>
+            <span className="planos__desconto">Economize até {DESCONTO_MAXIMO}%</span>
           </div>
 
           <div className="planos__grade">

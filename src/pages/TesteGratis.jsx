@@ -21,7 +21,7 @@ const recursos = [
   { icone: IconeSino, titulo: 'Alertas ilimitados', texto: 'Aviso 3 dias e 1 dia antes de cada vencimento.' },
   { icone: IconeChecklist, titulo: 'Checklist e parcelas', texto: 'Contas fixas e parceladas: o que já foi pago e o que falta.' },
   { icone: IconeGrafico, titulo: 'Relatórios completos', texto: 'Para onde foi o dinheiro, com comparação entre meses.' },
-  { icone: IconeLivro, titulo: 'Todos os cursos', texto: 'Acesso completo às aulas de organização financeira.' },
+  { icone: IconeLivro, titulo: '70% dos cursos', texto: 'Acesso à maior parte das aulas de organização financeira.' },
 ];
 
 // Os 14 dias, passo a passo

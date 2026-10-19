@@ -1,0 +1,126 @@
+/* ===== Janela "Fundo do painel" (Configurações) ===== */
+.fnd {
+  max-width: 520px;
+}
+
+.fnd__dica {
+  margin: -6px 0 0;
+  font-size: 13px;
+  color: var(--cinza);
+}
+
+.fnd__grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fnd__opcao {
+  padding: 6px 6px 8px;
+  border: 1.5px solid var(--borda);
+  border-radius: 14px;
+  background: var(--branco);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--preto);
+  cursor: pointer;
+}
+
+.fnd__opcao:hover {
+  border-color: var(--preto);
+}
+
+.fnd__opcao--ativa,
+.fnd__opcao--ativa:hover {
+  border-color: var(--preto);
+  box-shadow: -3px 3px 0 var(--dourado);
+}
+
+.fnd__amostra {
+  height: 46px;
+  border-radius: 9px;
+  border: 1px solid rgba(20, 20, 20, 0.12);
+}
+
+.fnd__foto {
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fnd__foto-topo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fnd__foto-topo b {
+  font-size: 14px;
+}
+
+.fnd__foto-topo span {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.fnd__previa {
+  height: 110px;
+  padding: 0;
+  border: 1.5px solid var(--borda);
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  overflow: hidden;
+  cursor: pointer;
+  font: inherit;
+}
+
+.fnd__previa span {
+  margin: 8px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--branco);
+  color: var(--preto);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.fnd__previa--ativa {
+  border-color: var(--preto);
+  box-shadow: -3px 3px 0 var(--dourado);
+}
+
+.fnd__previa--ativa span {
+  background: var(--dourado);
+}
+
+.fnd__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fnd__erro {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--negativo);
+}
+
+@media (max-width: 480px) {
+  .fnd__grade {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

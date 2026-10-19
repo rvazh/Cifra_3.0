@@ -21,4 +21,4 @@ export const EMPRESA = {
 export const FORO = 'Jundiaí/SP';
 
 // Botão do Distraction Block (acima do atendimento): outro projeto, para bloquear distrações
-export const DISTRACTION_BLOCK_URL = 'https://rvazh.github.io/DistractionBlock/';
+export const DISTRACTION_BLOCK_URL = 'https://distractionblock.vercel.app';

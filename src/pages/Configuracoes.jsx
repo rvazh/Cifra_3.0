@@ -21,7 +21,9 @@ import {
   IconePlanejamento,
   IconeRepetir,
   IconeMonitor,
+  IconeImagem,
 } from '../components/Icones.jsx';
+import EscolherFundo from '../components/EscolherFundo.jsx';
 import { EditarDados, TrocarSenha, ExcluirConta, SegundoFator } from '../components/MinhaConta.jsx';
 import OrcamentoCategorias from '../components/Orcamento.jsx';
 import ContasFixas from '../components/ContasFixas.jsx';
@@ -30,7 +32,7 @@ import { usuarioAtual } from '../dados/usuarios.js';
 import { carregarCategorias, carregar, salvar, nomeDoMes, listarFixas } from '../dados/lancamentos.js';
 import { carregarContas, salvarContas } from '../dados/contas.js';
 import { carregarObjetivos, salvarObjetivos } from '../dados/objetivos.js';
-import { carregarPreferencias, salvarPreferencias, aplicarTema } from '../dados/preferencias.js';
+import { carregarPreferencias, salvarPreferencias, aplicarTema, FUNDOS, fotoDeFundo } from '../dados/preferencias.js';
 import { EMAIL_CONTATO } from '../config.js';
 import { pedirPermissaoDeAviso } from '../dados/alertas.js';
 import { apagarTodosComprovantes } from '../dados/comprovantes.js';
@@ -430,6 +432,23 @@ export default function Configuracoes() {
                 </span>
               </Linha>
             </div>
+            <button type="button" className="cfg-linha" onClick={() => setJanela('fundo')}>
+              <Linha Icone={IconeImagem} titulo="Fundo" sub="Cor, padrão ou uma foto sua atrás das telas">
+                <span className="cfg-linha__valor">
+                  <span
+                    className="cfg-fundo-amostra"
+                    aria-hidden="true"
+                    style={
+                      preferencias.fundo === 'foto' && fotoDeFundo()
+                        ? { backgroundImage: `url("${fotoDeFundo()}")`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                        : { background: (FUNDOS.find((f) => f.id === preferencias.fundo) || FUNDOS[0]).css }
+                    }
+                  />
+                  {preferencias.fundo === 'foto' ? 'Sua foto' : (FUNDOS.find((f) => f.id === preferencias.fundo) || FUNDOS[0]).nome}
+                  <Seta />
+                </span>
+              </Linha>
+            </button>
           </Grupo>
 
           {/* ===== Organização ===== */}
@@ -685,6 +704,10 @@ export default function Configuracoes() {
               </div>
             </form>
           </div>
+        )}
+
+        {janela === 'fundo' && (
+          <EscolherFundo atual={preferencias.fundo || 'padrao'} aoEscolher={(id) => mudar('fundo', id)} aoFechar={() => setJanela(null)} />
         )}
 
         {/* ===== Janelas de Minha conta ===== */}

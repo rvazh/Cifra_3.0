@@ -604,3 +604,12 @@
     padding: 0 9px;
   }
 }
+
+/* Amostra do fundo na linha "Fundo" */
+.cfg-fundo-amostra {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 1.5px solid var(--preto);
+  flex-shrink: 0;
+}

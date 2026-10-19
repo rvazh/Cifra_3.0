@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './styles/global.css';
-import { aplicarTema } from './dados/preferencias.js';
+import { aplicarTema, aplicarFundo } from './dados/preferencias.js';
 import { prepararNuvem } from './dados/nuvem.js';
 import './dados/instalar.js'; // já fica de olho no convite de instalação do navegador
 
@@ -18,6 +18,7 @@ async function iniciar() {
 
   // Tema escolhido pela pessoa (Configurações > Preferências > Tema), antes de desenhar a tela
   aplicarTema();
+  aplicarFundo();
 
   // HashRouter (URLs com #/) funciona no GitHub Pages e no Vercel sem configuração extra
   ReactDOM.createRoot(document.getElementById('root')).render(

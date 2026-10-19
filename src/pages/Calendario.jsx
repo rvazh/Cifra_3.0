@@ -23,6 +23,8 @@ import { parcelasDoMes, parcelasProximas, totaisDasParcelas } from '../dados/par
 import './Painel.css';
 import './Calendario.css';
 import { mascaraValor } from '../dados/dinheiro.js';
+import { carregarDatasEscolhidas, datasAnuaisDoMes } from '../dados/datasAnuais.js';
+import DatasDoAno from '../components/DatasDoAno.jsx';
 
 const DIAS_DA_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -75,6 +77,8 @@ export default function Calendario() {
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
   const [evento, setEvento] = useState(null); // formulário de novo evento (aberto/fechado)
+  const [datasEscolhidas, setDatasEscolhidas] = useState(carregarDatasEscolhidas); // datas do ano que aparecem
+  const [escolhendoDatas, setEscolhendoDatas] = useState(false);
 
   // Sempre que a lista mudar, salva no aparelho
   useEffect(() => salvar(lista), [lista]);
@@ -100,6 +104,9 @@ export default function Calendario() {
     });
     return dias;
   }, [itensDoMes]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Feriados e datas do ano escolhidas: { "2026-12-25": [{ nome, emoji, ... }] }
+  const anuaisPorDia = useMemo(() => datasAnuaisDoMes(mes, datasEscolhidas), [mes, datasEscolhidas]);
 
   // Agrupa os lançamentos por dia: { "2026-10-05": [...] }
   const porDia = useMemo(() => {
@@ -151,6 +158,7 @@ export default function Calendario() {
   }, [lista, hoje, versao]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const doDia = (diaEscolhido.startsWith(mes) && porDia[diaEscolhido]) || [];
+  const datasDoDia = (diaEscolhido.startsWith(mes) && anuaisPorDia[diaEscolhido]) || [];
   const parcelasDoDia = parcelas.filter((p) => p.vence === diaEscolhido);
   const saldoDoDia =
     doDia.reduce((s, l) => s + l.valor, 0) +
@@ -260,6 +268,9 @@ export default function Calendario() {
             <p className="pp__subtitulo">Veja quando cada conta vence e o que já foi pago</p>
           </div>
           <div className="cal__navegacao">
+            <button type="button" className="cal__hoje" onClick={() => setEscolhendoDatas(true)}>
+              Datas do ano
+            </button>
             <button type="button" className="cal__hoje" onClick={() => irPara(hoje)}>
               Hoje
             </button>
@@ -315,6 +326,8 @@ export default function Calendario() {
                 const classes = ['cal-quadro'];
                 if (data === hoje) classes.push('cal-quadro--hoje');
                 if (data === diaEscolhido) classes.push('cal-quadro--escolhido');
+                const anuais = anuaisPorDia[data] || [];
+                if (anuais.some((d) => d.folga)) classes.push('cal-quadro--feriado');
                 // Os dias ficam limpos: o que acontece em cada dia aparece no painel ao lado
                 return (
                   <button
@@ -323,9 +336,14 @@ export default function Calendario() {
                     className={classes.join(' ')}
                     onClick={() => escolherDia(data)}
                     aria-pressed={data === diaEscolhido}
-                    aria-label={`${diaPorExtenso(data)}${fixasPorDia[data] ? ` · ${fixasPorDia[data] === 1 ? 'vence 1 conta fixa' : `vencem ${fixasPorDia[data]} contas fixas`}` : ''}`}
+                    aria-label={`${diaPorExtenso(data)}${anuais.length ? ` · ${anuais.map((d) => d.nome).join(', ')}` : ''}${fixasPorDia[data] ? ` · ${fixasPorDia[data] === 1 ? 'vence 1 conta fixa' : `vencem ${fixasPorDia[data]} contas fixas`}` : ''}`}
                   >
                     <span className="cal-quadro__numero">{Number(data.slice(8))}</span>
+                    {anuais.length > 0 && (
+                      <span className="cal-quadro__anual" title={anuais.map((d) => d.nome).join(' · ')} aria-hidden="true">
+                        {anuais.slice(0, 2).map((d) => d.emoji).join('')}
+                      </span>
+                    )}
                     {fixasPorDia[data] > 0 && (
                       <span className="cal-quadro__fixa" title="Vencimento de conta fixa" aria-hidden="true">
                         <IconeRepetir tamanho={11} espessura={2.6} />
@@ -342,6 +360,11 @@ export default function Calendario() {
                 Fixa
               </span>
               dia de vencimento de conta fixa
+              <span className="cal-grade__legenda-feriado" aria-hidden="true">7</span>
+              feriado
+              <button type="button" className="cal-grade__datas" onClick={() => setEscolhendoDatas(true)}>
+                Escolher datas do ano
+              </button>
             </p>
           </section>
 
@@ -357,8 +380,25 @@ export default function Calendario() {
                 )}
               </div>
 
+              {datasDoDia.length > 0 && (
+                <ul className="cal-dia__datas">
+                  {datasDoDia.map((d) => (
+                    <li key={d.id} className={d.folga ? 'cal-data cal-data--folga' : 'cal-data'}>
+                      <span className="cal-data__emoji" aria-hidden="true">{d.emoji}</span>
+                      <span className="cal-data__textos">
+                        <b>{d.nome}</b>
+                        <small>
+                          {d.tipo}
+                          {d.dica ? ` · ${d.dica}` : ''}
+                        </small>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               {doDia.length === 0 && parcelasDoDia.length === 0 ? (
-                <p className="cal-dia__vazio">Nada marcado para este dia.</p>
+                <p className="cal-dia__vazio">{datasDoDia.length ? 'Nenhuma conta para este dia.' : 'Nada marcado para este dia.'}</p>
               ) : doDia.length === 0 ? null : (
                 <ul className="cal-dia__lista">
                   {doDia.map((l) => {
@@ -601,6 +641,14 @@ export default function Calendario() {
             </section>
           </div>
         </div>
+        {escolhendoDatas && (
+          <DatasDoAno
+            escolhidas={datasEscolhidas}
+            ano={ano}
+            aoMudar={setDatasEscolhidas}
+            aoFechar={() => setEscolhendoDatas(false)}
+          />
+        )}
       </main>
     </div>
   );

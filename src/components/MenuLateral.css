@@ -5,6 +5,26 @@
   background: var(--fundo-painel);
 }
 
+/* Fundo escolhido em Configurações (cor, padrão ou foto). Fica parado atrás das telas ao rolar. */
+:root[data-fundo] .pp-app {
+  background: transparent;
+}
+
+:root[data-fundo] .pp-app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--fundo-app);
+  pointer-events: none;
+}
+
+@media print {
+  :root[data-fundo] .pp-app::before {
+    display: none;
+  }
+}
+
 /* ===== Menu lateral ===== */
 .lateral {
   position: sticky;

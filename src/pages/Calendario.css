@@ -647,3 +647,110 @@
     font-size: 9px;
   }
 }
+
+/* ===== Datas do ano (feriados, 13º, datas comemorativas) ===== */
+.cal-quadro {
+  position: relative;
+}
+
+.cal-quadro__anual {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.cal-quadro--feriado .cal-quadro__numero,
+.cal-grade__legenda-feriado {
+  color: var(--negativo);
+}
+
+.cal-quadro--hoje.cal-quadro--feriado .cal-quadro__numero {
+  color: var(--preto);
+}
+
+.cal-grade__legenda {
+  flex-wrap: wrap;
+}
+
+.cal-grade__legenda-feriado {
+  margin-left: 8px;
+  font-weight: 800;
+}
+
+.cal-grade__datas {
+  margin-left: auto;
+  padding: 5px 12px;
+  border: 1.5px solid var(--borda);
+  border-radius: 999px;
+  background: var(--branco);
+  color: var(--preto);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cal-grade__datas:hover {
+  border-color: var(--preto);
+}
+
+.cal-dia__datas {
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-data {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--fundo-painel);
+  border: 1.5px solid var(--borda);
+}
+
+.cal-data--folga {
+  border-color: #efc2bd;
+  background: #fdf1ef;
+}
+
+.cal-data__emoji {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.cal-data__textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cal-data__textos b {
+  font-size: 14px;
+}
+
+.cal-data__textos small {
+  font-size: 12px;
+  color: var(--cinza);
+  line-height: 1.35;
+}
+
+@media (max-width: 600px) {
+  .cal-quadro__anual {
+    top: 2px;
+    right: 2px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .cal-grade__datas {
+    margin-left: 0;
+  }
+}
