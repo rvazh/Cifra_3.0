@@ -1,0 +1,103 @@
+/* ===== Botão do Distraction Block (acima do atendimento, 70% do tamanho) ===== */
+.dbk {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 58px; /* centraliza o botão menor em cima do de atendimento */
+}
+
+.dbk__botao {
+  width: 41px; /* 70% dos 58px do botão de atendimento */
+  height: 41px;
+  margin: 0 auto;
+  padding: 0;
+  border: 2px solid var(--preto);
+  border-radius: 50%;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.dbk__botao img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dbk__botao:hover,
+.dbk__botao--aberto {
+  transform: scale(1.08);
+}
+
+.dbk__balao {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: max-content;
+  max-width: min(260px, calc(100vw - 110px));
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  padding: 10px 12px 10px 14px;
+  border-radius: 14px;
+  border: 2px solid var(--preto);
+  background: var(--branco);
+  color: var(--preto);
+  text-decoration: none;
+  box-shadow: -4px 4px 0 var(--preto);
+}
+
+.dbk__balao b {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.dbk__balao small {
+  grid-column: 1;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--texto-suave);
+}
+
+.dbk__seta {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--preto);
+  color: var(--branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.dbk__balao:hover b {
+  text-decoration: underline;
+}
+
+/* Pontinha do balão apontando para o botão */
+.dbk__balao::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid var(--preto);
+  border-right: 2px solid var(--preto);
+  background: var(--branco);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dbk__botao {
+    transition: none;
+  }
+}

@@ -6,8 +6,9 @@ import { inicioDoMes } from '../dados/preferencias.js';
 import { carregarOrcamentos, salvarOrcamentos, situacaoDosOrcamentos, porcentagemDeAviso } from '../dados/orcamentos.js';
 import { conferirAlertasAgora } from '../dados/alertas.js';
 import './Orcamento.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
-const paraTexto = (n) => (n ? String(n).replace('.', ',') : '');
+const paraTexto = (n) => valorParaCampo(n);
 function lerValor(texto) {
   const n = parseFloat(String(texto).replace(/\s|R\$/gi, '').replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
@@ -176,7 +177,7 @@ export default function OrcamentoCategorias({ aoFechar, aoSalvar }) {
                   inputMode="decimal"
                   placeholder="0,00"
                   value={valores[c.nome] || ''}
-                  onChange={(e) => setValores({ ...valores, [c.nome]: e.target.value })}
+                  onChange={(e) => setValores({ ...valores, [c.nome]: mascaraValor(e.target.value) })}
                 />
               </span>
             </li>

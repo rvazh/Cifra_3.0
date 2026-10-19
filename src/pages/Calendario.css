@@ -595,3 +595,55 @@
 .cal-dia__parcelas {
   margin-top: 4px;
 }
+
+/* Marca de conta fixa no dia do vencimento */
+.cal-quadro__fixa {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.cal-quadro--hoje .cal-quadro__fixa,
+.cal-quadro--escolhido .cal-quadro__fixa {
+  background: var(--dourado);
+  color: var(--preto);
+}
+
+.cal-grade__legenda {
+  margin: 12px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.cal-item__selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cal-selo--fixa {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--dourado-claro);
+  color: var(--dourado-escuro);
+}
+
+@media (max-width: 600px) {
+  .cal-quadro__fixa {
+    padding: 1px 4px;
+    font-size: 9px;
+  }
+}

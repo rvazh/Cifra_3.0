@@ -14,6 +14,7 @@ import {
 } from '../dados/objetivos.js';
 import './Painel.css';
 import './Objetivos.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 // "1.234,56" -> 1234.56
 function lerNumero(texto) {
@@ -21,7 +22,7 @@ function lerNumero(texto) {
   return Number.isFinite(numero) ? numero : null;
 }
 
-const numeroParaTexto = (n) => n.toFixed(2).replace('.', ',');
+const numeroParaTexto = (n) => valorParaCampo(n, { vazioSeZero: false });
 
 const PASSOS = [
   { titulo: 'Crie um objetivo', texto: 'Dê um nome, diga quanto quer juntar e até quando.' },
@@ -287,7 +288,7 @@ export default function Objetivos() {
                           placeholder="R$ 0,00"
                           value={movimento.texto}
                           onChange={(e) => {
-                            setMovimento({ ...movimento, texto: e.target.value });
+                            setMovimento({ ...movimento, texto: mascaraValor(e.target.value) });
                             setErroMovimento('');
                           }}
                         />
@@ -391,7 +392,7 @@ export default function Objetivos() {
                     inputMode="decimal"
                     placeholder="5.000,00"
                     value={formulario.metaTexto}
-                    onChange={(e) => atualizar({ metaTexto: e.target.value })}
+                    onChange={(e) => atualizar({ metaTexto: mascaraValor(e.target.value) })}
                   />
                 </label>
                 <label className="obj-form__campo">
@@ -399,7 +400,7 @@ export default function Objetivos() {
                   <input
                     inputMode="decimal"
                     value={formulario.guardadoTexto}
-                    onChange={(e) => atualizar({ guardadoTexto: e.target.value })}
+                    onChange={(e) => atualizar({ guardadoTexto: mascaraValor(e.target.value) })}
                   />
                 </label>
               </div>

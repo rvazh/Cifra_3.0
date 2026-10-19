@@ -15,7 +15,7 @@ import {
   mesFinanceiro,
 } from '../dados/lancamentos.js';
 import { inicioDoMes } from '../dados/preferencias.js';
-import { carregarContas, saldoGeralNoFimDo } from '../dados/contas.js';
+import { carregarContas, saldoGeralNoFimDo, saldoGeralNoDia } from '../dados/contas.js';
 import ResumoMeses from '../components/ResumoMeses.jsx';
 import './Painel.css';
 import './Relatorios.css';
@@ -38,6 +38,26 @@ function mesesDoPeriodo(referencia, periodo) {
   }
   return Array.from({ length: periodo.meses }, (_, i) => mudarMes(referencia, i - periodo.meses + 1));
 }
+
+// Semanas de um mês financeiro: [{ inicio: '2026-10-01', fim: '2026-10-07' }, ...]
+function semanasDoMes(mes, inicio) {
+  const [ano, m] = mes.split('-').map(Number);
+  const ultimoDia = new Date(ano, m, 0).getDate();
+  const comeco = new Date(ano, m - 1, Math.min(inicio, ultimoDia));
+  const proximo = new Date(ano, m, Math.min(inicio, new Date(ano, m + 1, 0).getDate()));
+  const texto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const semanas = [];
+  for (let d = new Date(comeco); d < proximo; d.setDate(d.getDate() + 7)) {
+    const fim = new Date(d);
+    fim.setDate(fim.getDate() + 6);
+    const ultimo = fim < proximo ? fim : new Date(proximo.getTime() - 86400000);
+    semanas.push({ inicio: texto(d), fim: texto(ultimo) });
+  }
+  return semanas;
+}
+
+const MESES_MINUSCULOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const diaMes = (data) => `${Number(data.slice(8))}/${MESES_MINUSCULOS[Number(data.slice(5, 7)) - 1]}`;
 
 // Mês de referência do período anterior (mesmo tamanho, logo antes)
 function referenciaAnterior(referencia, periodo) {
@@ -146,12 +166,23 @@ export default function Relatorios() {
   const atual = totais(itens);
   const antes = totais(anteriores);
 
-  // Gráfico mês a mês (no modo "Mês", mostra os 6 meses até o mês escolhido)
-  const mesesDoGrafico = periodo.id === 'mes' ? mesesDoPeriodo(referencia, PERIODOS[2]) : meses;
-  const evolucao = mesesDoGrafico.map((m) => {
-    const t = totais(lista.filter((l) => mesFinanceiro(l.data) === m));
-    return { chave: m, mes: mesCurto(m), ...t, saldo: saldoGeralNoFimDo(m, todos, contas) };
-  });
+  // Gráfico: no modo "Mês", uma coluna por semana do mês escolhido; nos outros, uma por mês
+  const porSemana = periodo.id === 'mes';
+  const evolucao = porSemana
+    ? semanasDoMes(referencia, inicio).map((s, i) => {
+        const t = totais(lista.filter((l) => l.data >= s.inicio && l.data <= s.fim));
+        return {
+          chave: `${referencia}-s${i + 1}`,
+          mes: `${Number(s.inicio.slice(8))}–${Number(s.fim.slice(8))}`,
+          rotulo: `Semana ${i + 1} · ${diaMes(s.inicio)} a ${diaMes(s.fim)}`,
+          ...t,
+          saldo: saldoGeralNoDia(s.fim, todos, contas),
+        };
+      })
+    : meses.map((m) => {
+        const t = totais(lista.filter((l) => mesFinanceiro(l.data) === m));
+        return { chave: m, mes: mesCurto(m), ...t, saldo: saldoGeralNoFimDo(m, todos, contas) };
+      });
 
   // Despesas por categoria (com o valor do período anterior para comparar)
   const despesasAtuais = somaPor(itens.filter((l) => l.valor < 0), 'categoria');
@@ -351,7 +382,7 @@ export default function Relatorios() {
         <div className="rel__linha rel__linha--grafico">
           <section className="cartao">
             <div className="cartao__titulo-linha">
-              <h2 className="cartao__titulo">Receitas x despesas x saldo por mês</h2>
+              <h2 className="cartao__titulo">Receitas x despesas x saldo {porSemana ? 'por semana' : 'por mês'}</h2>
               <div className="legenda">
                 <span className="legenda__item">
                   <span className="legenda__cor legenda__cor--receita" />
@@ -372,14 +403,14 @@ export default function Relatorios() {
             </div>
             <div className="rel-tabela" role="table" aria-label="Resultado de cada mês">
               <div className="rel-tabela__linha rel-tabela__linha--titulo" role="row">
-                <span role="columnheader">Mês</span>
+                <span role="columnheader">{porSemana ? 'Semana' : 'Mês'}</span>
                 <span role="columnheader">Receitas</span>
                 <span role="columnheader">Despesas</span>
                 <span role="columnheader">Resultado</span>
               </div>
               {evolucao.map((m) => (
-                <div key={m.chave} role="row" className={meses.includes(m.chave) ? 'rel-tabela__linha rel-tabela__linha--periodo' : 'rel-tabela__linha'}>
-                  <span role="cell">{nomeDoMes(m.chave)}</span>
+                <div key={m.chave} role="row" className={!porSemana && meses.includes(m.chave) ? 'rel-tabela__linha rel-tabela__linha--periodo' : 'rel-tabela__linha'}>
+                  <span role="cell">{m.rotulo || nomeDoMes(m.chave)}</span>
                   <span role="cell">{reais(m.receitas)}</span>
                   <span role="cell">{reais(m.despesas)}</span>
                   {m.receitas === 0 && m.despesas === 0 ? (

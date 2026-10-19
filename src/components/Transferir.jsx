@@ -3,6 +3,7 @@ import { reais } from './Graficos.jsx';
 import { criarTransferencia, dataDeHoje } from '../dados/lancamentos.js';
 import { mesmoNome } from '../dados/contas.js';
 import './Transferir.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 function lerValor(texto) {
   const n = parseFloat(String(texto).replace(/\s|R\$/gi, '').replace(/\./g, '').replace(',', '.'));
@@ -14,7 +15,7 @@ export default function Transferir({ contas, inicial = {}, aoConfirmar, aoFechar
   const nomes = contas.map((c) => c.nome);
   const [de, setDe] = useState(inicial.de || nomes.find((n) => n !== inicial.para) || '');
   const [para, setPara] = useState(inicial.para || nomes.find((n) => n !== (inicial.de || nomes[0])) || '');
-  const [valorTexto, setValorTexto] = useState(inicial.valor ? inicial.valor.toFixed(2).replace('.', ',') : '');
+  const [valorTexto, setValorTexto] = useState(inicial.valor ? valorParaCampo(inicial.valor) : '');
   const [data, setData] = useState(dataDeHoje());
   const [descricao, setDescricao] = useState(inicial.descricao || '');
   const [erro, setErro] = useState('');
@@ -89,7 +90,7 @@ export default function Transferir({ contas, inicial = {}, aoConfirmar, aoFechar
                   placeholder="0,00"
                   value={valorTexto}
                   onChange={(e) => {
-                    setValorTexto(e.target.value);
+                    setValorTexto(mascaraValor(e.target.value));
                     setErro('');
                   }}
                 />

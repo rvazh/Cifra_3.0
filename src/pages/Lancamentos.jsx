@@ -34,6 +34,7 @@ import {
 } from '../dados/lancamentos.js';
 import './Painel.css';
 import './Lancamentos.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 // Opções para criar uma categoria nova
 const EMOJIS = ['🐶', '🎓', '👕', '💡', '📱', '🎁', '✈️', '💪', '🧾', '💼', '🏦', '🍔'];
@@ -118,6 +119,16 @@ function DetalheTransferencia({ item, lista }) {
         {item.valor < 0 ? conta : objetivo}
         <span aria-hidden="true">→</span>
         {item.valor < 0 ? objetivo : conta}
+      </div>
+    );
+  }
+  if (item.ajuste) {
+    return (
+      <div className="detalhe__transf">
+        <span>
+          <small>Ajuste de saldo da conta</small>
+          <b>{item.conta}</b>
+        </span>
       </div>
     );
   }
@@ -540,7 +551,7 @@ export default function Lancamentos() {
     setEditando({
       ...l,
       tipo: l.valor >= 0 ? 'receita' : 'despesa',
-      valorTexto: Math.abs(l.valor).toFixed(2).replace('.', ','),
+      valorTexto: valorParaCampo(Math.abs(l.valor)),
     });
   }
 
@@ -613,7 +624,7 @@ export default function Lancamentos() {
                 autoComplete="off"
                 placeholder="0,00"
                 value={novo.valorTexto}
-                onChange={(e) => mudarNovo('valorTexto', e.target.value)}
+                onChange={(e) => mudarNovo('valorTexto', mascaraValor(e.target.value))}
               />
             </label>
             <label className="novo__campo">
@@ -864,11 +875,11 @@ export default function Lancamentos() {
                 </label>
                 <label className="lanc-filtros__campo">
                   Valor de (R$)
-                  <input inputMode="decimal" placeholder="0,00" value={filtros.minimo} onChange={(e) => mudarFiltro('minimo', e.target.value)} />
+                  <input inputMode="decimal" placeholder="0,00" value={filtros.minimo} onChange={(e) => mudarFiltro('minimo', mascaraValor(e.target.value))} />
                 </label>
                 <label className="lanc-filtros__campo">
                   até (R$)
-                  <input inputMode="decimal" placeholder="sem limite" value={filtros.maximo} onChange={(e) => mudarFiltro('maximo', e.target.value)} />
+                  <input inputMode="decimal" placeholder="sem limite" value={filtros.maximo} onChange={(e) => mudarFiltro('maximo', mascaraValor(e.target.value))} />
                 </label>
                 <p className="lanc-filtros__dica">A categoria é escolhida nos atalhos acima da lista.</p>
               </div>
@@ -1120,7 +1131,7 @@ export default function Lancamentos() {
                 <div className="edicao__dupla">
                   <label className="edicao__campo">
                     Valor (R$)
-                    <input inputMode="decimal" value={editando.valorTexto} onChange={(e) => setEditando({ ...editando, valorTexto: e.target.value })} required />
+                    <input inputMode="decimal" value={editando.valorTexto} onChange={(e) => setEditando({ ...editando, valorTexto: mascaraValor(e.target.value) })} required />
                   </label>
                   <label className="edicao__campo">
                     Data

@@ -18,13 +18,14 @@ import {
 import './Painel.css';
 import './Receber.css'; // a tela "A pagar" usa o mesmo visual da tela "A receber"
 import './Pagar.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 // "1.234,56" -> 1234.56
 function lerNumero(texto) {
   const n = parseFloat(String(texto).replace(/\s|R\$/gi, '').replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(n) ? n : null;
 }
-const paraTexto = (n) => (n ? n.toFixed(2).replace('.', ',') : '');
+const paraTexto = (n) => valorParaCampo(n);
 const dataLonga = (data) => data.split('-').reverse().join('/');
 
 // Iniciais para o "avatar" de quem você deve: "Banco Inter" -> "BI"
@@ -41,11 +42,15 @@ function textoDoPrazo(p) {
   return `atrasada há ${-p.dias} ${p.dias === -1 ? 'dia' : 'dias'} (${dataCurta(p.vence)})`;
 }
 
+const NOMES_DOS_MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const nomeDoMesCurto = (data) => `${NOMES_DOS_MESES[Number(data.slice(5, 7)) - 1]} de ${data.slice(0, 4)}`;
+
 const FORM_VAZIO = {
   pessoa: '',
   motivo: '',
   tipo: 'emprestimo',
   valorTexto: '',
+  parcelaTexto: '',
   data: dataDeHoje(),
   parcelas: 1,
   primeiroVencimento: '',
@@ -110,6 +115,27 @@ export default function Pagar() {
     setErro('');
   };
 
+  // Valor total, número de parcelas e valor da parcela andam juntos:
+  // mudou o total ou a quantidade -> recalcula a parcela; mudou a parcela -> recalcula o total
+  const centavos = (n) => Math.round(n * 100) / 100;
+  function mudarTotal(texto) {
+    const total = lerNumero(texto);
+    const qtd = Math.round(Number(formulario.parcelas));
+    atualizar({ valorTexto: texto, parcelaTexto: total > 0 && qtd > 1 ? paraTexto(centavos(total / qtd)) : '' });
+  }
+  function mudarQuantidade(texto) {
+    const qtd = Math.round(Number(texto));
+    const parcela = lerNumero(formulario.parcelaTexto);
+    const total = lerNumero(formulario.valorTexto);
+    if (parcela > 0 && qtd > 1 && !(total > 0)) atualizar({ parcelas: texto, valorTexto: paraTexto(centavos(parcela * qtd)) });
+    else atualizar({ parcelas: texto, parcelaTexto: total > 0 && qtd > 1 ? paraTexto(centavos(total / qtd)) : '' });
+  }
+  function mudarParcela(texto) {
+    const parcela = lerNumero(texto);
+    const qtd = Math.round(Number(formulario.parcelas));
+    atualizar({ parcelaTexto: texto, ...(parcela > 0 && qtd > 1 ? { valorTexto: paraTexto(centavos(parcela * qtd)) } : {}) });
+  }
+
   function abrirNova() {
     setFormulario({ ...FORM_VAZIO, data: dataDeHoje(), contaEntrada: contas[0] || '', categoria: categorias.includes('Outros') ? 'Outros' : categorias[0] || 'Outros' });
   }
@@ -121,6 +147,7 @@ export default function Pagar() {
       motivo: d.motivo || '',
       tipo: d.tipo || 'emprestimo',
       valorTexto: paraTexto(d.valor),
+      parcelaTexto: (d.parcelas || 1) > 1 ? paraTexto(Math.round((d.valor / d.parcelas) * 100) / 100) : '',
       data: d.data,
       parcelas: d.parcelas || 1,
       primeiroVencimento: d.primeiroVencimento || '',
@@ -472,7 +499,7 @@ export default function Pagar() {
                       <div className="rcb-receber__linha">
                         <label>
                           Quanto pagou (R$)
-                          <input autoFocus inputMode="decimal" value={pagando.valorTexto} onChange={(e) => { setPagando({ ...pagando, valorTexto: e.target.value }); setErroPagamento(''); }} />
+                          <input autoFocus inputMode="decimal" value={pagando.valorTexto} onChange={(e) => { setPagando({ ...pagando, valorTexto: mascaraValor(e.target.value) }); setErroPagamento(''); }} />
                         </label>
                         <label>
                           Quando
@@ -565,7 +592,7 @@ export default function Pagar() {
               <div className="rcb-form__dupla">
                 <label className="rcb-form__campo">
                   Valor total a pagar (R$)
-                  <input inputMode="decimal" placeholder="1.200,00" value={formulario.valorTexto} onChange={(e) => atualizar({ valorTexto: e.target.value })} />
+                  <input inputMode="decimal" placeholder="1.200,00" value={formulario.valorTexto} onChange={(e) => mudarTotal(mascaraValor(e.target.value))} />
                   <small>Com os juros do contrato, se tiver.</small>
                 </label>
                 <label className="rcb-form__campo">
@@ -577,17 +604,37 @@ export default function Pagar() {
               <div className="rcb-form__dupla">
                 <label className="rcb-form__campo">
                   Em quantas parcelas
-                  <input type="number" min="1" max="120" inputMode="numeric" value={formulario.parcelas} onChange={(e) => atualizar({ parcelas: e.target.value })} />
+                  <input type="number" min="1" max="120" inputMode="numeric" value={formulario.parcelas} onChange={(e) => mudarQuantidade(e.target.value)} />
                 </label>
                 <label className="rcb-form__campo">
-                  {Number(formulario.parcelas) > 1 ? '1ª parcela vence em' : 'Vence em'} <small>(opcional)</small>
-                  <input type="date" value={formulario.primeiroVencimento} onChange={(e) => atualizar({ primeiroVencimento: e.target.value })} />
+                  Valor da parcela (R$)
+                  <input
+                    id="pgr-parcela"
+                    inputMode="decimal"
+                    placeholder={Number(formulario.parcelas) > 1 ? '100,00' : 'Sem parcelas'}
+                    disabled={!(Number(formulario.parcelas) > 1)}
+                    value={formulario.parcelaTexto}
+                    onChange={(e) => mudarParcela(mascaraValor(e.target.value))}
+                  />
+                  <small>{Number(formulario.parcelas) > 1 ? 'Preencha o total ou a parcela: o outro é calculado.' : 'Coloque 2 ou mais parcelas para usar.'}</small>
                 </label>
               </div>
+              <label className="rcb-form__campo">
+                {Number(formulario.parcelas) > 1 ? '1ª parcela vence em' : 'Vence em'} <small>(opcional)</small>
+                <input type="date" value={formulario.primeiroVencimento} onChange={(e) => atualizar({ primeiroVencimento: e.target.value })} />
+              </label>
               {lerNumero(formulario.valorTexto) > 0 && Number(formulario.parcelas) > 1 && (
                 <p className="rcb-form__dica">
                   {formulario.parcelas}x de {reais(lerNumero(formulario.valorTexto) / Number(formulario.parcelas))}
                   {formulario.primeiroVencimento ? `, todo dia ${Number(formulario.primeiroVencimento.slice(8))}` : ''}.
+                </p>
+              )}
+              {!(Number(formulario.parcelas) > 1) && (
+                <p className="rcb-form__aviso" role="note">
+                  <b>Sem parcelas:</b>{' '}
+                  {lerNumero(formulario.valorTexto) > 0 ? `o valor total (${reais(lerNumero(formulario.valorTexto))})` : 'o valor total'} será somado às
+                  despesas do mês {formulario.primeiroVencimento ? `de vencimento (${nomeDoMesCurto(formulario.primeiroVencimento)})` : 'em que vencer'}. Para dividir
+                  entre os meses, coloque o número de parcelas.
                 </p>
               )}
 
@@ -628,11 +675,11 @@ export default function Pagar() {
                   <div className="rcb-form__dupla">
                     <label className="rcb-form__campo">
                       Juros ao mês (%)
-                      <input inputMode="decimal" placeholder="1,00" value={formulario.jurosMesTexto} onChange={(e) => atualizar({ jurosMesTexto: e.target.value })} />
+                      <input inputMode="decimal" placeholder="1,00" value={formulario.jurosMesTexto} onChange={(e) => atualizar({ jurosMesTexto: mascaraValor(e.target.value) })} />
                     </label>
                     <label className="rcb-form__campo">
                       Multa por atraso (%) <small>(uma vez)</small>
-                      <input inputMode="decimal" placeholder="2,00" value={formulario.multaTexto} onChange={(e) => atualizar({ multaTexto: e.target.value })} />
+                      <input inputMode="decimal" placeholder="2,00" value={formulario.multaTexto} onChange={(e) => atualizar({ multaTexto: mascaraValor(e.target.value) })} />
                     </label>
                   </div>
                   <p className="rcb-form__dica rcb-form__dica--juros">
@@ -680,7 +727,7 @@ export default function Pagar() {
                 {!formulario.id && (
                   <label className="rcb-form__campo">
                     Já pagou alguma parte? <small>(R$)</small>
-                    <input inputMode="decimal" placeholder="0,00" value={formulario.jaPagoTexto} onChange={(e) => atualizar({ jaPagoTexto: e.target.value })} />
+                    <input inputMode="decimal" placeholder="0,00" value={formulario.jaPagoTexto} onChange={(e) => atualizar({ jaPagoTexto: mascaraValor(e.target.value) })} />
                   </label>
                 )}
               </div>

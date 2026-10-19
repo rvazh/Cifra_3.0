@@ -5,8 +5,9 @@ import { dataCurta, dataDeHoje, diasAte } from '../dados/lancamentos.js';
 import { contasParaParcela, contaSugerida, registrarParcela, mudarDataDaParcela } from '../dados/parcelas.js';
 import { conferirAlertasAgora } from '../dados/alertas.js';
 import './ParcelaDivida.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
-const paraTexto = (n) => (n ? n.toFixed(2).replace('.', ',') : '');
+const paraTexto = (n) => valorParaCampo(n);
 function lerNumero(texto) {
   const n = parseFloat(String(texto).replace(/\s|R\$/gi, '').replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(n) ? n : null;
@@ -122,7 +123,7 @@ export default function ParcelaDivida({ p, aoMudar, mostrarData = false }) {
         <form className="pcl__form" onSubmit={confirmarRegistro}>
           <label>
             {receber ? 'Quanto recebeu (R$)' : 'Quanto pagou (R$)'}
-            <input autoFocus inputMode="decimal" value={form.valorTexto} onChange={(e) => { setForm({ ...form, valorTexto: e.target.value }); setErro(''); }} />
+            <input autoFocus inputMode="decimal" value={form.valorTexto} onChange={(e) => { setForm({ ...form, valorTexto: mascaraValor(e.target.value) }); setErro(''); }} />
           </label>
           <label>
             {receber ? 'Entrou em' : 'Saiu de'}

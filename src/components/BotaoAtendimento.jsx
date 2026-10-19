@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IconeAtendimento, IconeWhatsApp, IconeEmail } from './Icones.jsx';
 import { EMAIL_SUPORTE, WHATSAPP_ATENDIMENTO } from '../config.js';
+import BotaoDistraction from './BotaoDistraction.jsx';
 import './BotaoAtendimento.css';
 
 const MENSAGEM = 'Olá! Vim pelo site da CIFRA e preciso de ajuda.';
@@ -66,6 +67,8 @@ export default function BotaoAtendimento() {
           </a>
         </div>
       )}
+
+      {!aberto && <BotaoDistraction />}
 
       <button
         ref={botao}

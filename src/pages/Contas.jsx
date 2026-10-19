@@ -5,12 +5,13 @@ import { IconeMais, IconeCima, IconeBaixo, IconeEnviar } from '../components/Ico
 import ImportarOFX from '../components/ImportarOFX.jsx';
 import Transferir from '../components/Transferir.jsx';
 import { reais } from '../components/Graficos.jsx';
-import { carregar, salvar, novoId, dataCurta, nomeDoMes } from '../dados/lancamentos.js';
+import { carregar, salvar, novoId, dataCurta, nomeDoMes, dataDeHoje, TRANSFERENCIA } from '../dados/lancamentos.js';
 import { TIPOS, CORES, carregarContas, salvarContas, resumoDaConta, mesmoNome, ehCartao, resumoDoCartao } from '../dados/contas.js';
 import { lerArquivoOFX } from '../dados/ofx.js';
 import { lerArquivoCSV } from '../dados/csv.js';
 import './Painel.css';
 import './Contas.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 function valorComSinal(valor) {
   return `${valor >= 0 ? '+ ' : '− '}${reais(Math.abs(valor))}`;
@@ -31,7 +32,7 @@ function lerNumero(texto) {
 const CONTA_VAZIA = {
   nome: '',
   tipo: 'Conta corrente',
-  saldoTexto: '0,00',
+  saldoTexto: '',
   cor: CORES[0],
   noTotal: true,
   limiteTexto: '',
@@ -92,11 +93,15 @@ export default function Contas() {
   function abrirEdicao(conta) {
     setErro('');
     const cartao = ehCartao(conta);
+    // Conta comum: o campo mostra o saldo de HOJE. Se a pessoa mudar, a diferença vira um lançamento datado de hoje
+    // (assim os meses passados dos gráficos não mudam).
+    const saldoHoje = Math.round(resumoDaConta(conta, lancamentos).saldo * 100) / 100;
     setFormulario({
       ...conta,
+      saldoAntes: saldoHoje,
       // No cartão, o "saldo inicial" é o que já se devia (fica negativo); no formulário aparece positivo
-      saldoTexto: (cartao ? -conta.saldoInicial : conta.saldoInicial).toFixed(2).replace('.', ','),
-      limiteTexto: conta.limite ? conta.limite.toFixed(2).replace('.', ',') : '',
+      saldoTexto: cartao ? valorParaCampo(-conta.saldoInicial) : valorParaCampo(saldoHoje, { vazioSeZero: false }),
+      limiteTexto: conta.limite ? valorParaCampo(conta.limite) : '',
       fechamento: conta.fechamento || '',
       vencimento: conta.vencimento || '',
     });
@@ -128,11 +133,53 @@ export default function Contas() {
     const repetida = contas.some((c) => c.nome.toLowerCase() === nome.toLowerCase() && c.id !== formulario.id);
     if (repetida) return setErro('Já existe uma conta com esse nome.');
 
+    const antiga = formulario.id ? contas.find((c) => c.id === formulario.id) : null;
+    const hoje = dataDeHoje();
+    // Conta comum: o valor digitado não muda o passado. Vira lançamento de hoje:
+    //  - primeiro valor da conta (conta nova, ou conta ainda sem nenhum lançamento) = receita do mês;
+    //  - mudança depois disso = "Ajuste de saldo" (não conta como receita nem despesa).
+    let movimento = null;
+    if (!cartao) {
+      const antes = antiga ? formulario.saldoAntes || 0 : 0;
+      const diferenca = Math.round((numero - antes) * 100) / 100;
+      const semHistorico = !antiga || (!lancamentos.some((l) => l.conta === antiga.nome) && !antiga.saldoInicial);
+      if (Math.abs(diferenca) >= 0.01) {
+        movimento = semHistorico
+          ? {
+              id: novoId(),
+              data: hoje,
+              descricao: `Saldo inicial · ${nome}`,
+              categoria: diferenca > 0 ? 'Extra' : 'Outros',
+              conta: nome,
+              valor: diferenca,
+              pago: true,
+              repete: false,
+              observacao: 'Primeiro valor da conta',
+              saldoInicialDaConta: true,
+            }
+          : {
+              id: novoId(),
+              data: hoje,
+              descricao: `Ajuste de saldo · ${nome}`,
+              categoria: TRANSFERENCIA.nome,
+              conta: nome,
+              valor: diferenca,
+              pago: true,
+              repete: false,
+              observacao: 'Saldo corrigido em Contas',
+              transferencia: novoId(), // ajuste não é ganho nem gasto
+              ajuste: true,
+            };
+      }
+    }
+
     const conta = {
       id: formulario.id || novoId(),
       nome,
       tipo: formulario.tipo,
-      saldoInicial,
+      // Conta comum guarda o saldo inicial antigo (contas de antes desta mudança); o resto vai por lançamentos
+      saldoInicial: cartao ? saldoInicial : antiga ? antiga.saldoInicial || 0 : 0,
+      criadaEm: antiga?.criadaEm || (antiga ? undefined : hoje),
       cor: formulario.cor,
       noTotal: formulario.noTotal,
       ...(cartao
@@ -140,8 +187,9 @@ export default function Contas() {
         : {}),
     };
 
+    if (!conta.criadaEm) delete conta.criadaEm;
+    if (movimento) setLancamentos((atual) => [movimento, ...atual]);
     if (formulario.id) {
-      const antiga = contas.find((c) => c.id === formulario.id);
       setContas((atual) => atual.map((c) => (c.id === conta.id ? conta : c)));
       // Se o nome mudou, os lançamentos dessa conta passam a usar o nome novo
       if (antiga && antiga.nome !== nome) {
@@ -206,6 +254,7 @@ export default function Contas() {
           nome,
           tipo: cartao ? 'Cartão de crédito' : 'Conta corrente',
           saldoInicial,
+          criadaEm: dataDeHoje(),
           cor: CORES[atual.length % CORES.length],
           noTotal: !cartao,
         },
@@ -619,11 +668,11 @@ export default function Contas() {
                   </select>
                 </label>
                 <label className="ct-form__campo">
-                  {formulario.tipo === 'Cartão de crédito' ? 'Já deve hoje (R$)' : 'Saldo inicial (R$)'}
+                  {formulario.tipo === 'Cartão de crédito' ? 'Já deve hoje (R$)' : 'Saldo atual (R$)'}
                   <input
                     inputMode="decimal"
                     value={formulario.saldoTexto}
-                    onChange={(e) => setFormulario({ ...formulario, saldoTexto: e.target.value })}
+                    onChange={(e) => setFormulario({ ...formulario, saldoTexto: mascaraValor(e.target.value) })}
                   />
                 </label>
               </div>
@@ -636,7 +685,7 @@ export default function Contas() {
                         inputMode="decimal"
                         placeholder="0,00"
                         value={formulario.limiteTexto}
-                        onChange={(e) => setFormulario({ ...formulario, limiteTexto: e.target.value })}
+                        onChange={(e) => setFormulario({ ...formulario, limiteTexto: mascaraValor(e.target.value) })}
                       />
                     </label>
                     <label className="ct-form__campo">
@@ -665,8 +714,9 @@ export default function Contas() {
                 </>
               ) : (
                 <p className="ct-form__dica">
-                  O saldo inicial é quanto havia na conta antes dos lançamentos. O saldo atual soma tudo o que já foi pago e
-                  recebido nela.
+                  {!formulario.id || (!lancamentos.some((l) => l.conta === formulario.nome) && !formulario.saldoInicial)
+                    ? 'Quanto tem na conta hoje. Esse primeiro valor entra como receita deste mês.'
+                    : 'Quanto tem na conta hoje. Se mudar, a diferença entra hoje como "Ajuste de saldo" (não conta como receita nem despesa) e os meses passados não mudam.'}
                 </p>
               )}
 

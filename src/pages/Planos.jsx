@@ -78,7 +78,6 @@ const planos = [
     itens: [
       { texto: <>Tudo do <b>Plano Essencial</b></>, incluso: true },
       { texto: <>Acesso ao app <b>“Distraction Block”</b> incluso no plano</>, incluso: true },
-      { texto: 'Presente surpresa de agradecimento no começo e no final do ano', incluso: true },
     ],
   },
 ];

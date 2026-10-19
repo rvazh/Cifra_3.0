@@ -66,6 +66,7 @@ export function garantirConta(nome) {
     nome: limpo,
     tipo: cartao ? 'Cartão de crédito' : /carteira|dinheiro/i.test(limpo) ? 'Carteira' : 'Conta corrente',
     saldoInicial: 0,
+    criadaEm: dataDeHoje(),
     cor: CORES[contas.length % CORES.length],
     noTotal: !cartao, // cartão não soma no saldo: o dinheiro sai da conta quando a fatura é paga
   };
@@ -99,6 +100,13 @@ export function resumoDaConta(conta, lancamentos) {
   return { saldo, previsto, entradas, saidas, ultimos, quantidade: daConta.length };
 }
 
+// Mês em que a conta começou a existir na CIFRA
+export function mesDeInicioDaConta(conta, lancamentos, mesAtual = mesFinanceiro(dataDeHoje())) {
+  if (conta.criadaEm) return mesFinanceiro(conta.criadaEm);
+  const datas = lancamentos.filter((l) => l.conta === conta.nome).map((l) => l.data);
+  return datas.length ? mesFinanceiro(datas.sort()[0]) : mesAtual;
+}
+
 // Saldo geral (soma das contas marcadas para entrar no total) no fim de um mês ("2026-08").
 // Mês atual (ou futuro) = saldo de hoje, igual ao cartão "Saldo geral" do painel.
 // Meses passados = saldo inicial + tudo o que foi pago/recebido até o fim daquele mês.
@@ -106,9 +114,24 @@ export function saldoGeralNoFimDo(mes, lancamentos, contas = carregarContas()) {
   const mesAtual = mesFinanceiro(dataDeHoje());
   const noTotal = contas.filter((c) => c.noTotal);
   const nomes = new Set(noTotal.map((c) => c.nome));
-  const inicial = noTotal.reduce((s, c) => s + (Number(c.saldoInicial) || 0), 0);
+  // O saldo inicial de uma conta só vale a partir do mês em que ela começou
+  // (data de criação; nas contas antigas, o mês do primeiro lançamento dela)
+  const inicial = noTotal.reduce((s, c) => (mes >= mesDeInicioDaConta(c, lancamentos, mesAtual) ? s + (Number(c.saldoInicial) || 0) : s), 0);
   return lancamentos
     .filter((l) => l.pago && nomes.has(l.conta) && (mes >= mesAtual || mesFinanceiro(l.data) <= mes))
+    .reduce((s, l) => s + l.valor, inicial);
+}
+
+// Saldo geral no fim de um dia ("2026-10-14"). Hoje ou depois = saldo de hoje.
+export function saldoGeralNoDia(data, lancamentos, contas = carregarContas()) {
+  const hoje = dataDeHoje();
+  const mesAtual = mesFinanceiro(hoje);
+  const mesDoDia = mesFinanceiro(data);
+  const noTotal = contas.filter((c) => c.noTotal);
+  const nomes = new Set(noTotal.map((c) => c.nome));
+  const inicial = noTotal.reduce((s, c) => (mesDoDia >= mesDeInicioDaConta(c, lancamentos, mesAtual) ? s + (Number(c.saldoInicial) || 0) : s), 0);
+  return lancamentos
+    .filter((l) => l.pago && nomes.has(l.conta) && (data >= hoje || l.data <= data))
     .reduce((s, l) => s + l.valor, inicial);
 }
 

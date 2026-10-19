@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { reais } from './Graficos.jsx';
 import { dataDeHoje, historicoDaFixa, mudarMes, nomeDoMes, reajustarFixa } from '../dados/lancamentos.js';
 import './ReajustarFixa.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 // "2026-10" -> "out/2026"
 function mesCurto(mes) {
@@ -22,7 +23,7 @@ export default function ReajustarFixa({ modelo, lista, aoSalvar, aoFechar }) {
   const atual = historico[historico.length - 1] || { id: modelo.id, inicio: modelo.data.slice(0, 7), fim: null, valor: modelo.valor };
   const primeiroMes = atual.inicio; // não dá para reajustar antes da versão que está valendo
   const mesAtual = dataDeHoje().slice(0, 7);
-  const [valorTexto, setValorTexto] = useState(Math.abs(atual.valor).toFixed(2).replace('.', ','));
+  const [valorTexto, setValorTexto] = useState(valorParaCampo(Math.abs(atual.valor)));
   const [aPartirDe, setAPartirDe] = useState(mesAtual > primeiroMes ? mesAtual : primeiroMes);
   const [erro, setErro] = useState('');
 
@@ -71,7 +72,7 @@ export default function ReajustarFixa({ modelo, lista, aoSalvar, aoFechar }) {
               inputMode="decimal"
               value={valorTexto}
               onChange={(e) => {
-                setValorTexto(e.target.value);
+                setValorTexto(mascaraValor(e.target.value));
                 setErro('');
               }}
             />

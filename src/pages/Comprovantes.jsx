@@ -11,6 +11,11 @@ import {
   apagarComprovante,
   vincularComprovante,
   tamanhoLegivel,
+  listarGrupos,
+  criarGrupo,
+  renomearGrupo,
+  apagarGrupo,
+  moverParaGrupo,
 } from '../dados/comprovantes.js';
 import './Painel.css';
 import './Comprovantes.css';
@@ -26,6 +31,8 @@ function dataDoEnvio(iso) {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+const SEM_GRUPO = '__sem-grupo__';
+
 export default function Comprovantes() {
   const [comprovantes, setComprovantes] = useState([]);
   const [carregando, setCarregando] = useState(true);
@@ -36,6 +43,13 @@ export default function Comprovantes() {
   const [vendo, setVendo] = useState(null); // comprovante aberto na janela
   const [vinculo, setVinculo] = useState(''); // lançamento escolhido no envio avulso
   const campoArquivo = useRef(null);
+  // Grupos: '' = todos, SEM_GRUPO = os que não estão em grupo, ou o nome do grupo
+  const [grupos, setGrupos] = useState(listarGrupos);
+  const [grupoAtivo, setGrupoAtivo] = useState('');
+  const [grupoEnvio, setGrupoEnvio] = useState('');
+  const [nomeGrupo, setNomeGrupo] = useState(null); // texto do campo "novo grupo" / "renomear" (null = fechado)
+  const [renomeando, setRenomeando] = useState(false);
+  const [erroGrupo, setErroGrupo] = useState('');
 
   // Endereços temporários para mostrar as imagens (um por comprovante)
   const enderecos = useMemo(() => {
@@ -77,7 +91,9 @@ export default function Comprovantes() {
   );
 
   const termo = simplificar(busca.trim());
+  const doGrupo = (c) => (grupoAtivo === '' ? true : grupoAtivo === SEM_GRUPO ? !c.grupo : c.grupo === grupoAtivo);
   const visiveis = comprovantes.filter((c) => {
+    if (!doGrupo(c)) return false;
     if (!termo) return true;
     const l = porId[c.lancamentoId];
     return simplificar(`${c.nome} ${l ? `${l.descricao} ${l.categoria} ${l.conta}` : ''}`).includes(termo);
@@ -92,7 +108,7 @@ export default function Comprovantes() {
     setMensagem('');
     try {
       for (const arquivo of arquivos) {
-        const registro = await guardarComprovante(arquivo, vinculo || null);
+        const registro = await guardarComprovante(arquivo, vinculo || null, grupoEnvio);
         if (vinculo) {
           setLista((atual) => atual.map((l) => (l.id === vinculo ? { ...l, comprovanteId: registro.id } : l)));
         }
@@ -103,6 +119,58 @@ export default function Comprovantes() {
     } catch (e) {
       setErro(e.message || 'Não foi possível guardar o arquivo.');
     }
+  }
+
+  // ----- Grupos -----
+  function atualizarGrupos() {
+    setGrupos(listarGrupos());
+  }
+
+  function abrirNovoGrupo() {
+    setErroGrupo('');
+    setRenomeando(false);
+    setNomeGrupo('');
+  }
+
+  function abrirRenomear() {
+    setErroGrupo('');
+    setRenomeando(true);
+    setNomeGrupo(grupoAtivo);
+  }
+
+  function salvarGrupo(evento) {
+    evento.preventDefault();
+    try {
+      const nome = renomeando ? renomearGrupo(grupoAtivo, nomeGrupo) : criarGrupo(nomeGrupo);
+      atualizarGrupos();
+      setGrupoAtivo(nome);
+      setGrupoEnvio(nome);
+      setNomeGrupo(null);
+      if (renomeando) recarregar();
+    } catch (e) {
+      setErroGrupo(e.message);
+    }
+  }
+
+  function excluirGrupo() {
+    if (!window.confirm(`Apagar o grupo "${grupoAtivo}"? Os comprovantes dele continuam guardados, só ficam sem grupo.`)) return;
+    apagarGrupo(grupoAtivo);
+    atualizarGrupos();
+    if (grupoEnvio === grupoAtivo) setGrupoEnvio('');
+    setGrupoAtivo('');
+    recarregar();
+  }
+
+  function trocarGrupo(c, grupo) {
+    moverParaGrupo(c.id, grupo);
+    setVendo({ ...c, grupo: grupo || undefined });
+    recarregar();
+  }
+
+  function escolherGrupo(g) {
+    setGrupoAtivo(g);
+    setNomeGrupo(null);
+    if (g !== '' && g !== SEM_GRUPO) setGrupoEnvio(g);
   }
 
   async function excluir(c) {
@@ -154,6 +222,17 @@ export default function Comprovantes() {
               ))}
             </select>
           </label>
+          <label className="comp-envio__vinculo">
+            Guardar no grupo
+            <select value={grupoEnvio} onChange={(e) => setGrupoEnvio(e.target.value)}>
+              <option value="">Sem grupo</option>
+              {grupos.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
+          </label>
           <button type="button" className="comp-envio__botao" onClick={() => campoArquivo.current?.click()}>
             <IconeMais tamanho={18} espessura={2.6} />
             Enviar arquivo
@@ -189,6 +268,75 @@ export default function Comprovantes() {
           )}
         </div>
 
+        {/* ===== Grupos ===== */}
+        <div className="comp-grupos" role="toolbar" aria-label="Grupos de comprovantes">
+          {[
+            ['', 'Todos', comprovantes.length],
+            [SEM_GRUPO, 'Sem grupo', comprovantes.filter((c) => !c.grupo).length],
+            ...grupos.map((g) => [g, g, comprovantes.filter((c) => c.grupo === g).length]),
+          ].map(([id, nome, qtd]) => (
+            <button
+              key={id || 'todos'}
+              type="button"
+              aria-pressed={grupoAtivo === id}
+              className={grupoAtivo === id ? 'comp-grupo comp-grupo--ativo' : 'comp-grupo'}
+              onClick={() => escolherGrupo(id)}
+            >
+              {id !== '' && id !== SEM_GRUPO && <span aria-hidden="true">📁</span>}
+              {nome}
+              <span className="comp-grupo__qtd">{qtd}</span>
+            </button>
+          ))}
+          <button type="button" className="comp-grupo comp-grupo--novo" onClick={abrirNovoGrupo}>
+            <IconeMais tamanho={14} espessura={2.6} />
+            Novo grupo
+          </button>
+        </div>
+
+        {nomeGrupo !== null && (
+          <form className="comp-grupo-form" onSubmit={salvarGrupo}>
+            <label>
+              {renomeando ? `Novo nome para "${grupoAtivo}"` : 'Nome do grupo'}
+              <input
+                id="comp-nome-grupo"
+                autoFocus
+                maxLength={40}
+                placeholder="Ex.: Casa, Carro, Imposto de Renda 2026"
+                value={nomeGrupo}
+                onChange={(e) => {
+                  setNomeGrupo(e.target.value);
+                  setErroGrupo('');
+                }}
+              />
+            </label>
+            <button type="submit" className="comp-botao comp-botao--principal">
+              {renomeando ? 'Salvar nome' : 'Criar grupo'}
+            </button>
+            <button type="button" className="comp-botao" onClick={() => setNomeGrupo(null)}>
+              Cancelar
+            </button>
+            {erroGrupo && (
+              <p className="comp-envio__erro" role="alert">
+                {erroGrupo}
+              </p>
+            )}
+          </form>
+        )}
+
+        {grupoAtivo !== '' && grupoAtivo !== SEM_GRUPO && nomeGrupo === null && (
+          <div className="comp-grupo-acoes">
+            <span>
+              📁 <b>{grupoAtivo}</b> · os arquivos enviados agora vão para este grupo
+            </span>
+            <button type="button" className="comp-link" onClick={abrirRenomear}>
+              Renomear
+            </button>
+            <button type="button" className="comp-link comp-link--perigo" onClick={excluirGrupo}>
+              Apagar grupo
+            </button>
+          </div>
+        )}
+
         {/* ===== Lista ===== */}
         {carregando ? null : comprovantes.length === 0 ? (
           <section className="comp-vazio">
@@ -201,7 +349,9 @@ export default function Comprovantes() {
             </span>
           </section>
         ) : visiveis.length === 0 ? (
-          <p className="comp__nada">Nada encontrado para “{busca}”.</p>
+          <p className="comp__nada">
+            {termo ? `Nada encontrado para “${busca}”.` : grupoAtivo === SEM_GRUPO ? 'Todos os comprovantes estão em algum grupo.' : 'Nenhum comprovante neste grupo ainda.'}
+          </p>
         ) : (
           <div className="comp__grade">
             {visiveis.map((c) => {
@@ -219,6 +369,7 @@ export default function Comprovantes() {
                     <span className="comp-cartao__info">
                       {dataDoEnvio(c.criadoEm)} · {tamanhoLegivel(c.tamanho)}
                     </span>
+                    {c.grupo && grupoAtivo === '' && <span className="comp-cartao__grupo">📁 {c.grupo}</span>}
                     {l ? (
                       <span className="comp-cartao__lanc">
                         {l.descricao} · <b className={l.valor >= 0 ? 'valor--entrada' : 'valor--saida'}>{reais(Math.abs(l.valor))}</b>
@@ -264,6 +415,17 @@ export default function Comprovantes() {
                 )}
               </div>
               <div className="comp-janela__rodape">
+                <label className="comp-envio__vinculo">
+                  Grupo
+                  <select value={vendo.grupo || ''} onChange={(e) => trocarGrupo(vendo, e.target.value)}>
+                    <option value="">Sem grupo</option>
+                    {grupos.map((g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <label className="comp-envio__vinculo">
                   Lançamento
                   <select value={vendo.lancamentoId || ''} onChange={(e) => {

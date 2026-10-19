@@ -17,11 +17,12 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - **Lançamentos**: ganhos, gastos e transferências.
   - Contas fixas (repetem todo mês), parcelados e comprovante anexado.
 - **Contas e cartões**: saldo de cada conta, saldo geral e faturas de cartão de crédito.
+  - O primeiro saldo de uma conta nova entra como receita do mês; mudanças depois viram "Ajuste de saldo" (não mexem nos gráficos dos meses passados).
 - **Calendário** e **Checklist** do mês, com as parcelas de "A pagar" e "A receber".
 - **Objetivos**: guardar dinheiro tirando de uma conta.
-- **A receber** e **A pagar**: dívidas com parcelas, juros por atraso e data de vencimento ajustável.
-- **Comprovantes**: fotos e PDFs guardados na conta.
-- **Relatórios**: receitas x despesas x saldo por mês, gastos por categoria e resumo para enviar no WhatsApp.
+- **A receber** e **A pagar**: dívidas com parcelas (total ou valor da parcela), juros por atraso e data de vencimento ajustável.
+- **Comprovantes**: fotos e PDFs guardados na conta, organizados em grupos.
+- **Relatórios**: receitas x despesas x saldo por semana (Mês) ou por mês (3, 6 meses, ano), gastos por categoria e resumo para enviar no WhatsApp.
 - **Orçamento por categoria**, com aviso quando chega na % escolhida.
 - **Importar extrato** OFX ou CSV.
 

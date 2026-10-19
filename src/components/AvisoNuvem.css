@@ -37,7 +37,7 @@
 
 @media (max-width: 600px) {
   .aviso-nuvem {
-    bottom: 84px; /* acima do botão de atendimento */
+    bottom: 140px; /* acima dos botões do canto (atendimento e Distraction Block) */
     width: calc(100vw - 32px);
     font-size: 13px;
   }

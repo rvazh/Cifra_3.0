@@ -133,7 +133,7 @@ async function enviarArquivo(id, blob, tipo) {
 
 // ----- Funções usadas pelas telas -----
 // Confere o arquivo, envia e guarda. Devolve o registro salvo (com o arquivo em "blob").
-export async function guardarComprovante(arquivo, lancamentoId = null) {
+export async function guardarComprovante(arquivo, lancamentoId = null, grupo = '') {
   const tipoOk = arquivo.type.startsWith('image/') || arquivo.type === 'application/pdf';
   if (!tipoOk) throw new Error('Envie uma foto (JPG, PNG) ou um PDF.');
   const pronto = await reduzirFoto(arquivo);
@@ -149,6 +149,7 @@ export async function guardarComprovante(arquivo, lancamentoId = null) {
     tamanho: pronto.size,
     criadoEm: new Date().toISOString(),
     lancamentoId,
+    ...(grupo ? { grupo } : {}),
   };
   await enviarArquivo(dados.id, pronto, pronto.type);
   await guardarCopia({ ...dados, blob: pronto });
@@ -194,6 +195,82 @@ export async function apagarComprovante(id) {
 
 export async function vincularComprovante(id, lancamentoId) {
   gravarLista(lerLista().map((c) => (c.id === id ? { ...c, lancamentoId } : c)));
+}
+
+// ===== Grupos (pastas) de comprovantes =====
+// Cada comprovante pode estar em um grupo (ex.: "Casa", "Carro", "Imposto de Renda 2026").
+// A lista de grupos fica guardada à parte, para um grupo poder existir mesmo vazio.
+const CHAVE_GRUPOS = () => chave('grupos-comprovantes');
+const nomeLimpo = (nome) => String(nome || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+const mesmoGrupo = (a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }) === 0;
+
+export function listarGrupos() {
+  let salvos = [];
+  try {
+    salvos = JSON.parse(localStorage.getItem(CHAVE_GRUPOS()) || '[]');
+  } catch {
+    salvos = [];
+  }
+  // Inclui grupos que só aparecem nos comprovantes (ex.: vindos de outro aparelho)
+  const usados = lerLista().map((c) => c.grupo).filter(Boolean);
+  const todos = [];
+  [...(Array.isArray(salvos) ? salvos : []), ...usados].forEach((g) => {
+    if (!todos.some((x) => mesmoGrupo(x, g))) todos.push(g);
+  });
+  return todos.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+}
+
+function gravarGrupos(grupos) {
+  try {
+    if (grupos.length) localStorage.setItem(CHAVE_GRUPOS(), JSON.stringify(grupos));
+    else localStorage.removeItem(CHAVE_GRUPOS());
+  } catch {
+    /* sem acesso ao armazenamento */
+  }
+}
+
+// Devolve o nome final do grupo. Lança erro com mensagem pronta para a tela.
+export function criarGrupo(nome) {
+  const limpo = nomeLimpo(nome);
+  if (!limpo) throw new Error('Dê um nome para o grupo.');
+  const grupos = listarGrupos();
+  const existente = grupos.find((g) => mesmoGrupo(g, limpo));
+  if (existente) return existente;
+  if (grupos.length >= 50) throw new Error('Limite de 50 grupos.');
+  gravarGrupos([...grupos, limpo]);
+  return limpo;
+}
+
+export function renomearGrupo(antigo, novo) {
+  const limpo = nomeLimpo(novo);
+  if (!limpo) throw new Error('Dê um nome para o grupo.');
+  const grupos = listarGrupos();
+  if (grupos.some((g) => mesmoGrupo(g, limpo) && !mesmoGrupo(g, antigo))) throw new Error('Já existe um grupo com esse nome.');
+  gravarGrupos(grupos.map((g) => (g === antigo ? limpo : g)));
+  gravarLista(lerLista().map((c) => (c.grupo === antigo ? { ...c, grupo: limpo } : c)));
+  return limpo;
+}
+
+// Apaga só o grupo: os comprovantes dele continuam guardados, "sem grupo"
+export function apagarGrupo(nome) {
+  gravarGrupos(listarGrupos().filter((g) => g !== nome));
+  gravarLista(
+    lerLista().map((c) => {
+      if (c.grupo !== nome) return c;
+      const { grupo, ...resto } = c;
+      return resto;
+    })
+  );
+}
+
+export function moverParaGrupo(id, grupo) {
+  gravarLista(
+    lerLista().map((c) => {
+      if (c.id !== id) return c;
+      const { grupo: _, ...resto } = c;
+      return grupo ? { ...resto, grupo } : resto;
+    })
+  );
 }
 
 // Apaga os arquivos da nuvem de uma pessoa (inclusive os que ficaram fora da lista)

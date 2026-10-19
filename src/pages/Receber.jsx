@@ -18,13 +18,14 @@ import {
 } from '../dados/receber.js';
 import './Painel.css';
 import './Receber.css';
+import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
 
 // "1.234,56" -> 1234.56
 function lerNumero(texto) {
   const n = parseFloat(String(texto).replace(/\s|R\$/gi, '').replace(/\./g, '').replace(',', '.'));
   return Number.isFinite(n) ? n : null;
 }
-const paraTexto = (n) => (n ? n.toFixed(2).replace('.', ',') : '');
+const paraTexto = (n) => valorParaCampo(n);
 const dataLonga = (data) => data.split('-').reverse().join('/');
 
 // Iniciais para o "avatar" da pessoa: "Ana Lima" -> "AL"
@@ -457,7 +458,7 @@ export default function Receber() {
                       <div className="rcb-receber__linha">
                         <label>
                           Quanto recebeu (R$)
-                          <input autoFocus inputMode="decimal" value={recebendo.valorTexto} onChange={(e) => { setRecebendo({ ...recebendo, valorTexto: e.target.value }); setErroRecebimento(''); }} />
+                          <input autoFocus inputMode="decimal" value={recebendo.valorTexto} onChange={(e) => { setRecebendo({ ...recebendo, valorTexto: mascaraValor(e.target.value) }); setErroRecebimento(''); }} />
                         </label>
                         <label>
                           Quando
@@ -555,7 +556,7 @@ export default function Receber() {
               <div className="rcb-form__dupla">
                 <label className="rcb-form__campo">
                   Valor total (R$)
-                  <input inputMode="decimal" placeholder="1.200,00" value={formulario.valorTexto} onChange={(e) => atualizar({ valorTexto: e.target.value })} />
+                  <input inputMode="decimal" placeholder="1.200,00" value={formulario.valorTexto} onChange={(e) => atualizar({ valorTexto: mascaraValor(e.target.value) })} />
                 </label>
                 <label className="rcb-form__campo">
                   {formulario.tipo === 'venda' ? 'Data da venda' : 'Data do empréstimo'}
@@ -617,11 +618,11 @@ export default function Receber() {
                   <div className="rcb-form__dupla">
                     <label className="rcb-form__campo">
                       Juros ao mês (%)
-                      <input inputMode="decimal" placeholder="1,00" value={formulario.jurosMesTexto} onChange={(e) => atualizar({ jurosMesTexto: e.target.value })} />
+                      <input inputMode="decimal" placeholder="1,00" value={formulario.jurosMesTexto} onChange={(e) => atualizar({ jurosMesTexto: mascaraValor(e.target.value) })} />
                     </label>
                     <label className="rcb-form__campo">
                       Multa por atraso (%) <small>(uma vez)</small>
-                      <input inputMode="decimal" placeholder="2,00" value={formulario.multaTexto} onChange={(e) => atualizar({ multaTexto: e.target.value })} />
+                      <input inputMode="decimal" placeholder="2,00" value={formulario.multaTexto} onChange={(e) => atualizar({ multaTexto: mascaraValor(e.target.value) })} />
                     </label>
                   </div>
                   <p className="rcb-form__dica rcb-form__dica--juros">
@@ -661,7 +662,7 @@ export default function Receber() {
                 {!formulario.id && (
                   <label className="rcb-form__campo">
                     Já recebeu alguma parte? <small>(R$)</small>
-                    <input inputMode="decimal" placeholder="0,00" value={formulario.jaRecebidoTexto} onChange={(e) => atualizar({ jaRecebidoTexto: e.target.value })} />
+                    <input inputMode="decimal" placeholder="0,00" value={formulario.jaRecebidoTexto} onChange={(e) => atualizar({ jaRecebidoTexto: mascaraValor(e.target.value) })} />
                   </label>
                 )}
               </div>

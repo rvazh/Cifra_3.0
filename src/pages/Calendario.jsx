@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import MenuLateral from '../components/MenuLateral.jsx';
-import { IconeMais } from '../components/Icones.jsx';
+import { IconeMais, IconeRepetir } from '../components/Icones.jsx';
 import { reais } from '../components/Graficos.jsx';
 import { nomesDasContas, garantirConta } from '../dados/contas.js';
 import { carregarPreferencias } from '../dados/preferencias.js';
@@ -22,6 +22,7 @@ import ParcelaDivida from '../components/ParcelaDivida.jsx';
 import { parcelasDoMes, parcelasProximas, totaisDasParcelas } from '../dados/parcelas.js';
 import './Painel.css';
 import './Calendario.css';
+import { mascaraValor } from '../dados/dinheiro.js';
 
 const DIAS_DA_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -88,6 +89,17 @@ export default function Calendario() {
     setVersao((v) => v + 1);
     setAviso(texto);
   }
+
+  // Conta fixa = lançamento que se repete todo mês (o original, os previstos e os já confirmados)
+  const ehFixa = (l) => Boolean((l.repete || l.previsto || l.origem) && !l.transferencia);
+  // Dias com conta fixa vencendo: { "2026-10-05": 2 }
+  const fixasPorDia = useMemo(() => {
+    const dias = {};
+    itensDoMes.filter((l) => ehFixa(l) && l.valor < 0).forEach((l) => {
+      dias[l.data] = (dias[l.data] || 0) + 1;
+    });
+    return dias;
+  }, [itensDoMes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Agrupa os lançamentos por dia: { "2026-10-05": [...] }
   const porDia = useMemo(() => {
@@ -311,13 +323,26 @@ export default function Calendario() {
                     className={classes.join(' ')}
                     onClick={() => escolherDia(data)}
                     aria-pressed={data === diaEscolhido}
-                    aria-label={diaPorExtenso(data)}
+                    aria-label={`${diaPorExtenso(data)}${fixasPorDia[data] ? ` · ${fixasPorDia[data] === 1 ? 'vence 1 conta fixa' : `vencem ${fixasPorDia[data]} contas fixas`}` : ''}`}
                   >
                     <span className="cal-quadro__numero">{Number(data.slice(8))}</span>
+                    {fixasPorDia[data] > 0 && (
+                      <span className="cal-quadro__fixa" title="Vencimento de conta fixa" aria-hidden="true">
+                        <IconeRepetir tamanho={11} espessura={2.6} />
+                        {fixasPorDia[data] > 1 ? fixasPorDia[data] : 'Fixa'}
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
+            <p className="cal-grade__legenda">
+              <span className="cal-quadro__fixa" aria-hidden="true">
+                <IconeRepetir tamanho={11} espessura={2.6} />
+                Fixa
+              </span>
+              dia de vencimento de conta fixa
+            </p>
           </section>
 
           <div className="cal__lado">
@@ -348,7 +373,14 @@ export default function Calendario() {
                           <span className="cal-item__detalhe">
                             {l.categoria} · {l.conta}
                           </span>
-                          <span className={`cal-selo cal-selo--${s.classe}`}>{s.texto}</span>
+                          <span className="cal-item__selos">
+                            <span className={`cal-selo cal-selo--${s.classe}`}>{s.texto}</span>
+                            {ehFixa(l) && (
+                              <span className="cal-selo cal-selo--fixa">
+                                <IconeRepetir tamanho={11} espessura={2.6} /> Conta fixa
+                              </span>
+                            )}
+                          </span>
                         </span>
                         <span className="cal-item__direita">
                           <b className={l.valor >= 0 ? 'cal-item__valor valor--entrada' : 'cal-item__valor valor--saida'}>
@@ -428,7 +460,7 @@ export default function Calendario() {
                         autoComplete="off"
                         placeholder="0,00"
                         value={evento.valorTexto}
-                        onChange={(e) => mudarEvento('valorTexto', e.target.value)}
+                        onChange={(e) => mudarEvento('valorTexto', mascaraValor(e.target.value))}
                       />
                     </label>
                     <label className="cal-evento__campo">

@@ -854,3 +854,24 @@
   font-weight: 500;
   color: var(--cinza);
 }
+
+/* Aviso de "sem parcelas" (A pagar) */
+.rcb-form__aviso {
+  margin: -4px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--dourado);
+  background: var(--dourado-claro);
+  color: var(--texto-suave);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.rcb-form__aviso b {
+  color: var(--preto);
+}
+
+.rcb-form__campo input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
