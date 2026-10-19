@@ -83,7 +83,7 @@ export default function BotaoAtendimento() {
         {aberto ? (
           <span className="atd__x" aria-hidden="true">×</span>
         ) : (
-          <IconeAtendimento tamanho={26} espessura={2} />
+          <IconeAtendimento tamanho={21} espessura={2} />
         )}
       </button>
     </div>

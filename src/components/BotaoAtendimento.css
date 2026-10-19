@@ -11,8 +11,8 @@
 }
 
 .atd__botao {
-  width: 58px;
-  height: 58px;
+  width: 46px; /* 20% menor que os 58px de antes */
+  height: 46px;
   border: 2px solid var(--preto); /* reto, sem efeito 3D */
   border-radius: 50%;
   background: var(--dourado);
@@ -50,7 +50,7 @@
 }
 
 .atd__x {
-  font-size: 30px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -154,8 +154,8 @@
   }
 
   .atd__botao {
-    width: 52px;
-    height: 52px;
+    width: 42px;
+    height: 42px;
   }
 }
 

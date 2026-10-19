@@ -1,20 +1,21 @@
-/* ===== Botão do Distraction Block (acima do atendimento, 70% do tamanho) ===== */
+/* ===== Botão do Distraction Block (acima do atendimento) ===== */
 .dbk {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 58px; /* centraliza o botão menor em cima do de atendimento */
+  width: 46px; /* mesma largura do botão de atendimento: centraliza o botão menor em cima dele */
 }
 
 .dbk__botao {
-  width: 41px; /* 70% dos 58px do botão de atendimento */
-  height: 41px;
+  width: 37px; /* 10% menor que os 41px de antes */
+  height: 37px;
   margin: 0 auto;
   padding: 0;
-  border: 2px solid var(--preto);
+  border: 2px solid #fff; /* borda branca */
   border-radius: 50%;
   background: #000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); /* sombra leve para a borda branca aparecer no fundo claro */
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -94,6 +95,12 @@
   border-right: 2px solid var(--preto);
   background: var(--branco);
   transform: translateY(-50%) rotate(45deg);
+}
+
+@media (max-width: 560px) {
+  .dbk {
+    width: 42px; /* acompanha o botão de atendimento no celular */
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
