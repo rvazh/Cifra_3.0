@@ -380,3 +380,16 @@
 .cad__confirmar .entrar__link-forte {
   align-self: center;
 }
+
+/* Endereço opcional */
+.cad__opcional {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.cad__aviso-endereco {
+  margin: -4px 0 12px;
+  font-size: 13px;
+  color: var(--cinza);
+}

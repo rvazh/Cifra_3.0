@@ -88,8 +88,9 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
     evento.preventDefault();
     if (!f.nome.trim() || !f.sobrenome.trim()) return setErro('Preencha o nome e o sobrenome.');
     if (!emailValido(f.email)) return setErro('Este e-mail não parece certo. Ex.: nome@email.com');
-    if (soNumeros(f.cep).length !== 8) return setErro('O CEP tem 8 números.');
-    if (!f.rua.trim() || !f.numero.trim() || !f.bairro.trim() || !f.cidade.trim() || !f.uf) return setErro('Preencha o endereço completo (só o complemento é opcional).');
+    // Endereço é opcional; se começar a digitar o CEP, ele precisa estar completo
+    const numerosDoCep = soNumeros(f.cep).length;
+    if (numerosDoCep > 0 && numerosDoCep !== 8) return setErro('O CEP tem 8 números.');
     setSalvando(true);
     try {
       const { usuario: novo, emailPendente } = await atualizarUsuario({
@@ -124,6 +125,7 @@ export function EditarDados({ usuario, aoSalvar, aoFechar }) {
             Troca para <b>{usuario.emailNovo}</b> esperando confirmação pelo link enviado. Até lá, entre com {usuario.email}.
           </p>
         )}
+        <p className="mc-inteiro mc-nota">Endereço é opcional: só será usado quando existir cobrança de planos pagos.</p>
         <label className="cfg-campo">
           CEP
           <input value={f.cep} inputMode="numeric" onChange={(ev) => mudarCEP(ev.target.value)} />

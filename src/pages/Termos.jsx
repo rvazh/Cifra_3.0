@@ -1,14 +1,16 @@
 import { Link } from 'react-router-dom';
 import Documento from '../components/Documento.jsx';
 import { IconeCheck } from '../components/Icones.jsx';
-import { EMAIL_CONTATO, EMPRESA, FORO } from '../config.js';
+import { EMAIL_CONTATO, EMPRESA, FORO, WHATSAPP_ATENDIMENTO } from '../config.js';
+import { DIAS_DE_TESTE, PLANO_DO_TESTE } from '../dados/plano.js';
 
 // Pontos principais, mostrados no quadro de resumo do topo
 const resumo = [
   'A CIFRA é uma ferramenta para organizar as suas finanças. As decisões são sempre suas.',
-  'Existe um Plano Gratuito e planos pagos, com 15 dias de teste grátis.',
+  `Existe um Plano Gratuito e planos pagos. O ${PLANO_DO_TESTE} pode ser testado de graça por ${DIAS_DE_TESTE} dias.`,
   'Você pode cancelar quando quiser. Em até 15 dias da contratação, devolvemos o valor pago.',
-  'Você cuida do seu usuário e da sua senha. Nós cuidamos da plataforma.',
+  'Você cuida do seu e-mail e da sua senha. Nós cuidamos da plataforma.',
+  'Cálculos, alertas e conteúdos da CIFRA são estimativas e informação, não consultoria financeira.',
 ];
 
 // Linha com os dados da empresa (o CNPJ só aparece se estiver preenchido em config.js)
@@ -21,7 +23,7 @@ export default function Termos() {
     <Documento
       titulo="Termos de Uso"
       subtitulo="As regras para usar a CIFRA, em português claro."
-      atualizado="9 de outubro de 2026"
+      atualizado="20 de outubro de 2026"
     >
       <div className="doc__resumo">
         <h2 className="doc__resumo-titulo">Resumo rápido</h2>
@@ -71,7 +73,7 @@ export default function Termos() {
           </li>
           <li>
             <strong>Conteúdo:</strong> tudo o que você registra na CIFRA, como ganhos, gastos,
-            contas e objetivos. Esse conteúdo é seu.
+            contas, objetivos, datas e comprovantes. Esse conteúdo é seu.
           </li>
           <li>
             <strong>Planos:</strong> as opções de uso da CIFRA, gratuitas ou pagas, descritas na
@@ -85,19 +87,24 @@ export default function Termos() {
           <span className="doc__numero">03</span> Sua conta
         </h2>
         <p>
-          Para usar a CIFRA, você cria uma conta com um nome de usuário e uma senha. As
-          informações que você colocar no cadastro precisam ser verdadeiras.
+          Para usar a CIFRA, você cria uma conta com o seu e-mail e uma senha, e confirma o e-mail
+          pelo link que enviamos. A CIFRA é só para maiores de 18 anos, e as informações do
+          cadastro precisam ser verdadeiras. O endereço é opcional enquanto não existir cobrança.
         </p>
         <p>
-          O nosso suporte é feito principalmente por e-mail. Se você informar o seu e-mail,
-          poderemos enviar mensagens relacionadas ao serviço, e você pode pedir para não
-          recebê-las a qualquer momento.
+          Você pode ligar a verificação em duas etapas (código de um app autenticador) para
+          proteger ainda mais a conta. Com ela ligada, o código também é pedido para trocar a senha
+          e excluir a conta.
         </p>
         <p>
-          Para a CIFRA funcionar bem, você precisa de conexão com a internet e de um navegador
-          atualizado, como Google Chrome, Mozilla Firefox, Safari ou Microsoft Edge. Quando o
-          aplicativo para celular estiver disponível, os requisitos dele serão informados na loja
-          de aplicativos.
+          Usamos o seu e-mail para mensagens do serviço, como confirmação de cadastro e troca de
+          senha. Não enviamos propaganda sem a sua permissão.
+        </p>
+        <p>
+          A CIFRA funciona no navegador (Google Chrome, Mozilla Firefox, Safari ou Microsoft Edge
+          atualizados) e pode ser instalada como app no celular e no computador pelo próprio site.
+          Ela abre sem internet com o que já está no aparelho, e o que você lançar offline é enviado
+          quando a conexão voltar.
         </p>
       </section>
 
@@ -117,8 +124,9 @@ export default function Termos() {
         </p>
         <ul>
           <li>
-            <strong>Teste grátis:</strong> você pode testar os planos pagos de graça por 15
-            (quinze) dias. Ao final, pode assinar ou continuar usando o Plano Gratuito.
+            <strong>Teste grátis:</strong> você pode testar o {PLANO_DO_TESTE} de graça por{' '}
+            {DIAS_DE_TESTE} dias, uma vez por conta. Ao final, pode assinar ou continuar usando o Plano
+            Gratuito, sem perder o que registrou.
           </li>
           <li>
             <strong>Uma assinatura por conta:</strong> a assinatura vale para a conta em que você
@@ -136,6 +144,11 @@ export default function Termos() {
           <li>
             <strong>Promoções:</strong> a CIFRA pode oferecer cupons, períodos extras ou acesso
             temporário a funções. Essas ofertas valem apenas pelo tempo informado.
+          </li>
+          <li>
+            <strong>Limites de uso:</strong> para manter a plataforma estável, cada conta pode guardar
+            até 60 grupos de informações (cerca de 20 MB de dados), até 300 comprovantes (100 MB no
+            total, 10 MB por arquivo) e enviar até 10 relatos de problema por dia.
           </li>
         </ul>
       </section>
@@ -157,11 +170,12 @@ export default function Termos() {
             Depois desse prazo, o cancelamento interrompe as próximas cobranças, e você continua
             com acesso ao plano até o fim do período que já foi pago.
           </li>
-          <li>
-            Se você assinou pelo Google Play, o cancelamento da renovação automática é feito na
-            área de assinaturas do próprio Google Play.
-          </li>
         </ul>
+        <p>
+          Você também pode <strong>excluir a sua conta</strong> quando quiser, em Configurações →
+          Cuidado → Excluir minha conta. Isso apaga o cadastro, tudo o que você registrou e os
+          comprovantes, e não pode ser desfeito. Baixe um backup antes, se quiser guardar uma cópia.
+        </p>
       </section>
 
       <section className="doc__secao">
@@ -181,7 +195,11 @@ export default function Termos() {
           <li>Casos fortuitos ou de força maior.</li>
           <li>Ações de terceiros que afetem a plataforma, como ataques de hackers.</li>
           <li>Informações erradas ou incompletas registradas pelos usuários.</li>
-          <li>O conteúdo de sites e aplicativos de terceiros que tenham links na plataforma.</li>
+          <li>
+            O conteúdo de sites e aplicativos de terceiros que tenham links na plataforma, como o
+            site do Distraction Block.
+          </li>
+          <li>Interrupções dos serviços de internet, hospedagem e e-mail usados pela CIFRA.</li>
         </ul>
         <p>
           A CIFRA só compartilha informações com autoridades quando for obrigada por lei ou por
@@ -191,7 +209,23 @@ export default function Termos() {
 
       <section className="doc__secao">
         <h2>
-          <span className="doc__numero">07</span> Suas responsabilidades
+          <span className="doc__numero">07</span> Cálculos, alertas e conteúdos
+        </h2>
+        <p>
+          A Calculadora, o “Sobrará no mês”, os gráficos, os alertas, as datas sazonais, os Cursos e
+          as Notícias ajudam você a se organizar, mas são <strong>estimativas e informação
+          educativa</strong>: não são consultoria financeira, contábil ou de investimentos.
+        </p>
+        <p>
+          Os resultados dependem dos números que você digita e de valores de referência (como
+          alíquotas de impostos e médias de mercado) que podem mudar. Confira sempre os valores do
+          seu caso antes de tomar uma decisão.
+        </p>
+      </section>
+
+      <section className="doc__secao">
+        <h2>
+          <span className="doc__numero">08</span> Suas responsabilidades
         </h2>
         <ul>
           <li>
@@ -204,12 +238,17 @@ export default function Termos() {
             um antivírus.
           </li>
           <li>Usar a plataforma de acordo com a lei e com estes termos.</li>
+          <li>
+            Enviar como comprovante só documentos seus ou que você tem o direito de guardar, sem
+            conteúdo ilegal. Se um arquivo tiver dados de outras pessoas, você é responsável por
+            ter permissão para guardá-lo.
+          </li>
         </ul>
       </section>
 
       <section className="doc__secao">
         <h2>
-          <span className="doc__numero">08</span> Suspensão da conta
+          <span className="doc__numero">09</span> Suspensão da conta
         </h2>
         <p>
           A CIFRA pode advertir, suspender ou cancelar uma conta, por um tempo ou de vez, em
@@ -225,7 +264,7 @@ export default function Termos() {
 
       <section className="doc__secao">
         <h2>
-          <span className="doc__numero">09</span> Mudanças nestes termos
+          <span className="doc__numero">10</span> Mudanças nestes termos
         </h2>
         <p>
           Estes termos podem mudar conforme a CIFRA evolui. Quando isso acontecer, avisaremos na
@@ -240,7 +279,7 @@ export default function Termos() {
 
       <section className="doc__secao">
         <h2>
-          <span className="doc__numero">10</span> Leis e foro
+          <span className="doc__numero">11</span> Leis e foro
         </h2>
         <p>
           Estes termos seguem as leis do Brasil. Para resolver qualquer questão sobre eles, fica
@@ -251,12 +290,13 @@ export default function Termos() {
 
       <section className="doc__secao">
         <h2>
-          <span className="doc__numero">11</span> Fale com a gente
+          <span className="doc__numero">12</span> Fale com a gente
         </h2>
         <p>
           Dúvidas sobre estes termos ou sobre a plataforma? Escreva para{' '}
-          <a href={`mailto:${EMAIL_CONTATO}`}>{EMAIL_CONTATO}</a>. Quando precisarmos falar com
-          você, faremos isso por e-mail ou dentro da própria plataforma.
+          <a href={`mailto:${EMAIL_CONTATO}`}>{EMAIL_CONTATO}</a>, fale pelo WhatsApp{' '}
+          {WHATSAPP_ATENDIMENTO.texto} ou use o botão “Relatar problema” dentro do app. Quando
+          precisarmos falar com você, faremos isso por e-mail ou dentro da própria plataforma.
         </p>
         <p>Obrigado por ler os nossos termos. Esperamos que a CIFRA ajude você a ir longe!</p>
       </section>

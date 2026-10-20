@@ -59,12 +59,10 @@ function conferir(f) {
   if (!f.idade) erros.idade = 'Digite a sua idade.';
   else if (!Number.isInteger(idade) || idade > 120) erros.idade = 'Idade inválida.';
   else if (idade < IDADE_MINIMA) erros.idade = `A CIFRA é para maiores de ${IDADE_MINIMA} anos.`;
-  if (soNumeros(f.cep).length !== 8) erros.cep = 'O CEP tem 8 números.';
-  if (!f.rua.trim()) erros.rua = 'Digite a rua.';
-  if (!f.numero.trim()) erros.numero = 'Falta o número.';
-  if (!f.bairro.trim()) erros.bairro = 'Digite o bairro.';
-  if (!f.cidade.trim()) erros.cidade = 'Digite a cidade.';
-  if (!f.uf) erros.uf = 'Escolha a UF.';
+  // Endereço é opcional (só será usado quando existir cobrança dos planos pagos).
+  // Se a pessoa começar a digitar o CEP, ele precisa estar completo.
+  const numerosDoCep = soNumeros(f.cep).length;
+  if (numerosDoCep > 0 && numerosDoCep !== 8) erros.cep = 'O CEP tem 8 números.';
   if (!regrasDaSenha(f.senha).every((r) => r.ok)) erros.senha = 'A senha ainda não cumpre as regras abaixo.';
   if (!f.confirmar) erros.confirmar = 'Repita a senha.';
   else if (f.confirmar !== f.senha) erros.confirmar = 'As senhas não são iguais.';
@@ -273,8 +271,11 @@ export default function Cadastro() {
         {/* ===== 02 Endereço ===== */}
         <fieldset className="cad__bloco">
           <legend className="cad__legenda">
-            <span className="cad__numero">02</span> Endereço
+            <span className="cad__numero">02</span> Endereço <small className="cad__opcional">(opcional)</small>
           </legend>
+          <p className="cad__aviso-endereco">
+            Não é obrigatório agora. Só vamos precisar dele quando você assinar um plano pago.
+          </p>
           <div className="cad__grade cad__grade--endereco">
             <label className="cad__campo cad__campo--cep">
               <span className="cad__rotulo">CEP</span>
