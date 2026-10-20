@@ -19,6 +19,7 @@ export const PADRAO = {
   avisoOrcamento: 80, // avisar quando o gasto da categoria chegar nesta % do orçamento
   tema: 'escuro', // 'escuro' (padrão da CIFRA) ou 'claro'
   fundo: 'padrao', // fundo do painel: um dos FUNDOS abaixo ou 'foto'
+  datasSazonais: true, // calendário: pinta os dias com gasto a mais (Dia das Mães, Black Friday...) e avisa no mês
 };
 
 let guardadas = null; // lidas uma vez e guardadas aqui para não ler o armazenamento toda hora

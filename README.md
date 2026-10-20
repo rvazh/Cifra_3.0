@@ -19,7 +19,10 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - **Contas e cartões**: saldo de cada conta, saldo geral e faturas de cartão de crédito.
   - O primeiro saldo de uma conta nova entra como receita do mês; mudanças depois viram "Ajuste de saldo" (não mexem nos gráficos dos meses passados).
 - **Calendário** e **Checklist** do mês, com as parcelas de "A pagar" e "A receber".
-  - **Datas do ano** no calendário (feriados, 13º, Imposto de Renda, Black Friday, datas comemorativas): a pessoa escolhe quais aparecem.
+  - **Datas do ano** no calendário (feriados, datas sazonais, 13º, Imposto de Renda): a pessoa escolhe quais aparecem.
+  - **Datas sazonais** (IPVA/IPTU e material escolar em janeiro, Páscoa, Dia das Mães, Namorados, São João, férias de julho, Pais, Crianças, Black Friday, Cyber Monday, Natal, Réveillon): o dia fica lilás e o mês mostra o aviso "haverá um gasto a mais", já adiantando o mês seguinte. Liga e desliga em Configurações.
+  - **Data especial**: clicando num dia, a pessoa marca aniversário, viagem etc. (só neste ano ou todo ano), com gasto a mais e valor previsto opcionais.
+  - Fontes das datas sazonais: [calendário do varejo 2026 (Bem Paraná)](https://www.bemparana.com.br/noticias/economia/melhores-datas-para-comprar/) e [despesas do começo do ano (Meu Bolso em Dia)](https://www.meubolsoemdia.com.br/Materias/despesas-comeco-do-ano).
 - **Objetivos**: guardar dinheiro tirando de uma conta.
 - **A receber** e **A pagar**: dívidas com parcelas (total ou valor da parcela), juros por atraso e data de vencimento ajustável.
 - **Comprovantes**: fotos e PDFs guardados na conta, organizados em grupos.

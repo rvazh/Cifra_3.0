@@ -399,6 +399,19 @@ export default function Configuracoes() {
               </Linha>
             </label>
             <label className="cfg-linha">
+              <Linha
+                Icone={IconeCalendario}
+                titulo="Datas sazonais no calendário"
+                sub="Dias com gasto a mais (Dia das Mães, Black Friday, Natal…) ficam coloridos e o mês mostra um aviso"
+              >
+                <Interruptor
+                  rotulo="Datas sazonais no calendário"
+                  ligado={preferencias.datasSazonais !== false}
+                  aoMudar={(v) => mudar('datasSazonais', v)}
+                />
+              </Linha>
+            </label>
+            <label className="cfg-linha">
               <Linha Icone={IconeOlho} titulo="Esconder valores ao abrir" sub="Mostra •••• até você tocar no olho do menu">
                 <Interruptor
                   rotulo="Esconder valores ao abrir"

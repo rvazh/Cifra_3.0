@@ -185,3 +185,34 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.dda__grupo:disabled .dda__lista {
+  opacity: 0.45;
+}
+
+.dda__desligado {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--sazonal-claro);
+  color: var(--sazonal);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dda__desligado a {
+  color: inherit;
+  font-weight: 800;
+}
+
+/* Datas que trazem gasto a mais ficam com a cor das sazonais quando ligadas */
+.dda__item--gasto:has(input:checked) {
+  border-color: var(--sazonal-borda);
+  background: var(--sazonal-claro);
+}
+
+.dda__rodape {
+  margin: 0;
+  font-size: 12px;
+  color: var(--cinza);
+}

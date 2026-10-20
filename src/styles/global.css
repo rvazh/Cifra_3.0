@@ -19,6 +19,11 @@
   --positivo: #1e7b45;       /* receitas */
   --negativo: #c2362b;       /* despesas */
 
+  /* Datas sazonais (meses com gasto a mais) no calendário */
+  --sazonal: #5b3fb3;
+  --sazonal-claro: #f1ecfc;
+  --sazonal-borda: #c9b9f2;
+
   --rodape: #111111;
   --rodape-texto: #d9d2c5;
 

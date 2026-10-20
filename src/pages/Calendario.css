@@ -754,3 +754,250 @@
     margin-left: 0;
   }
 }
+
+/* ===== Datas sazonais: dia colorido (gasto a mais) ===== */
+.cal-quadro--sazonal {
+  background: var(--sazonal-claro);
+  border-color: var(--sazonal-borda);
+}
+
+.cal-quadro--sazonal:hover {
+  background: #e9e1fb;
+  border-color: var(--sazonal);
+}
+
+.cal-quadro--sazonal.cal-quadro--escolhido,
+.cal-quadro--sazonal.cal-quadro--escolhido:hover {
+  background: var(--sazonal-claro);
+  border-color: var(--preto);
+}
+
+.cal-grade__legenda-sazonal {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border-radius: 5px;
+  background: var(--sazonal-claro);
+  border: 1.5px solid var(--sazonal-borda);
+}
+
+.cal-data--sazonal {
+  border-color: var(--sazonal-borda);
+  background: var(--sazonal-claro);
+}
+
+.cal-data__gasto {
+  align-self: flex-start;
+  white-space: nowrap;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--sazonal);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cal-data__apagar {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--borda);
+  border-radius: 999px;
+  background: var(--branco);
+  color: var(--negativo);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cal-data__apagar:hover {
+  border-color: var(--negativo);
+}
+
+/* ===== Aviso do mês: gasto a mais ===== */
+.cal-sazonal {
+  padding: 16px 20px;
+  border-radius: 18px;
+  border: 1.5px solid var(--sazonal-borda);
+  background: var(--sazonal-claro);
+  color: var(--preto);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cal-sazonal--leve {
+  padding: 12px 18px;
+  background: var(--branco);
+  border-style: dashed;
+}
+
+.cal-sazonal__topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cal-sazonal__icone {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.cal-sazonal__topo div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cal-sazonal__topo b {
+  font-size: 16px;
+  color: var(--sazonal);
+}
+
+.cal-sazonal__topo span {
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.cal-sazonal__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cal-sazonal__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--sazonal-borda);
+  border-radius: 999px;
+  background: var(--branco);
+  color: var(--preto);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cal-sazonal__item:hover:not(:disabled) {
+  border-color: var(--sazonal);
+}
+
+.cal-sazonal__item:disabled {
+  cursor: default;
+}
+
+.cal-sazonal__item small {
+  color: var(--cinza);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cal-sazonal__item .cal-sazonal__valor {
+  color: var(--sazonal);
+  font-weight: 800;
+}
+
+.cal-sazonal__dica,
+.cal-sazonal__proximo {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--texto-suave);
+}
+
+.cal-sazonal__proximo b {
+  color: var(--sazonal);
+}
+
+/* ===== Adicionar neste dia ===== */
+.cal-dia__adicionar {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.cal-dia__adicionar .cal-evento__abrir {
+  margin-top: 0;
+}
+
+.cal-evento__abrir--especial {
+  border-color: var(--sazonal-borda);
+  color: var(--sazonal);
+}
+
+.cal-evento__abrir--especial:hover {
+  border-color: var(--sazonal);
+  background: var(--sazonal-claro);
+}
+
+.cal-especial {
+  margin-top: 14px;
+}
+
+.cal-especial__emojis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cal-especial__emoji {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid var(--borda);
+  border-radius: 10px;
+  background: var(--branco);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.cal-especial__emoji--ativo {
+  border-color: var(--preto);
+  background: var(--dourado-claro);
+}
+
+.cal-especial__gasto {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--sazonal-borda);
+  background: var(--sazonal-claro);
+  cursor: pointer;
+}
+
+.cal-especial__gasto input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--sazonal);
+}
+
+.cal-especial__gasto span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cal-especial__gasto b {
+  font-size: 14px;
+}
+
+.cal-especial__gasto small {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+@media (max-width: 600px) {
+  .cal-sazonal {
+    padding: 14px;
+  }
+}

@@ -23,8 +23,16 @@ import { parcelasDoMes, parcelasProximas, totaisDasParcelas } from '../dados/par
 import './Painel.css';
 import './Calendario.css';
 import { mascaraValor } from '../dados/dinheiro.js';
-import { carregarDatasEscolhidas, datasAnuaisDoMes } from '../dados/datasAnuais.js';
+import {
+  carregarDesligadas,
+  carregarPessoais,
+  salvarPessoais,
+  datasDoMes,
+  diaCurto,
+  nomeDoMesLongo,
+} from '../dados/datasAnuais.js';
 import DatasDoAno from '../components/DatasDoAno.jsx';
+import DataEspecial from '../components/DataEspecial.jsx';
 
 const DIAS_DA_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -77,8 +85,11 @@ export default function Calendario() {
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
   const [evento, setEvento] = useState(null); // formulário de novo evento (aberto/fechado)
-  const [datasEscolhidas, setDatasEscolhidas] = useState(carregarDatasEscolhidas); // datas do ano que aparecem
+  const [desligadas, setDesligadas] = useState(carregarDesligadas); // datas do ano que a pessoa desligou
+  const [pessoais, setPessoais] = useState(carregarPessoais); // datas especiais criadas pela pessoa
   const [escolhendoDatas, setEscolhendoDatas] = useState(false);
+  const [especial, setEspecial] = useState(false); // formulário de data especial aberto
+  const sazonaisLigadas = carregarPreferencias().datasSazonais !== false; // Configurações > Datas sazonais
 
   // Sempre que a lista mudar, salva no aparelho
   useEffect(() => salvar(lista), [lista]);
@@ -106,7 +117,12 @@ export default function Calendario() {
   }, [itensDoMes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Feriados e datas do ano escolhidas: { "2026-12-25": [{ nome, emoji, ... }] }
-  const anuaisPorDia = useMemo(() => datasAnuaisDoMes(mes, datasEscolhidas), [mes, datasEscolhidas]);
+  const opcoesDeDatas = { desligadas, sazonais: sazonaisLigadas, pessoais };
+  const datas = useMemo(() => datasDoMes(mes, opcoesDeDatas), [mes, desligadas, pessoais, sazonaisLigadas]); // eslint-disable-line react-hooks/exhaustive-deps
+  const proximoMes = mudarMes(mes, 1);
+  const gastosDoProximo = useMemo(() => datasDoMes(proximoMes, opcoesDeDatas).gastos, [proximoMes, desligadas, pessoais, sazonaisLigadas]); // eslint-disable-line react-hooks/exhaustive-deps
+  const anuaisPorDia = datas.porDia;
+  const previstoExtra = datas.gastos.reduce((s, d) => s + (d.valor || 0), 0);
 
   // Agrupa os lançamentos por dia: { "2026-10-05": [...] }
   const porDia = useMemo(() => {
@@ -191,6 +207,7 @@ export default function Calendario() {
   const contas = nomesDasContas(); // a pessoa também pode digitar uma conta nova
 
   function abrirEvento() {
+    setEspecial(false);
     setErro('');
     setAviso('');
     setEvento({
@@ -238,13 +255,35 @@ export default function Calendario() {
     setDiaEscolhido(evento.data);
     setAviso(
       (evento.tipo === 'receita'
-        ? 'Evento criado.'
-        : 'Evento criado. Você será avisado 3 dias antes e 1 dia antes do vencimento.') +
+        ? 'Receita criada.'
+        : 'Conta criada. Você será avisado 3 dias antes e 1 dia antes do vencimento.') +
         (contaCriada ? ` Conta "${nomeDaConta}" criada.` : '')
     );
     pedirPermissaoDeAviso(); // pede para mostrar notificações (só pergunta uma vez)
     conferirAlertasAgora(); // se já está perto de vencer, o aviso sai na hora
     return undefined;
+  }
+
+  // ----- Datas especiais (marcadas pela pessoa) -----
+  function abrirEspecial() {
+    setEvento(null);
+    setAviso('');
+    setEspecial(true);
+  }
+
+  function salvarEspecial(nova) {
+    const lista = [...pessoais, { id: novoId(), ...nova }];
+    salvarPessoais(lista);
+    setPessoais(lista);
+    setEspecial(false);
+    setAviso(nova.gasto ? 'Data salva. O dia ficou colorido e o mês mostra o aviso de gasto a mais.' : 'Data salva.');
+  }
+
+  function apagarEspecial(id) {
+    const lista = pessoais.filter((p) => p.id !== id);
+    salvarPessoais(lista);
+    setPessoais(lista);
+    setAviso('Data especial apagada.');
   }
 
   function escolherDia(data) {
@@ -312,6 +351,49 @@ export default function Calendario() {
           </div>
         </div>
 
+        {/* ===== Aviso: mês com gasto a mais (datas sazonais e datas especiais) ===== */}
+        {(datas.gastos.length > 0 || gastosDoProximo.length > 0) && (
+          <section className={datas.gastos.length ? 'cal-sazonal' : 'cal-sazonal cal-sazonal--leve'} aria-label="Gasto a mais no mês">
+            {datas.gastos.length > 0 && (
+              <>
+                <div className="cal-sazonal__topo">
+                  <span className="cal-sazonal__icone" aria-hidden="true">⚠️</span>
+                  <div>
+                    <b>Em {nomeDoMesLongo(Number(mes.slice(5, 7)))} haverá um gasto a mais</b>
+                    <span>
+                      Separe um valor extra para não apertar o orçamento do mês
+                      {previstoExtra > 0 ? ` · ${reais(previstoExtra)} já previstos nas suas datas especiais` : ''}.
+                    </span>
+                  </div>
+                </div>
+                <ul className="cal-sazonal__lista">
+                  {datas.gastos.map((d) => (
+                    <li key={d.chave}>
+                      <button type="button" className="cal-sazonal__item" onClick={() => d.data && irPara(d.data)} disabled={!d.data}>
+                        <span aria-hidden="true">{d.emoji}</span>
+                        <b>{d.nome}</b>
+                        <small>{d.data ? diaCurto(d.data) : 'o mês todo'}</small>
+                        {d.valor > 0 && <small className="cal-sazonal__valor">{reais(d.valor)}</small>}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {datas.doMesTodo.filter((d) => d.sazonal).map((d) => (
+                  <p key={d.chave} className="cal-sazonal__dica">
+                    <b>{d.nome}:</b> {d.gasto}
+                  </p>
+                ))}
+              </>
+            )}
+            {gastosDoProximo.length > 0 && (
+              <p className="cal-sazonal__proximo">
+                <b>Próximo mês ({nomeDoMesLongo(Number(proximoMes.slice(5, 7)))}):</b>{' '}
+                {gastosDoProximo.map((d) => d.nome).join(', ')}. Já dá para começar a separar.
+              </p>
+            )}
+          </section>
+        )}
+
         <div className="cal__colunas">
           {/* ===== Grade do mês ===== */}
           <section className="cartao cal-grade">
@@ -328,6 +410,7 @@ export default function Calendario() {
                 if (data === diaEscolhido) classes.push('cal-quadro--escolhido');
                 const anuais = anuaisPorDia[data] || [];
                 if (anuais.some((d) => d.folga)) classes.push('cal-quadro--feriado');
+                if (anuais.some((d) => d.sazonal)) classes.push('cal-quadro--sazonal');
                 // Os dias ficam limpos: o que acontece em cada dia aparece no painel ao lado
                 return (
                   <button
@@ -362,6 +445,8 @@ export default function Calendario() {
               dia de vencimento de conta fixa
               <span className="cal-grade__legenda-feriado" aria-hidden="true">7</span>
               feriado
+              <span className="cal-grade__legenda-sazonal" aria-hidden="true" />
+              gasto a mais
               <button type="button" className="cal-grade__datas" onClick={() => setEscolhendoDatas(true)}>
                 Escolher datas do ano
               </button>
@@ -383,7 +468,10 @@ export default function Calendario() {
               {datasDoDia.length > 0 && (
                 <ul className="cal-dia__datas">
                   {datasDoDia.map((d) => (
-                    <li key={d.id} className={d.folga ? 'cal-data cal-data--folga' : 'cal-data'}>
+                    <li
+                      key={d.chave}
+                      className={['cal-data', d.folga && 'cal-data--folga', d.sazonal && 'cal-data--sazonal'].filter(Boolean).join(' ')}
+                    >
                       <span className="cal-data__emoji" aria-hidden="true">{d.emoji}</span>
                       <span className="cal-data__textos">
                         <b>{d.nome}</b>
@@ -391,7 +479,17 @@ export default function Calendario() {
                           {d.tipo}
                           {d.dica ? ` · ${d.dica}` : ''}
                         </small>
+                        {d.sazonal && (
+                          <span className="cal-data__gasto">
+                            Gasto a mais{d.valor ? ` · ${reais(d.valor)}` : ''}
+                          </span>
+                        )}
                       </span>
+                      {d.pessoal && (
+                        <button type="button" className="cal-data__apagar" onClick={() => apagarEspecial(d.id)}>
+                          Apagar
+                        </button>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -450,16 +548,25 @@ export default function Calendario() {
                 </p>
               )}
 
-              {/* Novo evento (vencimento fixo ou de uma vez só) */}
-              {!evento ? (
-                <button type="button" className="cal-evento__abrir" onClick={abrirEvento}>
-                  <IconeMais tamanho={18} espessura={2.6} />
-                  Adicionar evento
-                </button>
-              ) : (
+              {/* Adicionar neste dia: data especial (aniversário, viagem...) ou conta/receita */}
+              {especial && (
+                <DataEspecial data={diaEscolhido} aoSalvar={salvarEspecial} aoFechar={() => setEspecial(false)} />
+              )}
+              {!evento && !especial ? (
+                <div className="cal-dia__adicionar">
+                  <button type="button" className="cal-evento__abrir cal-evento__abrir--especial" onClick={abrirEspecial}>
+                    <IconeMais tamanho={18} espessura={2.6} />
+                    Data especial
+                  </button>
+                  <button type="button" className="cal-evento__abrir" onClick={abrirEvento}>
+                    <IconeMais tamanho={18} espessura={2.6} />
+                    Conta ou receita
+                  </button>
+                </div>
+              ) : !evento ? null : (
                 <form className="cal-evento" onSubmit={criarEvento} noValidate>
                   <div className="cal-evento__topo">
-                    <b>Novo evento</b>
+                    <b>Nova conta ou receita</b>
                     <button type="button" className="cal-evento__fechar" onClick={() => setEvento(null)} aria-label="Fechar">
                       ×
                     </button>
@@ -551,7 +658,7 @@ export default function Calendario() {
 
                   {erro && <p className="cal-dia__erro">{erro}</p>}
                   <button type="submit" className="cal-evento__salvar">
-                    Criar evento
+                    Salvar
                   </button>
                 </form>
               )}
@@ -643,9 +750,10 @@ export default function Calendario() {
         </div>
         {escolhendoDatas && (
           <DatasDoAno
-            escolhidas={datasEscolhidas}
+            desligadas={desligadas}
             ano={ano}
-            aoMudar={setDatasEscolhidas}
+            sazonaisLigadas={sazonaisLigadas}
+            aoMudar={setDesligadas}
             aoFechar={() => setEscolhendoDatas(false)}
           />
         )}
