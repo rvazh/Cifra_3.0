@@ -14,6 +14,7 @@ import Calendario from './pages/Calendario.jsx';
 import Contas from './pages/Contas.jsx';
 import Relatorios from './pages/Relatorios.jsx';
 import Objetivos from './pages/Objetivos.jsx';
+import Calculadora from './pages/Calculadora.jsx';
 import Configuracoes from './pages/Configuracoes.jsx';
 import Cursos from './pages/Cursos.jsx';
 import EmBreve from './pages/EmBreve.jsx';
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/painel/contas" element={<Contas />} />
           <Route path="/painel/relatorios" element={<Relatorios />} />
           <Route path="/painel/objetivos" element={<Objetivos />} />
+          <Route path="/painel/calculadora" element={<Calculadora />} />
           <Route path="/painel/receber" element={<Receber />} />
           <Route path="/painel/pagar" element={<Pagar />} />
           <Route path="/painel/configuracoes" element={<Configuracoes />} />

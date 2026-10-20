@@ -13,6 +13,7 @@ const TELAS = {
   '/painel/relatorios': 'Relatórios',
   '/painel/calendario': 'Calendário',
   '/painel/objetivos': 'Objetivos',
+  '/painel/calculadora': 'Calculadora',
   '/painel/receber': 'A receber',
   '/painel/pagar': 'A pagar',
   '/painel/comprovantes': 'Comprovantes',

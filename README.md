@@ -28,6 +28,8 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - **Comprovantes**: fotos e PDFs guardados na conta, organizados em grupos.
 - **Relatórios**: receitas x despesas x saldo por semana (Mês) ou por mês (3, 6 meses, ano), gastos por categoria e resumo para enviar no WhatsApp.
 - **Orçamento por categoria**, com aviso quando chega na % escolhida.
+- **Calculadora** de custo (primeira: **carro**): custo por mês e por ano, quanto custa rodar 1 km, para onde vai o dinheiro e a renda mínima para ter o carro (10%, 20% ou 30% da renda). Compara com as receitas do mês na CIFRA.
+  - Referências: [IPVA 2026 por estado](https://www.numerando.com.br/ipva), [custos de manter um carro](https://www.comprecar.com.br/blog/?p=1499) e [regra de 10/20/30% da renda](https://www.calculadoradetaxas.com.br/public/ferramentas/calculadora-qual-carro-posso-comprar/renda-6000).
 - **Importar extrato** OFX ou CSV.
 
 **Conta**
@@ -173,7 +175,7 @@ cifra/
         ├── Entrar, Cadastro, RecuperarSenha, NovaSenha            conta
         ├── Privacidade, Termos                                    documentos
         └── Painel, Lancamentos, Checklist, Contas, Relatorios,
-            Calendario, Objetivos, Receber, Pagar, Comprovantes,
+            Calendario, Objetivos, Calculadora, Receber, Pagar, Comprovantes,
             Cursos, Noticias, Configuracoes                        sistema (/painel/...)
 ```
 

@@ -18,6 +18,7 @@ import {
   IconeRecibo,
   IconeJornal,
   IconeInfo,
+  IconeCalculadora,
 } from './Icones.jsx';
 import { valoresEscondidos, alternarValores } from '../dados/preferencias.js';
 import { encerrarSessao, irPara } from '../dados/acesso.js';
@@ -34,6 +35,7 @@ const menu = [
   { para: '/painel/relatorios', texto: 'Relatórios', Icone: IconeGrafico },
   { para: '/painel/calendario', texto: 'Calendário', Icone: IconeCalendario },
   { para: '/painel/objetivos', texto: 'Objetivos', Icone: IconeAlvo },
+  { para: '/painel/calculadora', texto: 'Calculadora', Icone: IconeCalculadora },
   { para: '/painel/receber', texto: 'A receber', Icone: IconeMoeda },
   { para: '/painel/pagar', texto: 'A pagar', Icone: IconeAPagar },
   { para: '/painel/comprovantes', texto: 'Comprovantes', Icone: IconeRecibo },
