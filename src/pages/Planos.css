@@ -582,3 +582,20 @@
     bottom: 0;
   }
 }
+
+/* Quanto economiza no plano anual */
+.plano__economia {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cinza);
+}
+
+.plano__economia--ativa {
+  align-self: flex-start;
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e3f3e8;
+  color: var(--positivo);
+}

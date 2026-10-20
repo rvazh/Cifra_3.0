@@ -39,33 +39,35 @@ const planos = [
   {
     nome: 'Plano Base',
     descricao: 'Para quem quer um controle melhor das suas finanças.',
-    precoMensal: 24.9,
-    precoAnual: 18.9,
+    precoMensal: 25.9,
+    precoAnual: 22.9,
     botao: 'Quero esse plano',
     itens: [
       { texto: <>Tudo do <b>Plano Gratuito</b></>, incluso: true },
       { texto: <><b>Até 3 contas</b></>, incluso: true },
+      { texto: 'Acesso ao Checklist', incluso: true },
       { texto: 'Até 10 alertas financeiros no mês', incluso: true },
       { texto: 'Relatórios fáceis de entender', incluso: true },
       { texto: 'Acesso básico aos cursos', incluso: true },
+      { texto: 'Calendário financeiro', incluso: false },
     ],
   },
   {
     nome: 'Plano Essencial',
     descricao: 'Para quem quer se planejar e não ter surpresas no mês.',
     precoMensal: 32.9,
-    precoAnual: 29.9,
-    destaque: 'Mais popular',
+    precoAnual: 28.9,
+    destaque: 'Recomendado',
     teste: true, // mostra o link do teste grátis
     botao: 'Quero esse plano',
     itens: [
       { texto: <>Tudo do <b>Plano Base</b></>, incluso: true },
       { texto: <><b>Contas ilimitadas</b></>, incluso: true },
-      { texto: 'Planejamentos prontos', incluso: true },
       { texto: 'Calendário financeiro', incluso: true },
       { texto: 'Alertas e lembretes ilimitados', incluso: true },
       { texto: 'Relatórios completos e com análises', incluso: true },
       { texto: <>Acesso a <b>70% dos cursos</b></>, incluso: true },
+      { texto: 'Calculadora de custos (só no Plano Combo)', incluso: false },
     ],
   },
   {
@@ -78,15 +80,15 @@ const planos = [
     itens: [
       { texto: <>Tudo do <b>Plano Essencial</b></>, incluso: true },
       { texto: <><b>Cursos completos</b>: acesso a todos os cursos</>, incluso: true },
+      { texto: <><b>Calculadora de custos</b> (ex.: quanto custa ter um carro), só no Combo</>, incluso: true },
       { texto: <>Acesso ao app <b>“Distraction Block”</b> incluso no plano</>, incluso: true },
     ],
   },
 ];
 
-// Maior desconto do anual em relação ao mensal (ex.: 24,90 -> 18,90 = 24%)
-const DESCONTO_MAXIMO = Math.max(
-  ...planos.filter((p) => p.precoMensal > 0).map((p) => Math.floor((1 - p.precoAnual / p.precoMensal) * 100)),
-);
+// Quanto a pessoa economiza por ano no plano anual (ex.: (32,90 − 28,90) × 12 = R$ 48,00)
+const economiaNoAno = (p) => Math.round((p.precoMensal - p.precoAnual) * 12 * 100) / 100;
+const ECONOMIA_MAXIMA = Math.max(...planos.map(economiaNoAno));
 
 // 9.9 -> "9,90"
 function formatarPreco(valor) {
@@ -94,7 +96,7 @@ function formatarPreco(valor) {
 }
 
 export default function Planos() {
-  const [anual, setAnual] = useState(false);
+  const [anual, setAnual] = useState(true); // a página abre no plano anual
 
   return (
     <>
@@ -181,7 +183,7 @@ export default function Planos() {
             <span className={anual ? 'planos__chave-texto planos__chave-texto--ativo' : 'planos__chave-texto'}>
               Anual
             </span>
-            <span className="planos__desconto">Economize até {DESCONTO_MAXIMO}%</span>
+            <span className="planos__desconto">Economize até R$ {formatarPreco(ECONOMIA_MAXIMA)} por ano</span>
           </div>
 
           <div className="planos__grade">
@@ -212,6 +214,13 @@ export default function Planos() {
                         ? `R$ ${formatarPreco(preco * 12)} cobrados uma vez por ano`
                         : 'Cobrado todo mês, cancele quando quiser'}
                   </p>
+                  {economiaNoAno(plano) > 0 && (
+                    <p className={anual ? 'plano__economia plano__economia--ativa' : 'plano__economia'}>
+                      {anual
+                        ? `Economize R$ ${formatarPreco(economiaNoAno(plano))} no ano`
+                        : `No plano anual, você economiza R$ ${formatarPreco(economiaNoAno(plano))} por ano`}
+                    </p>
+                  )}
                   {plano.teste && (
                     <Link to="/teste-gratis" className="plano__teste">
                       Teste 14 dias grátis →
