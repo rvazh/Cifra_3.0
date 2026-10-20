@@ -18,13 +18,71 @@ import { gravarSessao, apagarSessao, usuarioAtualId } from './armazenamento.js';
 const URL_DO_PROJETO = import.meta.env.VITE_SUPABASE_URL || 'https://iwcdsxtatatrwlblzxye.supabase.co';
 const CHAVE_PUBLICA = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_5dEFZ0FHknik2F8nxJb0NQ_JOds1VMX';
 
+// ----- Login só enquanto a página estiver aberta -----
+// O login do Supabase fica no sessionStorage (não no localStorage): ao fechar a aba ou o app,
+// ele some e a pessoa precisa digitar e-mail e senha de novo. Recarregar a página não desloga.
+const CHAVE_LOGIN = 'cifra-login';
+const CHAVE_SAIU_EM = 'cifra-saiu-em'; // quando a página foi escondida/fechada pela última vez
+const TEMPO_DE_RECARREGAR = 15000; // reabrir depois disso conta como "fechou e abriu de novo"
+
+const armazenamentoDaAba = {
+  getItem: (k) => {
+    try {
+      return sessionStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (k, v) => {
+    try {
+      sessionStorage.setItem(k, v);
+    } catch {
+      /* sem acesso */
+    }
+  },
+  removeItem: (k) => {
+    try {
+      sessionStorage.removeItem(k);
+    } catch {
+      /* sem acesso */
+    }
+  },
+};
+
+// Alguns navegadores devolvem o sessionStorage ao restaurar abas fechadas ("continuar de onde parou").
+// Se a página ficou fechada mais que alguns segundos, o login antigo não vale: apaga antes de abrir.
+function esquecerLoginDeAbaReaberta() {
+  try {
+    localStorage.removeItem(CHAVE_LOGIN); // versões antigas guardavam o login aqui (ficava para sempre)
+    const saiuEm = Number(localStorage.getItem(CHAVE_SAIU_EM)) || 0;
+    if (saiuEm && Date.now() - saiuEm > TEMPO_DE_RECARREGAR) {
+      sessionStorage.removeItem(CHAVE_LOGIN);
+      sessionStorage.removeItem('cifra:sessao');
+    }
+    localStorage.removeItem(CHAVE_SAIU_EM);
+  } catch {
+    /* sem acesso */
+  }
+}
+
+function anotarSaida() {
+  try {
+    localStorage.setItem(CHAVE_SAIU_EM, String(Date.now()));
+  } catch {
+    /* sem acesso */
+  }
+}
+
+esquecerLoginDeAbaReaberta(); // antes de criar o cliente, que lê o login guardado
+
 export const supabase = createClient(URL_DO_PROJETO, CHAVE_PUBLICA, {
   auth: {
     flowType: 'implicit', // os links de e-mail voltam com o login no endereço (tratado em tratarLinkDoEmail)
     detectSessionInUrl: false, // nós mesmos lemos o link, por causa do HashRouter (#/)
     persistSession: true,
     autoRefreshToken: true,
-    storageKey: 'cifra-login',
+    storageKey: CHAVE_LOGIN,
+    storage: armazenamentoDaAba,
   },
 });
 
@@ -383,15 +441,17 @@ export async function prepararNuvem() {
     sessao = null;
   }
 
-  const idLocal = usuarioAtualId();
+  // Marca quando a página é escondida ou fechada (para saber, na próxima abertura, se foi só um recarregar)
+  window.addEventListener('pagehide', anotarSaida);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') anotarSaida();
+  });
+
   if (!sessao) {
-    // Sem internet, quem já estava logado continua usando o que está no aparelho
-    if (idLocal && !navigator.onLine && localStorage.getItem('cifra-login')) {
-      uid = idLocal;
-      mudarEstado('erro');
-    } else {
-      apagarSessao(); // sessão vencida, ou o antigo acesso de teste
-    }
+    // Ninguém logado nesta aba: pede e-mail e senha e tira deste aparelho a cópia dos dados
+    // (o que ainda não subiu para a nuvem fica guardado e sobe no próximo login da pessoa)
+    apagarSessao();
+    await limparCopiasSemLogin();
   } else if (await faltaCodigoDoSegundoFator()) {
     // Entrou com a senha, mas não digitou o código do 2FA: o banco não libera os dados.
     // Na tela "Criar senha nova" (link do e-mail) a sessão fica, para pedir o código lá.
@@ -514,6 +574,25 @@ export async function sairDaConta() {
   apagarSessao();
   // Os dados estão na nuvem: tira a cópia deste aparelho (se algo não subiu, fica guardado para a próxima vez)
   if (quem && tudoEnviado) await limparDesteAparelho(quem);
+}
+
+// Apaga a cópia local de quem não está logado, menos de quem tem mudanças que ainda não subiram
+async function limparCopiasSemLogin() {
+  let ids = [];
+  try {
+    ids = [...new Set(Object.keys(localStorage).filter((k) => k.startsWith('cifra:u:')).map((k) => k.split(':')[2]))];
+  } catch {
+    return;
+  }
+  for (const id of ids) {
+    let pendentes = [];
+    try {
+      pendentes = JSON.parse(localStorage.getItem(`cifra-pendentes:${id}`) || '[]');
+    } catch {
+      pendentes = [];
+    }
+    if (!pendentes.length) await limparDesteAparelho(id);
+  }
 }
 
 export async function limparDesteAparelho(id) {

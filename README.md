@@ -42,7 +42,7 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 
 **App**
 - Instalável (PWA): página **Baixar o app** com passo a passo para Android, iPhone e computador, e QR code.
-- Abre sem internet com o que já está no aparelho. O que for lançado offline sobe quando a conexão voltar.
+- Pede e-mail e senha toda vez que é aberto. O que for lançado sem internet sobe quando a conexão voltar.
 
 ---
 
@@ -75,6 +75,9 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - **A cada mudança:** a chave `cifra:u:<id>:<nome>` é enviada cerca de 1 segundo depois.
 - **Sem internet:** a mudança entra numa fila e sobe quando a conexão volta. Um aviso aparece na tela.
 - **Ao sair da conta:** o que falta é enviado e a cópia do aparelho é apagada.
+- **Ao fechar a página ou o app:** o login acaba. Ele fica no `sessionStorage` da aba, então recarregar não desloga, mas reabrir a CIFRA pede e-mail e senha de novo.
+  - Se o navegador restaurar a aba depois de mais de 15 segundos fechada, o login antigo também é descartado.
+  - Ao abrir sem login, a cópia dos dados deste aparelho é apagada. O que ainda não subiu para a nuvem fica guardado e sobe no próximo login da pessoa.
 - **Segurança:** cada pessoa só lê e grava as próprias linhas. Quem garante isso são as regras **RLS** do banco, não o site.
 - **Chave no código:** a chave publicável do Supabase pode ficar no site. A chave `service_role` **nunca** entra no código.
 

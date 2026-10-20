@@ -143,9 +143,11 @@ export default function Privacidade() {
           <span className="doc__numero">05</span> Cookies e armazenamento no aparelho
         </h2>
         <p>
-          A CIFRA não usa cookies de propaganda nem ferramentas de rastreamento. Ela guarda uma cópia dos seus dados no
-          navegador do aparelho em que você está logado, para abrir rápido e funcionar sem internet. Essa cópia é
-          apagada quando você sai da conta. O app instalado (PWA) também guarda os arquivos do site para abrir offline.
+          A CIFRA não usa cookies de propaganda nem ferramentas de rastreamento. Enquanto você está logado, ela guarda
+          uma cópia dos seus dados no navegador, para ficar rápida e continuar funcionando se a internet cair. O login
+          fica só na aba aberta e acaba quando você fecha a página ou o app; ao abrir de novo sem login, essa cópia é
+          apagada (o que ainda não foi enviado para a nuvem fica guardado até você entrar de novo). O app instalado
+          (PWA) também guarda os arquivos do site, como imagens e códigos, para abrir mais rápido.
         </p>
       </section>
 

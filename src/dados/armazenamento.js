@@ -12,9 +12,11 @@ const PREFIXO_PESSOA = 'u:'; // valor da sessão de quem criou conta: "u:<id>"
 // Chaves que são do navegador inteiro, não de uma pessoa
 const CHAVES_GERAIS = ['cifra:sessao', 'cifra:usuarios'];
 
+// A sessão fica no sessionStorage: some quando a aba (ou o app) é fechada,
+// então a pessoa precisa entrar com e-mail e senha toda vez que abrir a CIFRA de novo.
 function lerSessao() {
   try {
-    return localStorage.getItem(CHAVE_SESSAO);
+    return sessionStorage.getItem(CHAVE_SESSAO);
   } catch {
     return null;
   }
@@ -34,7 +36,7 @@ export function temSessao() {
 export function gravarSessao(id) {
   if (!id) return;
   try {
-    localStorage.setItem(CHAVE_SESSAO, `${PREFIXO_PESSOA}${id}`);
+    sessionStorage.setItem(CHAVE_SESSAO, `${PREFIXO_PESSOA}${id}`);
   } catch {
     /* sem acesso ao armazenamento */
   }
@@ -42,7 +44,8 @@ export function gravarSessao(id) {
 
 export function apagarSessao() {
   try {
-    localStorage.removeItem(CHAVE_SESSAO);
+    sessionStorage.removeItem(CHAVE_SESSAO);
+    localStorage.removeItem(CHAVE_SESSAO); // versões antigas guardavam aqui
   } catch {
     /* sem acesso ao armazenamento */
   }

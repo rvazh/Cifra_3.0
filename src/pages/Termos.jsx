@@ -103,8 +103,9 @@ export default function Termos() {
         <p>
           A CIFRA funciona no navegador (Google Chrome, Mozilla Firefox, Safari ou Microsoft Edge
           atualizados) e pode ser instalada como app no celular e no computador pelo próprio site.
-          Ela abre sem internet com o que já está no aparelho, e o que você lançar offline é enviado
-          quando a conexão voltar.
+          Por segurança, o login acaba quando você fecha a página ou o app, e a CIFRA pede e-mail e
+          senha de novo na próxima vez. Se a internet cair com a CIFRA aberta, você continua usando, e
+          o que lançar é enviado quando a conexão voltar.
         </p>
       </section>
 
