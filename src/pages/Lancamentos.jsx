@@ -4,7 +4,7 @@ import MenuLateral from '../components/MenuLateral.jsx';
 import { IconeSeta, IconeBusca, IconeClipe } from '../components/Icones.jsx';
 import { TIPOS_ACEITOS, guardarComprovante, pegarComprovante, vincularComprovante } from '../dados/comprovantes.js';
 import { reais } from '../components/Graficos.jsx';
-import { nomesDasContas, garantirConta, mesmoNome } from '../dados/contas.js';
+import { nomesDasContas, garantirConta, mesmoNome, carregarContas, ehCartao } from '../dados/contas.js';
 import ReajustarFixa from '../components/ReajustarFixa.jsx';
 import { conferirAlertasAgora } from '../dados/alertas.js';
 import { EncerrarFixa } from '../components/ContasFixas.jsx';
@@ -151,6 +151,7 @@ function DetalheTransferencia({ item, lista }) {
 }
 
 export default function Lancamentos() {
+  const local = useLocation();
   const [lista, setLista] = useState(carregar);
   const [mes, setMes] = useState(() => mesFinanceiro(dataDeHoje()));
   const [erro, setErro] = useState('');
@@ -165,12 +166,14 @@ export default function Lancamentos() {
   const [editando, setEditando] = useState(null); // cópia do lançamento sendo editado
   const [categorias, setCategorias] = useState(carregarCategorias);
   const [busca, setBusca] = useState('');
-  const [filtros, setFiltros] = useState(FILTROS_VAZIOS);
+  // Vindo dos cartões "Receitas do mês" / "Despesas do mês" do Painel: já abre filtrado por Ganhos ou Despesas
+  const [filtros, setFiltros] = useState(() =>
+    ['receita', 'despesa'].includes(local.state?.tipo) ? { ...FILTROS_VAZIOS, tipo: local.state.tipo } : FILTROS_VAZIOS
+  );
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [reajustando, setReajustando] = useState(null); // modelo da conta fixa sendo reajustada
   const [encerrando, setEncerrando] = useState(null); // conta fixa sendo encerrada
   const campoBusca = useRef(null);
-  const local = useLocation();
 
   // Vindo da lupa do Painel: já coloca o cursor na busca
   useEffect(() => {
@@ -205,12 +208,18 @@ export default function Lancamentos() {
     categoria: 'Outros',
     frequencia: 'unica', // 'unica' | 'fixo' (todo mês) | 'parcelado'
     parcelas: 2,
+    valorDe: 'total', // parcelado: o valor digitado é o 'total' da compra ou o de 'parcela'
+    jaPagas: 0, // parcelado: quantas parcelas já foram pagas antes (não entram nas contas)
   });
-  const [novo, setNovo] = useState(() => formularioVazio());
+  const [novo, setNovo] = useState(() => formularioVazio(local.state?.tipo === 'receita' ? 'receita' : 'despesa'));
   const valorDoNovo = Math.abs(parseFloat(String(novo.valorTexto).replace(/\./g, '').replace(',', '.'))) || 0;
   const transferindo = novo.tipo === 'transferencia';
   const parcelado = !transferindo && novo.frequencia === 'parcelado';
   const qtdParcelas = Math.min(Math.max(parseInt(novo.parcelas, 10) || 0, 0), 48);
+  const jaPagas = parcelado ? Math.min(Math.max(parseInt(novo.jaPagas, 10) || 0, 0), Math.max(qtdParcelas - 1, 0)) : 0;
+  const valorDaParcela = parcelado && qtdParcelas ? (novo.valorDe === 'parcela' ? valorDoNovo : valorDoNovo / qtdParcelas) : 0;
+  const cartoes = carregarContas().filter(ehCartao).map((c) => c.nome); // para escolher o cartão da compra parcelada
+  const noCartao = cartoes.some((c) => mesmoNome(c, novo.conta));
 
   function mudarNovo(campo, valor) {
     setNovo((atual) => ({ ...atual, [campo]: valor }));
@@ -290,6 +299,8 @@ export default function Lancamentos() {
     if (!valorDoNovo) return setErro('Coloque o valor, por exemplo 45,90.');
     if (!novo.data) return setErro('Escolha a data.');
     if (parcelado && (qtdParcelas < 2 || qtdParcelas > 48)) return setErro('O número de parcelas vai de 2 a 48.');
+    if (parcelado && (parseInt(novo.jaPagas, 10) || 0) >= qtdParcelas)
+      return setErro('As parcelas já pagas precisam ser menos que o total de parcelas.');
     if (!novo.conta.trim()) return setErro('Diga em qual conta foi, por exemplo "Nubank" ou "Carteira".');
 
     // Se a conta ainda não existe, ela é criada na tela de Contas
@@ -301,14 +312,18 @@ export default function Lancamentos() {
     const vezes = parcelado ? qtdParcelas : 1;
     const grupo = vezes > 1 ? novoId() : null;
 
-    // Divide o valor em centavos; a diferença dos centavos fica na 1ª parcela
-    const totalCentavos = Math.round(valorDoNovo * 100);
+    // Divide o valor em centavos; a diferença dos centavos fica na 1ª parcela.
+    // Se a pessoa digitou o valor de cada parcela, todas ficam com esse valor.
+    const porParcela = parcelado && novo.valorDe === 'parcela';
+    const totalCentavos = porParcela ? Math.round(valorDoNovo * 100) * vezes : Math.round(valorDoNovo * 100);
     const parcelaCentavos = Math.floor(totalCentavos / vezes);
     const sobra = totalCentavos - parcelaCentavos * vezes;
     const diaOriginal = Number(novo.data.slice(8));
 
-    const novos = Array.from({ length: vezes }, (_, i) => {
-      const mesDaParcela = mudarMes(novo.data.slice(0, 7), i);
+    // Parcelas já pagas antes não são lançadas: a data do formulário é a da próxima parcela a pagar
+    const novos = Array.from({ length: vezes - jaPagas }, (_, k) => {
+      const i = k + jaPagas; // número da parcela (0 = 1ª)
+      const mesDaParcela = mudarMes(novo.data.slice(0, 7), k);
       const dia = Math.min(diaOriginal, diasNoMes(mesDaParcela));
       const data = `${mesDaParcela}-${String(dia).padStart(2, '0')}`;
       const centavos = parcelaCentavos + (i === 0 ? sobra : 0);
@@ -351,13 +366,16 @@ export default function Lancamentos() {
     const textoComprovante = arquivo ? ' Comprovante guardado.' : '';
     const textoBase =
       vezes > 1
-        ? `${vezes} parcelas lançadas, uma em cada mês.`
+        ? jaPagas
+          ? `${vezes - jaPagas} parcelas lançadas (da ${jaPagas + 1}ª à ${vezes}ª), uma em cada mês. As ${jaPagas} já pagas ficaram de fora.`
+          : `${vezes} parcelas lançadas, uma em cada mês.`
         : novo.frequencia === 'fixo'
           ? 'Conta fixa salva: ela aparece todo mês.'
           : 'Lançamento salvo.';
     const textoChecklist = novos[0].valor < 0 && (vezes > 1 || novo.frequencia === 'fixo') ? ' Já está no Checklist.' : '';
+    const textoCartao = vezes > 1 && cartoes.some((c) => mesmoNome(c, nomeDaConta)) ? ' Cada parcela entra na fatura do cartão do seu mês.' : '';
     const textoConta = contaCriada ? ` Conta "${nomeDaConta}" criada.` : '';
-    setAviso(textoBase + textoChecklist + textoConta + textoComprovante);
+    setAviso(textoBase + textoCartao + textoChecklist + textoConta + textoComprovante);
     return undefined;
   }
 
@@ -618,7 +636,7 @@ export default function Lancamentos() {
               />
             </label>
             <label className="novo__campo">
-              {parcelado ? 'Valor total (R$)' : 'Valor (R$)'}
+              {parcelado ? (novo.valorDe === 'parcela' ? 'Valor de cada parcela (R$)' : 'Valor total (R$)') : 'Valor (R$)'}
               <input
                 inputMode="decimal"
                 autoComplete="off"
@@ -628,7 +646,7 @@ export default function Lancamentos() {
               />
             </label>
             <label className="novo__campo">
-              {parcelado ? 'Data da 1ª parcela' : 'Data'}
+              {parcelado ? (jaPagas ? `Data da ${jaPagas + 1}ª parcela` : 'Data da 1ª parcela') : 'Data'}
               <input type="date" value={novo.data} onChange={(e) => mudarNovo('data', e.target.value)} />
             </label>
             <label className="novo__campo">
@@ -705,9 +723,63 @@ export default function Lancamentos() {
               </label>
             )}
             {novo.frequencia === 'fixo' && <span className="novo__resumo">Aparece todo mês e no Checklist</span>}
+            {parcelado && (
+              <div className="novo__parcelado">
+                <div className="novo__valor-de" role="group" aria-label="O valor digitado é">
+                  <span>O valor é</span>
+                  {[
+                    ['total', 'da compra toda'],
+                    ['parcela', 'de cada parcela'],
+                  ].map(([v, t]) => (
+                    <button
+                      key={v}
+                      type="button"
+                      aria-pressed={novo.valorDe === v}
+                      className={novo.valorDe === v ? 'novo__mini novo__mini--ativo' : 'novo__mini'}
+                      onClick={() => mudarNovo('valorDe', v)}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+                <label className="novo__parcelas">
+                  já paguei
+                  <input
+                    id="novo-ja-pagas"
+                    type="number"
+                    min={0}
+                    max={Math.max(qtdParcelas - 1, 0)}
+                    value={novo.jaPagas}
+                    onChange={(e) => mudarNovo('jaPagas', e.target.value)}
+                    aria-label="Parcelas já pagas"
+                  />
+                  parcelas
+                </label>
+                {cartoes.length > 0 && (
+                  <label className="novo__parcelas">
+                    no cartão
+                    <select
+                      id="novo-cartao"
+                      value={noCartao ? cartoes.find((c) => mesmoNome(c, novo.conta)) : ''}
+                      onChange={(e) => mudarNovo('conta', e.target.value || contaPadrao)}
+                      aria-label="Cartão de crédito da compra"
+                    >
+                      <option value="">Não é no cartão</option>
+                      {cartoes.map((c) => (
+                        <option key={c} value={c}>
+                          💳 {c}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+              </div>
+            )}
             {parcelado && valorDoNovo > 0 && qtdParcelas >= 2 && (
               <span className="novo__resumo">
-                {qtdParcelas}x de {reais(valorDoNovo / qtdParcelas)}, uma por mês
+                {qtdParcelas}x de {reais(valorDaParcela)}
+                {jaPagas ? ` · ${jaPagas} já pagas, faltam ${qtdParcelas - jaPagas}` : ', uma por mês'}
+                {noCartao ? ' · na fatura do cartão' : ''}
               </span>
             )}
             <button type="button" className={arquivo ? 'novo__anexo novo__anexo--ok' : 'novo__anexo'} onClick={() => campoComprovante.current?.click()}>
@@ -750,6 +822,8 @@ export default function Lancamentos() {
         <div className="atalhos" role="group" aria-label={removendo ? 'Remover categoria' : 'Filtrar por categoria'}>
           {categorias
             .filter((c) => c.nome !== 'Outros')
+            // Com o filtro de Ganhos ou Despesas, só aparecem as categorias daquele tipo
+            .filter((c) => !['receita', 'despesa'].includes(filtros.tipo) || !c.tipo || c.tipo === filtros.tipo)
             .map((c) => (
               <button
                 key={c.nome}
@@ -795,7 +869,13 @@ export default function Lancamentos() {
           <section className="cartao lanc__lista">
             <div className="cartao__titulo-linha">
               <h2 className="cartao__titulo">
-                {filtrosAtivos ? 'Resultado da busca' : 'Lançamentos do mês'}
+                {filtrosAtivos === 1 && !filtro && filtros.tipo === 'despesa'
+                  ? 'Despesas do mês'
+                  : filtrosAtivos === 1 && !filtro && filtros.tipo === 'receita'
+                    ? 'Ganhos do mês'
+                    : filtrosAtivos
+                      ? 'Resultado da busca'
+                      : 'Lançamentos do mês'}
                 {filtro ? ` · ${filtro}` : ''}
               </h2>
               <div className="lanc__ferramentas">

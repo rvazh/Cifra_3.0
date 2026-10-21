@@ -613,3 +613,53 @@
   border: 1.5px solid var(--preto);
   flex-shrink: 0;
 }
+
+/* Foto de perfil no cartão do topo */
+.cfg-perfil__foto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+button.cfg-perfil__avatar {
+  position: relative;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.cfg-perfil__avatar .avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  font-size: inherit;
+}
+
+.cfg-perfil__camera {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--branco);
+  border: 2px solid var(--esc-fundo, #141414);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.cfg-perfil__tirar {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--esc-texto-apagado, #bdb4a4);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -4,28 +4,22 @@ import { reais } from '../components/Graficos.jsx';
 import { mascaraValor } from '../dados/dinheiro.js';
 import { carregar, dataDeHoje, lancamentosDoMes, mesFinanceiro } from '../dados/lancamentos.js';
 import { inicioDoMes } from '../dados/preferencias.js';
-import {
-  IPVA_POR_ESTADO,
-  PERFIS_DE_RENDA,
-  EXEMPLO,
-  carregarCarro,
-  salvarCarro,
-  calcularCarro,
-} from '../dados/calculadoraCarro.js';
+import { CALCULADORAS, carregarCalculadora, salvarCalculadora } from '../dados/calculadoras.js';
 import './Painel.css';
 import './Calculadora.css';
 
-// Calculadoras de custo. A primeira é a do carro; as outras aparecem como "em breve".
-const CALCULADORAS = [
-  { id: 'carro', nome: 'Carro', emoji: '🚗' },
-  { id: 'moto', nome: 'Moto', emoji: '🏍️', emBreve: true },
-  { id: 'casa', nome: 'Alugar ou comprar casa', emoji: '🏠', emBreve: true },
-  { id: 'pet', nome: 'Pet', emoji: '🐶', emBreve: true },
-];
+// De onde vêm os valores de referência de cada calculadora (aparece no rodapé)
+const FONTES = {
+  carro: 'Alíquotas do IPVA 2026 por estado, desvalorização média de 7% a 10% ao ano e a regra de até 10%, 20% ou 30% da renda para todos os custos do carro.',
+  moto: 'IPVA de moto em SP (2%), desvalorização média de 7% a 10% ao ano e a regra de até 10%, 20% ou 30% da renda para todos os custos do veículo.',
+  aluguel: 'Regra de mercado de renda de 3x o aluguel, moradia até 30% da renda, seguro incêndio de R$ 15 a R$ 50 por mês, caução de até 3 aluguéis e seguro fiança de 1 a 2,5 aluguéis por ano.',
+  casa: 'Juros do SBPE da Caixa em 2026 (TR + 10,99% a 11,49% ao ano), prazo de até 35 anos, financiamento de até 80% (SAC) ou 70% (Price) e parcela até 30% da renda. A TR não entra na conta.',
+  pet: 'Custo médio de um cão de R$ 270 a R$ 600 por mês conforme o porte, vacinas e vermífugos de R$ 750 a R$ 1.200 por ano, banho de R$ 80 a R$ 130 e enxoval de R$ 400 a R$ 800.',
+};
 
 // Dinheiro da calculadora: sempre visível (são números de simulação, não da conta da pessoa)
 function rs(valor) {
-  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return (Number(valor) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 // "1.250,5" -> 1250.5
@@ -40,57 +34,20 @@ function paraTexto(valor, dinheiro) {
   return valor.toLocaleString('pt-BR', dinheiro ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 2 });
 }
 
-// Campos do formulário, em grupos. dinheiro: mostra "R$" na frente
-const GRUPOS = [
-  {
-    titulo: 'O carro',
-    campos: [
-      { id: 'valorCarro', rotulo: 'Valor do carro', dinheiro: true, dica: 'Use o preço da tabela FIPE ou o valor que você vai pagar.' },
-    ],
-    estado: true,
-  },
-  {
-    titulo: 'Uso no mês',
-    campos: [
-      { id: 'kmPorMes', rotulo: 'Quantos km roda por mês', sufixo: 'km', dica: 'Ida e volta do trabalho, passeios... Em média 1.000 km por mês.' },
-      { id: 'consumo', rotulo: 'Consumo', sufixo: 'km/l', dica: 'Quantos km o carro faz com 1 litro (na cidade).' },
-      { id: 'precoLitro', rotulo: 'Preço do litro', dinheiro: true, dica: 'Do posto onde você abastece.' },
-      { id: 'outrosMes', rotulo: 'Estacionamento, pedágio e lavagem', dinheiro: true, sufixo: '/mês' },
-    ],
-  },
-  {
-    titulo: 'Contas do ano',
-    campos: [
-      { id: 'seguroAno', rotulo: 'Seguro', dinheiro: true, sufixo: '/ano', dica: 'Peça uma cotação: muda com a cidade, a idade e o modelo.' },
-      { id: 'licenciamentoAno', rotulo: 'Licenciamento', dinheiro: true, sufixo: '/ano', dica: 'Taxa do Detran do seu estado.' },
-      { id: 'manutencaoAno', rotulo: 'Revisões e manutenção', dinheiro: true, sufixo: '/ano', dica: 'Revisões, óleo, freios, bateria...' },
-      { id: 'precoPneus', rotulo: 'Jogo de 4 pneus', dinheiro: true },
-      { id: 'duracaoPneusKm', rotulo: 'Os pneus duram', sufixo: 'km', dica: 'Em geral entre 40.000 e 50.000 km.' },
-    ],
-  },
-  {
-    titulo: 'Financiamento',
-    campos: [
-      { id: 'parcela', rotulo: 'Parcela por mês (se for financiado)', dinheiro: true, sufixo: '/mês', dica: 'Deixe vazio se o carro já é seu.' },
-    ],
-  },
-];
+const camposDe = (calc) => calc.grupos.flatMap((g) => g.campos);
+const ehNumero = (c) => !c.tipo;
 
-const TODOS_OS_CAMPOS = GRUPOS.flatMap((g) => g.campos).concat([
-  { id: 'ipva' },
-  { id: 'depreciacao' },
-  { id: 'rendimento' },
-]);
-
-function textosDe(dados) {
+function textosDe(calc, dados) {
   const textos = {};
-  TODOS_OS_CAMPOS.forEach((c) => {
-    textos[c.id] = paraTexto(dados[c.id], c.dinheiro);
-  });
+  camposDe(calc)
+    .filter(ehNumero)
+    .forEach((c) => {
+      textos[c.id] = paraTexto(dados[c.id], c.dinheiro);
+    });
   return textos;
 }
 
-// Receitas do mês atual na CIFRA (para comparar com o custo do carro)
+// Receitas do mês atual na CIFRA (para comparar com o custo)
 function receitasDoMes() {
   const mes = mesFinanceiro(dataDeHoje());
   return lancamentosDoMes(carregar(), mes, inicioDoMes())
@@ -126,17 +83,20 @@ function Campo({ campo, texto, aoMudar }) {
   );
 }
 
-export default function Calculadora() {
-  const [dados, setDados] = useState(carregarCarro);
-  const [textos, setTextos] = useState(() => textosDe(carregarCarro()));
-  const [perfil, setPerfil] = useState('equilibrado');
-  const receitas = useMemo(receitasDoMes, []);
+// Uma calculadora qualquer (carro, moto, aluguel, casa, pet): formulário + resultado
+function CalculadoraDe({ calc, receitas }) {
+  const [dados, setDados] = useState(() => carregarCalculadora(calc));
+  const [textos, setTextos] = useState(() => textosDe(calc, carregarCalculadora(calc)));
+  const conta = useMemo(() => calc.calcular(dados), [calc, dados]);
+  const [perfil, setPerfil] = useState(() => calc.calcular(carregarCalculadora(calc)).renda?.padrao);
 
-  useEffect(() => salvarCarro(dados), [dados]);
+  useEffect(() => salvarCalculadora(calc, dados), [calc, dados]);
 
-  const conta = useMemo(() => calcularCarro(dados), [dados]);
-  const escolhido = conta.rendaMinima.find((p) => p.id === perfil);
+  const escolhido = conta.renda?.perfis.find((p) => p.id === perfil) || conta.renda?.perfis[0];
   const maior = conta.itens[0]?.valor || 1;
+  const parteDaRenda = receitas > 0 ? conta.comparar / receitas : 0;
+  const v = veredito(parteDaRenda);
+  const totalUnicos = conta.unicos.reduce((s, u) => s + u.valor, 0);
 
   function mudarTexto(id, valor) {
     const texto = mascaraValor(valor).replace('-', '');
@@ -144,32 +104,227 @@ export default function Calculadora() {
     setDados((d) => ({ ...d, [id]: lerNumero(texto) }));
   }
 
-  function mudar(id, valor) {
-    setDados((d) => ({ ...d, [id]: valor }));
-  }
-
-  function escolherEstado(uf) {
-    const ipva = IPVA_POR_ESTADO[uf];
-    setDados((d) => ({ ...d, estado: uf, ipva }));
-    setTextos((t) => ({ ...t, ipva: paraTexto(ipva) }));
+  // Lista de opções (estado, espécie, tabela...): algumas já preenchem outros campos
+  function escolher(campo, valor) {
+    setDados((d) => {
+      const extra = campo.aoEscolher ? campo.aoEscolher(valor, { ...d, [campo.id]: valor }) || {} : {};
+      if (Object.keys(extra).length) {
+        setTextos((t) => {
+          const novo = { ...t };
+          camposDe(calc)
+            .filter((c) => ehNumero(c) && c.id in extra)
+            .forEach((c) => {
+              novo[c.id] = paraTexto(extra[c.id], c.dinheiro);
+            });
+          return novo;
+        });
+      }
+      return { ...d, [campo.id]: valor, ...extra };
+    });
   }
 
   function voltarAoExemplo() {
-    setDados({ ...EXEMPLO });
-    setTextos(textosDe(EXEMPLO));
+    setDados({ ...calc.exemplo });
+    setTextos(textosDe(calc, calc.exemplo));
   }
 
   function limpar() {
-    const vazio = { ...EXEMPLO };
-    TODOS_OS_CAMPOS.forEach((c) => {
-      if (!['ipva', 'depreciacao', 'rendimento'].includes(c.id)) vazio[c.id] = 0;
-    });
+    const vazio = { ...calc.exemplo };
+    camposDe(calc)
+      .filter(ehNumero)
+      .forEach((c) => {
+        vazio[c.id] = 0;
+      });
     setDados(vazio);
-    setTextos(textosDe(vazio));
+    setTextos(textosDe(calc, vazio));
   }
 
-  const parteDaRenda = receitas > 0 ? conta.doBolso / receitas : 0;
-  const v = veredito(parteDaRenda);
+  return (
+    <div className="calc__grade">
+      {/* ===== Resumo ===== */}
+      <section className="calc-resumo" aria-live="polite">
+        <span className="calc-resumo__rotulo">{conta.rotulo}</span>
+        <b className="calc-resumo__valor">
+          {rs(conta.mensal)}
+          <small>/mês</small>
+        </b>
+        <span className="calc-resumo__linha">
+          {rs(conta.porAno)} por ano · {rs(conta.porDia)} por dia
+        </span>
+        {conta.destaque && (
+          <span className="calc-resumo__bolso">
+            {conta.destaque.texto}: <b>{rs(conta.destaque.valor)}</b>
+            {conta.destaque.nota && <small>{conta.destaque.nota}</small>}
+          </span>
+        )}
+
+        {conta.minis.length > 0 && (
+          <div className="calc-km">
+            {conta.minis.map((m) => (
+              <div key={m.rotulo}>
+                <span>{m.rotulo}</span>
+                <b>{rs(m.valor)}</b>
+                {m.nota && <small>{m.nota}</small>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {conta.renda ? (
+          <div className="calc-renda">
+            <span className="calc-renda__titulo">{conta.renda.titulo}</span>
+            <div
+              className="calc-renda__perfis"
+              role="radiogroup"
+              aria-label="Regra de renda"
+              style={{ gridTemplateColumns: `repeat(${conta.renda.perfis.length}, minmax(0, 1fr))` }}
+            >
+              {conta.renda.perfis.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={escolhido.id === p.id}
+                  className={escolhido.id === p.id ? 'calc-renda__perfil calc-renda__perfil--ativo' : 'calc-renda__perfil'}
+                  onClick={() => setPerfil(p.id)}
+                >
+                  {p.nome}
+                  <small>{p.sub}</small>
+                </button>
+              ))}
+            </div>
+            <b className="calc-renda__valor">{rs(escolhido.renda)}</b>
+            <small className="calc-renda__dica">{escolhido.dica}</small>
+            {receitas > 0 && conta.comparar > 0 && (
+              <p className={`calc-renda__voce calc-renda__voce--${conta.veredito ? v.classe : 'neutro'}`}>
+                Suas receitas deste mês na CIFRA: <b>{reais(receitas)}</b>. Isso levaria <b>{Math.round(parteDaRenda * 100)}%</b> delas.
+                {conta.veredito ? ` ${v.texto}` : ''}
+              </p>
+            )}
+          </div>
+        ) : (
+          receitas > 0 &&
+          conta.comparar > 0 && (
+            <div className="calc-renda">
+              <p className="calc-renda__voce calc-renda__voce--neutro">
+                Suas receitas deste mês na CIFRA: <b>{reais(receitas)}</b>. Isso levaria <b>{Math.round(parteDaRenda * 100)}%</b> delas.
+              </p>
+            </div>
+          )
+        )}
+      </section>
+
+      {/* ===== Formulário ===== */}
+      <section className="calc-form" aria-label={`Informações: ${calc.nome}`}>
+        <div className="calc-form__acoes">
+          <button type="button" onClick={voltarAoExemplo}>
+            Ver exemplo
+          </button>
+          <button type="button" onClick={limpar}>
+            Limpar
+          </button>
+        </div>
+
+        {calc.grupos.map((g) => (
+          <fieldset key={g.titulo} className="cartao calc-grupo">
+            <legend className="calc-grupo__titulo">{g.titulo}</legend>
+            {g.texto && <p className="calc-grupo__texto">{g.texto}</p>}
+            <div className="calc-grupo__campos">
+              {g.campos.map((c) => {
+                if (c.tipo === 'liga') {
+                  return (
+                    <label key={c.id} className="calc-escondido__liga">
+                      <input type="checkbox" checked={Boolean(dados[c.id])} onChange={(e) => setDados((d) => ({ ...d, [c.id]: e.target.checked }))} />
+                      {c.rotulo}
+                    </label>
+                  );
+                }
+                if (c.tipo === 'opcoes') {
+                  return (
+                    <label key={c.id} className="calc-campo">
+                      <span className="calc-campo__rotulo">{c.rotulo}</span>
+                      <span className="calc-campo__caixa">
+                        <select id={`calc-${c.id}`} value={dados[c.id]} onChange={(e) => escolher(c, e.target.value)}>
+                          {c.opcoes.map((o) => (
+                            <option key={o.valor} value={o.valor}>
+                              {o.texto}
+                            </option>
+                          ))}
+                        </select>
+                      </span>
+                      {c.dica && <small className="calc-campo__dica">{c.dica}</small>}
+                    </label>
+                  );
+                }
+                return <Campo key={c.id} campo={c} texto={textos[c.id] ?? ''} aoMudar={mudarTexto} />;
+              })}
+            </div>
+          </fieldset>
+        ))}
+      </section>
+
+      {/* ===== Para onde vai o dinheiro ===== */}
+      <section className="cartao calc-detalhe">
+        <h2 className="cartao__titulo">Para onde vai o dinheiro (por mês)</h2>
+        {conta.itens.length === 0 ? (
+          <p className="calc-detalhe__vazio">Preencha os campos para ver a conta.</p>
+        ) : (
+          <ul className="calc-itens">
+            {conta.itens.map((i) => (
+              <li key={i.id} className={`calc-item calc-item--${i.tipo}`}>
+                <div className="calc-item__linha">
+                  <span className="calc-item__nome">{i.nome}</span>
+                  <b>{rs(i.valor)}</b>
+                </div>
+                <span className="calc-item__trilho" aria-hidden="true">
+                  <span style={{ width: `${Math.max(2, (i.valor / maior) * 100)}%` }} />
+                </span>
+                <small>
+                  {i.dica ? `${i.dica} · ` : ''}
+                  {conta.mensal ? Math.round((i.valor / conta.mensal) * 100) : 0}% do total
+                </small>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="calc-detalhe__legenda">
+          {conta.legenda.map((l, k) => (
+            <span key={l.tipo} className="calc-detalhe__legenda-item">
+              <span className={`calc-item__cor calc-item__cor--${l.tipo}${k === 0 ? ' calc-item__cor--primeira' : ''}`} /> {l.texto}
+            </span>
+          ))}
+        </p>
+
+        {conta.unicos.length > 0 && (
+          <div className="calc-unicos">
+            <h3 className="calc-unicos__titulo">Na hora de começar (uma vez só)</h3>
+            <ul>
+              {conta.unicos.map((u) => (
+                <li key={u.nome}>
+                  <span>{u.nome}</span>
+                  <b>{rs(u.valor)}</b>
+                </li>
+              ))}
+            </ul>
+            <div className="calc-unicos__total">
+              <span>Total</span>
+              <b>{rs(totalUnicos)}</b>
+            </div>
+          </div>
+        )}
+
+        <p className="calc-detalhe__fonte">
+          Valores de referência: {FONTES[calc.id]} É uma estimativa: confira os valores do seu caso.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+export default function Calculadora() {
+  const [aba, setAba] = useState('carro');
+  const receitas = useMemo(receitasDoMes, []);
+  const calc = CALCULADORAS.find((c) => c.id === aba) || CALCULADORAS[0];
 
   return (
     <div className="pp-app">
@@ -179,7 +334,7 @@ export default function Calculadora() {
         <div className="pp__topo">
           <div>
             <h1 className="pp__titulo">Calculadora</h1>
-            <p className="pp__subtitulo">Descubra quanto uma coisa vai custar de verdade antes de comprar</p>
+            <p className="pp__subtitulo">Descubra quanto uma coisa vai custar de verdade antes de assumir</p>
           </div>
         </div>
 
@@ -189,189 +344,18 @@ export default function Calculadora() {
               key={c.id}
               type="button"
               role="tab"
-              aria-selected={c.id === 'carro'}
-              disabled={c.emBreve}
-              className={c.id === 'carro' ? 'calc__aba calc__aba--ativa' : 'calc__aba'}
+              aria-selected={c.id === aba}
+              className={c.id === aba ? 'calc__aba calc__aba--ativa' : 'calc__aba'}
+              onClick={() => setAba(c.id)}
             >
               <span aria-hidden="true">{c.emoji}</span>
               {c.nome}
-              {c.emBreve && <small>em breve</small>}
             </button>
           ))}
         </div>
 
-        <div className="calc__grade">
-          {/* ===== Resumo: custo por mês e renda mínima ===== */}
-          <section className="calc-resumo" aria-live="polite">
-            <span className="calc-resumo__rotulo">Este carro custa</span>
-            <b className="calc-resumo__valor">
-              {rs(conta.total)}
-              <small>/mês</small>
-            </b>
-            <span className="calc-resumo__linha">
-              {rs(conta.porAno)} por ano · {rs(conta.porDia)} por dia
-            </span>
-            {conta.total !== conta.doBolso && (
-              <span className="calc-resumo__bolso">
-                Sai do bolso todo mês: <b>{rs(conta.doBolso)}</b>
-                <small>O resto é a desvalorização{dados.contarRendimento ? ' e o rendimento perdido' : ''}: não sai da conta, mas você perde.</small>
-              </span>
-            )}
-
-            <div className="calc-km">
-              <div>
-                <span>Para rodar 1 km</span>
-                <b>{rs(conta.porKmRodar)}</b>
-                <small>combustível, pneus e manutenção</small>
-              </div>
-              <div>
-                <span>Custo total por km</span>
-                <b>{rs(conta.porKmTotal)}</b>
-                <small>tudo ÷ km do mês</small>
-              </div>
-            </div>
-
-            <div className="calc-renda">
-              <span className="calc-renda__titulo">Renda mínima para ter este carro</span>
-              <div className="calc-renda__perfis" role="radiogroup" aria-label="Quanto da renda vai para o carro">
-                {conta.rendaMinima.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={perfil === p.id}
-                    className={perfil === p.id ? 'calc-renda__perfil calc-renda__perfil--ativo' : 'calc-renda__perfil'}
-                    onClick={() => setPerfil(p.id)}
-                  >
-                    {p.nome}
-                    <small>{Math.round(p.parte * 100)}% da renda</small>
-                  </button>
-                ))}
-              </div>
-              <b className="calc-renda__valor">{rs(escolhido.renda)}</b>
-              <small className="calc-renda__dica">
-                Renda líquida (o que cai na conta) para o carro ocupar até {Math.round(escolhido.parte * 100)}% dela.{' '}
-                {escolhido.dica}
-              </small>
-              {receitas > 0 && conta.doBolso > 0 && (
-                <p className={`calc-renda__voce calc-renda__voce--${v.classe}`}>
-                  Suas receitas deste mês na CIFRA: <b>{reais(receitas)}</b>. O carro levaria{' '}
-                  <b>{Math.round(parteDaRenda * 100)}%</b> delas. {v.texto}
-                </p>
-              )}
-            </div>
-          </section>
-
-          {/* ===== Formulário ===== */}
-          <section className="calc-form" aria-label="Informações do carro">
-            <div className="calc-form__acoes">
-              <button type="button" onClick={voltarAoExemplo}>
-                Ver exemplo
-              </button>
-              <button type="button" onClick={limpar}>
-                Limpar
-              </button>
-            </div>
-
-            {GRUPOS.map((g) => (
-              <fieldset key={g.titulo} className="cartao calc-grupo">
-                <legend className="calc-grupo__titulo">{g.titulo}</legend>
-                <div className="calc-grupo__campos">
-                  {g.campos.map((c) => (
-                    <Campo key={c.id} campo={c} texto={textos[c.id]} aoMudar={mudarTexto} />
-                  ))}
-                  {g.estado && (
-                    <>
-                      <label className="calc-campo">
-                        <span className="calc-campo__rotulo">Estado (para o IPVA)</span>
-                        <span className="calc-campo__caixa">
-                          <select id="calc-estado" value={dados.estado} onChange={(e) => escolherEstado(e.target.value)}>
-                            {Object.keys(IPVA_POR_ESTADO)
-                              .sort()
-                              .map((uf) => (
-                                <option key={uf} value={uf}>
-                                  {uf}
-                                </option>
-                              ))}
-                          </select>
-                        </span>
-                      </label>
-                      <Campo
-                        campo={{ id: 'ipva', rotulo: 'IPVA', sufixo: '% ao ano', dica: 'Alíquota de 2026 para carro a gasolina/flex. Elétricos e híbridos podem pagar menos.' }}
-                        texto={textos.ipva}
-                        aoMudar={mudarTexto}
-                      />
-                    </>
-                  )}
-                </div>
-              </fieldset>
-            ))}
-
-            <fieldset className="cartao calc-grupo">
-              <legend className="calc-grupo__titulo">Custos escondidos</legend>
-              <p className="calc-grupo__texto">Não saem da conta todo mês, mas fazem parte do custo real do carro.</p>
-              <div className="calc-grupo__campos">
-                <div className="calc-escondido">
-                  <label className="calc-escondido__liga">
-                    <input type="checkbox" checked={dados.contarDepreciacao} onChange={(e) => mudar('contarDepreciacao', e.target.checked)} />
-                    Contar a desvalorização
-                  </label>
-                  <Campo
-                    campo={{ id: 'depreciacao', rotulo: 'O carro perde por ano', sufixo: '% do valor', dica: 'Em geral entre 7% e 10% ao ano; carro novo perde mais no 1º ano.' }}
-                    texto={textos.depreciacao}
-                    aoMudar={mudarTexto}
-                  />
-                </div>
-                <div className="calc-escondido">
-                  <label className="calc-escondido__liga">
-                    <input type="checkbox" checked={dados.contarRendimento} onChange={(e) => mudar('contarRendimento', e.target.checked)} />
-                    Contar o rendimento que o dinheiro teria
-                  </label>
-                  <Campo
-                    campo={{ id: 'rendimento', rotulo: 'Se o dinheiro estivesse aplicado', sufixo: '% ao ano', dica: 'Quanto o valor do carro renderia numa aplicação. Se for financiado, use só a entrada.' }}
-                    texto={textos.rendimento}
-                    aoMudar={mudarTexto}
-                  />
-                </div>
-              </div>
-            </fieldset>
-          </section>
-
-          {/* ===== Para onde vai o dinheiro ===== */}
-          <section className="cartao calc-detalhe">
-            <h2 className="cartao__titulo">Para onde vai o dinheiro</h2>
-            {conta.itens.length === 0 ? (
-              <p className="calc-detalhe__vazio">Preencha os campos para ver a conta.</p>
-            ) : (
-              <ul className="calc-itens">
-                {conta.itens.map((i) => (
-                  <li key={i.id} className={`calc-item calc-item--${i.tipo}`}>
-                    <div className="calc-item__linha">
-                      <span className="calc-item__nome">{i.nome}</span>
-                      <b>{rs(i.valor)}</b>
-                    </div>
-                    <span className="calc-item__trilho" aria-hidden="true">
-                      <span style={{ width: `${Math.max(2, (i.valor / maior) * 100)}%` }} />
-                    </span>
-                    <small>
-                      {i.dica ? `${i.dica} · ` : ''}
-                      {conta.total ? Math.round((i.valor / conta.total) * 100) : 0}% do total
-                    </small>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="calc-detalhe__legenda">
-              <span className="calc-item__cor calc-item__cor--rodar" /> depende de quanto você roda
-              <span className="calc-item__cor calc-item__cor--fixo" /> fixo
-              <span className="calc-item__cor calc-item__cor--escondido" /> escondido
-            </p>
-            <p className="calc-detalhe__fonte">
-              Valores de referência: alíquotas do IPVA 2026 por estado, desvalorização média de 7% a 10% ao ano e a regra de
-              até 10%, 20% ou 30% da renda para todos os custos do carro. É uma estimativa: confira os valores do seu caso.
-            </p>
-          </section>
-        </div>
+        {/* "key" recria a calculadora ao trocar de aba (cada uma com os seus números) */}
+        <CalculadoraDe key={calc.id} calc={calc} receitas={receitas} />
       </main>
     </div>
   );

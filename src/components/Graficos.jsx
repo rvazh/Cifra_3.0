@@ -26,6 +26,7 @@ export function GraficoColunas({
   corSaldo = '#EAAF5A',
   largura = 560,
   altura = 200,
+  rotulos = { receitas: 'receitas', despesas: 'despesas', saldo: 'saldo geral' }, // nomes nas dicas ao passar o mouse
 }) {
   const comSaldo = dados.some((d) => typeof d.saldo === 'number');
   const base = altura - 24; // espaço embaixo para o nome do mês
@@ -56,10 +57,10 @@ export function GraficoColunas({
         return (
           <g key={d.chave || d.mes}>
             <rect x={x(0)} y={base - alturaDe(d.receitas)} width={coluna} height={alturaDe(d.receitas)} rx="4" fill={corReceita}>
-              <title>{`${d.mes}: receitas ${reais(d.receitas)}`}</title>
+              <title>{`${d.mes}: ${rotulos.receitas} ${reais(d.receitas)}`}</title>
             </rect>
             <rect x={x(1)} y={base - alturaDe(d.despesas)} width={coluna} height={alturaDe(d.despesas)} rx="4" fill={corDespesa}>
-              <title>{`${d.mes}: despesas ${reais(d.despesas)}`}</title>
+              <title>{`${d.mes}: ${rotulos.despesas} ${reais(d.despesas)}`}</title>
             </rect>
             {comSaldo && (
               <rect
@@ -73,7 +74,7 @@ export function GraficoColunas({
                 strokeWidth={negativo ? 2 : 0}
                 strokeDasharray={negativo ? '4 3' : undefined}
               >
-                <title>{`${d.mes}: saldo geral ${sinal(d.saldo)}${negativo ? ' (negativo)' : ''}`}</title>
+                <title>{`${d.mes}: ${rotulos.saldo} ${sinal(d.saldo)}${negativo ? ' (negativo)' : ''}`}</title>
               </rect>
             )}
             <text x={centro} y={altura - 6} textAnchor="middle" fontSize="12" fill="#6B6355">

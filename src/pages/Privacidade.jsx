@@ -50,7 +50,7 @@ export default function Privacidade() {
           <li>
             <strong>O que você registra no app:</strong> contas, lançamentos, categorias, orçamentos, objetivos, valores
             de “A receber” e “A pagar”, datas especiais do calendário, simulações da Calculadora e as suas preferências
-            (como tema, foto de fundo e, se você quiser, o número de WhatsApp para enviar o resumo do mês).
+            (como tema, foto de perfil, foto de fundo e, se você quiser, o número de WhatsApp para enviar o resumo do mês).
           </li>
           <li>
             <strong>Comprovantes:</strong> as fotos e os PDFs que você envia. Eles podem conter dados de outras pessoas

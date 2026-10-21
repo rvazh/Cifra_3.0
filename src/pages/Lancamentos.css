@@ -1262,3 +1262,49 @@
   color: var(--negativo);
   border: 1.5px solid var(--negativo);
 }
+
+/* Compra parcelada: valor total ou da parcela, parcelas já pagas e cartão */
+.novo__parcelado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.novo__valor-de {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--esc-texto-apagado);
+}
+
+.novo__mini {
+  padding: 6px 10px;
+  border: 1.5px solid var(--esc-linha);
+  border-radius: 999px;
+  background: none;
+  color: var(--esc-texto-suave);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.novo__mini--ativo {
+  border-color: var(--dourado);
+  background: var(--dourado);
+  color: #141414;
+}
+
+.novo__parcelas select {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--esc-linha);
+  background: var(--esc-campo);
+  color: var(--esc-texto);
+  font: inherit;
+  font-size: 14px;
+  color-scheme: var(--esc-esquema);
+}

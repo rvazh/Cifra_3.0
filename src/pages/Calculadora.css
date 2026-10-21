@@ -522,3 +522,68 @@
   color: #b3a995;
   font-weight: 500;
 }
+
+/* ===== Itens genéricos das calculadoras ===== */
+.calc-escondido__liga {
+  grid-column: 1 / -1;
+}
+
+.calc-renda__voce--neutro {
+  border-left-color: var(--esc-dourado);
+}
+
+.calc-detalhe__legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calc-detalhe__legenda .calc-item__cor {
+  margin-left: 0;
+}
+
+.calc-item__cor--rodar {
+  background: var(--dourado);
+}
+
+/* Custos de uma vez só (caução, entrada, enxoval...) */
+.calc-unicos {
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--fundo-painel);
+  border: 1px solid var(--borda);
+}
+
+.calc-unicos__titulo {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.calc-unicos ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-unicos li,
+.calc-unicos__total {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.calc-unicos li span {
+  color: var(--texto-suave);
+}
+
+.calc-unicos__total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--borda);
+  font-weight: 800;
+}

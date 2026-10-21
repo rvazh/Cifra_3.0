@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
 import { IconeSeta, IconeCheck } from '../components/Icones.jsx';
+import { DISTRACTION_BLOCK_PRECO } from '../config.js';
 import './Planos.css';
 
 // Ícone de "não incluso" (um X dentro do círculo)
@@ -18,6 +19,9 @@ function IconeX() {
 // Para mudar preços, nomes ou itens, é só editar esta lista.
 // precoMensal = valor no plano mensal
 // precoAnual  = valor por mês no plano anual (aparece ao ligar a chave "Anual")
+// Quanto o Distraction Block (plano Pro) custaria sozinho, por mês
+const PRECO_DISTRACTION_BLOCK = DISTRACTION_BLOCK_PRECO;
+
 const planos = [
   {
     nome: 'Plano Gratuito',
@@ -30,8 +34,8 @@ const planos = [
       { texto: 'Lançamento de ganhos e gastos', incluso: true },
       { texto: 'Categorias e subcategorias', incluso: true },
       { texto: 'Saldo de cada conta e saldo geral', incluso: true },
-      { texto: 'Alertas financeiros', incluso: false },
-      { texto: 'Calendário financeiro', incluso: false },
+      { texto: 'Sem alertas financeiros', incluso: false },
+      { texto: 'Sem calendário financeiro', incluso: false },
       { texto: 'Sem acesso ao Checklist', incluso: false },
       { texto: 'Sem acesso a Cursos e Notícias', incluso: false },
     ],
@@ -49,7 +53,9 @@ const planos = [
       { texto: 'Até 10 alertas financeiros no mês', incluso: true },
       { texto: 'Relatórios fáceis de entender', incluso: true },
       { texto: 'Acesso básico aos cursos', incluso: true },
-      { texto: 'Calendário financeiro', incluso: false },
+      { texto: 'Sem calendário financeiro', incluso: false },
+      { texto: 'Sem as funções “A pagar” e “A receber”', incluso: false },
+      { texto: 'Sem armazém de comprovantes', incluso: false },
     ],
   },
   {
@@ -66,23 +72,44 @@ const planos = [
       { texto: 'Calendário financeiro', incluso: true },
       { texto: 'Alertas e lembretes ilimitados', incluso: true },
       { texto: 'Relatórios completos e com análises', incluso: true },
-      { texto: <>Acesso a <b>70% dos cursos</b></>, incluso: true },
-      { texto: 'Calculadora de custos (só no Plano Combo)', incluso: false },
+      { texto: 'Acesso parcial aos cursos', incluso: true },
+      { texto: 'Armazém de comprovantes', incluso: true },
+      { texto: 'Sem calculadora de custos', incluso: false },
     ],
   },
   {
     nome: 'Plano Combo',
-    descricao: 'Para quem quer controle total das finanças, menos distrações e mais foco.',
+    descricao: 'Para quem quer controle total das finanças e ajuda com o digital.',
     precoMensal: 35.9,
     precoAnual: 32.9,
     emBreve: true,
     botao: 'Quero esse plano',
-    itens: [
-      { texto: <>Tudo do <b>Plano Essencial</b></>, incluso: true },
-      { texto: <><b>Cursos completos</b>: acesso a todos os cursos</>, incluso: true },
-      { texto: <><b>Calculadora de custos</b> (ex.: quanto custa ter um carro), só no Combo</>, incluso: true },
-      { texto: <>Acesso ao app <b>“Distraction Block”</b> incluso no plano</>, incluso: true },
-    ],
+    // A lista depende da chave Mensal/Anual: o desconto do Distraction Block muda
+    itens: (anual) => {
+      const essencial = planos.find((p) => p.nome === 'Plano Essencial');
+      const combo = planos.find((p) => p.nome === 'Plano Combo');
+      const aMais = anual ? combo.precoAnual - essencial.precoAnual : combo.precoMensal - essencial.precoMensal;
+      const desconto = Math.round((1 - aMais / PRECO_DISTRACTION_BLOCK) * 100);
+      return [
+        { texto: <>Tudo do <b>Plano Essencial</b></>, incluso: true },
+        { texto: <><b>Cursos completos</b>: acesso a todos os cursos</>, incluso: true },
+        { texto: <><b>Calculadora de custos</b> (ex.: quanto custa ter um carro)</>, incluso: true },
+        {
+          texto: (
+            <>
+              Acesso ao app <b>“Distraction Block”</b> incluso no plano{' '}
+              <span
+                className="plano__desconto"
+                title={`Sozinho, o Distraction Block Pro custa R$ ${formatarPreco(PRECO_DISTRACTION_BLOCK)}/mês. No Combo, ele sai por R$ ${formatarPreco(aMais)} a mais que o Essencial.`}
+              >
+                {desconto}% de desconto
+              </span>
+            </>
+          ),
+          incluso: true,
+        },
+      ];
+    },
   },
 ];
 
@@ -228,7 +255,7 @@ export default function Planos() {
                   )}
 
                   <ul className="plano__lista">
-                    {plano.itens.map((item, indice) => (
+                    {(typeof plano.itens === 'function' ? plano.itens(anual) : plano.itens).map((item, indice) => (
                       <li
                         key={indice}
                         className={item.incluso ? 'plano__item' : 'plano__item plano__item--fora'}

@@ -14,8 +14,12 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
   - Saldo geral, Receitas e Despesas do mês e **Sobrará no mês**: saldo do início do mês + receitas − despesas.
   - As despesas incluem as contas fixas previstas e as parcelas a pagar.
   - O cartão Sobrará também mostra "se receber o que te devem".
+  - Clicar em Receitas ou Despesas abre Lançamentos já filtrado (só ganhos ou só despesas).
+  - Gráficos em carrossel (arrastar, setas ou abas): últimos 6 meses, **previsão dos próximos 6 meses** (ganhos, fixas, faturas do cartão e parcelas) e gastos por categoria.
+  - Clicar na logo abre a escolha entre a CIFRA e o Distraction Block.
 - **Lançamentos**: ganhos, gastos e transferências.
   - Contas fixas (repetem todo mês), parcelados e comprovante anexado.
+  - Parcelado: valor total ou de cada parcela, escolher o cartão de crédito e informar parcelas já pagas (só as que faltam são lançadas).
 - **Contas e cartões**: saldo de cada conta, saldo geral e faturas de cartão de crédito.
   - O primeiro saldo de uma conta nova entra como receita do mês; mudanças depois viram "Ajuste de saldo" (não mexem nos gráficos dos meses passados).
 - **Calendário** e **Checklist** do mês, com as parcelas de "A pagar" e "A receber".
@@ -28,12 +32,14 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
 - **Comprovantes**: fotos e PDFs guardados na conta, organizados em grupos.
 - **Relatórios**: receitas x despesas x saldo por semana (Mês) ou por mês (3, 6 meses, ano), gastos por categoria e resumo para enviar no WhatsApp.
 - **Orçamento por categoria**, com aviso quando chega na % escolhida.
-- **Calculadora** de custo (primeira: **carro**): custo por mês e por ano, quanto custa rodar 1 km, para onde vai o dinheiro e a renda mínima para ter o carro (10%, 20% ou 30% da renda). Compara com as receitas do mês na CIFRA.
-  - Referências: [IPVA 2026 por estado](https://www.numerando.com.br/ipva), [custos de manter um carro](https://www.comprecar.com.br/blog/?p=1499) e [regra de 10/20/30% da renda](https://www.calculadoradetaxas.com.br/public/ferramentas/calculadora-qual-carro-posso-comprar/renda-6000).
-- **Importar extrato** OFX ou CSV.
+- **Calculadora** de custo: **carro, moto, aluguel, comprar casa e pet**. Custo por mês, para onde vai o dinheiro, custos de começar e a renda mínima (ou quanto das suas receitas isso levaria).
+  - Carro/moto: custo por km e renda pela regra de 10%, 20% ou 30%. Aluguel: 3x o aluguel e moradia até 30%. Casa: SAC ou Price, ITBI, cartório e parcela até 30% da renda. Pet: por espécie e porte, reserva de emergência e custo na vida toda.
+  - Referências: [IPVA 2026 por estado](https://www.numerando.com.br/ipva), [custos de manter um carro](https://www.comprecar.com.br/blog/?p=1499), [regra de 10/20/30% da renda](https://www.calculadoradetaxas.com.br/public/ferramentas/calculadora-qual-carro-posso-comprar/renda-6000), [renda mínima para alugar](https://geracontratos.com.br/recursos/renda-minima-para-alugar-imovel), [juros da Caixa em 2026](https://www.spimovel.com.br/blog/qual-a-taxa-de-juros-para-financiamento-imobiliario-da-caixa-em-2026/2877/) e [custos de ter um pet em 2026](https://timesbrasil.com.br/minhas-financas/quanto-custa-ter-um-pet-em-2026-veja-os-gastos-que-mais-pesam-no-bolso/).
+- **Importar extrato** OFX ou CSV. Cada pagamento ou recebimento pode quitar uma parcela de "A pagar" ou "A receber" (a CIFRA sugere pela pessoa citada na descrição).
 
 **Conta**
 - Cadastro com e-mail e senha, confirmação de e-mail e "Esqueci minha senha".
+- **Foto de perfil**: no cadastro (opcional) ou em Configurações; aparece no Painel.
 - Os mesmos dados no celular e no computador (sincronização).
 - Minha conta: editar dados, trocar senha e excluir a conta (LGPD).
 - **Verificação em duas etapas** (opcional): código de 6 números de um app autenticador, pedido no login.

@@ -12,6 +12,8 @@ import { lerArquivoCSV } from '../dados/csv.js';
 import './Painel.css';
 import './Contas.css';
 import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
+import { carregarReceber, salvarReceber, registrarRecebimento } from '../dados/receber.js';
+import { carregarPagar, salvarPagar, registrarPagamento } from '../dados/pagar.js';
 
 function valorComSinal(valor) {
   return `${valor >= 0 ? '+ ' : '− '}${reais(Math.abs(valor))}`;
@@ -221,7 +223,9 @@ export default function Contas() {
     const existente = contas.find((c) => mesmoNome(c.nome, nomeDigitado));
     const nome = existente ? existente.nome : nomeDigitado;
 
-    const novos = itens.map((t) => ({
+    // Movimentações ligadas a uma dívida viram recebimento/pagamento de parcela (o lançamento é criado por lá)
+    const ligadas = itens.filter((t) => t.divida);
+    const novos = itens.filter((t) => !t.divida).map((t) => ({
       id: novoId(),
       data: t.data,
       descricao: t.descricao,
@@ -233,7 +237,32 @@ export default function Contas() {
       observacao: 'Importado do extrato (OFX)',
       ofx: t.chave, // evita importar a mesma movimentação duas vezes
     }));
-    const todos = [...novos, ...lancamentos];
+    let todos = [...novos, ...lancamentos];
+    let quitadas = 0;
+    if (ligadas.length) {
+      salvar(todos); // as funções de A receber/A pagar leem e gravam a lista guardada
+      let receber = carregarReceber();
+      let pagar = carregarPagar();
+      ligadas.forEach((t) => {
+        const [tipo, id] = t.divida.split(':');
+        const lista = tipo === 'receber' ? receber : pagar;
+        const d = lista.find((x) => x.id === id);
+        if (!d) return;
+        const registrar = tipo === 'receber' ? registrarRecebimento : registrarPagamento;
+        const nova = registrar(d, { valor: Math.abs(t.valor), data: t.data, conta: nome });
+        const ultimo = (tipo === 'receber' ? nova.recebimentos : nova.pagamentos).at(-1);
+        // Marca o lançamento criado com o código do extrato (para não importar de novo)
+        if (ultimo?.lancamentoId) {
+          salvar(carregar().map((l) => (l.id === ultimo.lancamentoId ? { ...l, ofx: t.chave, observacao: l.observacao || 'Importado do extrato' } : l)));
+        }
+        if (tipo === 'receber') receber = receber.map((x) => (x.id === id ? nova : x));
+        else pagar = pagar.map((x) => (x.id === id ? nova : x));
+        quitadas += 1;
+      });
+      salvarReceber(receber);
+      salvarPagar(pagar);
+      todos = carregar();
+    }
 
     // Saldo igual ao do banco: calcula o saldo inicial que faz a conta bater com o extrato naquela data
     let saldoInicial = existente ? existente.saldoInicial : 0;
@@ -266,7 +295,9 @@ export default function Contas() {
       tipo: 'ok',
       texto: `${novos.length} ${novos.length === 1 ? 'lançamento importado' : 'lançamentos importados'} para ${nome}${
         existente ? '' : ' (conta criada)'
-      }.${saldo !== null ? ' Saldo igual ao do banco.' : ''} Já aparecem em Lançamentos, Painel e Relatórios.`,
+      }.${quitadas ? ` ${quitadas} ${quitadas === 1 ? 'parcela registrada' : 'parcelas registradas'} em A receber/A pagar.` : ''}${
+        saldo !== null ? ' Saldo igual ao do banco.' : ''
+      } Já aparecem em Lançamentos, Painel e Relatórios.`,
     });
   }
 

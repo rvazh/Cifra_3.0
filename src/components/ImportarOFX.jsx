@@ -4,6 +4,8 @@ import { carregarCategorias, categoria as dadosDaCategoria, dataCurta, dataPorEx
 import { mesmoNome, ehCartao } from '../dados/contas.js';
 import { aprenderDoHistorico, sugerirCategoria } from '../dados/ofx.js';
 import { extratoDoCSV } from '../dados/csv.js';
+import { carregarReceber, situacaoDaDivida as situacaoReceber } from '../dados/receber.js';
+import { carregarPagar, situacaoDaDivida as situacaoPagar } from '../dados/pagar.js';
 import './ImportarOFX.css';
 
 // Como a categoria foi encontrada (aparece como uma etiqueta pequena)
@@ -28,6 +30,29 @@ function contaSugerida(extrato, opcoes, paraCartao) {
   return existente ? existente.nome : nome;
 }
 
+// Dívidas em aberto de "A receber" (para entradas) e "A pagar" (para saídas)
+function dividasEmAberto() {
+  const sem = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const montar = (lista, situacao, tipo) =>
+    lista
+      .map((d) => ({ d, s: situacao(d) }))
+      .filter(({ s }) => !s.quitada)
+      .map(({ d, s }) => ({
+        chave: `${tipo}:${d.id}`,
+        tipo,
+        pessoa: d.pessoa,
+        busca: sem(d.pessoa || ''),
+        texto: `${tipo === 'receber' ? 'A receber' : 'A pagar'} · ${d.pessoa}${
+          s.parcelas > 1 && s.proxima ? ` (parcela ${s.proxima.numero}/${s.parcelas})` : ''
+        } · falta ${reais(s.faltaComJuros)}`,
+      }));
+  return {
+    receber: montar(carregarReceber(), situacaoReceber, 'receber'),
+    pagar: montar(carregarPagar(), situacaoPagar, 'pagar'),
+    sem,
+  };
+}
+
 // Janela de conferência: mostra o que veio do extrato antes de virar lançamento
 // modo: 'conta' (extrato do banco) ou 'cartao' (fatura do cartão de crédito)
 export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: todasAsContas, lancamentos, aoConfirmar, aoFechar }) {
@@ -49,7 +74,9 @@ export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: 
   const tipoTrocado = paraCartao ? !csv && !arquivo.cartao : Boolean(arquivo.cartao) && !csv;
   const [conta, setConta] = useState(() => contaSugerida(extrato, contas, paraCartao));
   const [ajustarSaldo, setAjustarSaldo] = useState(arquivo.saldo != null);
-  const [escolhas, setEscolhas] = useState({}); // o que a pessoa mudou: { [chave]: { incluir, categoria } }
+  const [escolhas, setEscolhas] = useState({}); // o que a pessoa mudou: { [chave]: { incluir, categoria, divida } }
+  // Pagamentos e recebimentos podem quitar parcelas de "A receber"/"A pagar" (só no extrato da conta)
+  const dividas = useMemo(() => (paraCartao ? { receber: [], pagar: [], sem: (s) => s } : dividasEmAberto()), [paraCartao]);
 
   // Fecha com Esc
   useEffect(() => {
@@ -79,15 +106,22 @@ export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: 
         }
         const sugestao = sugestoes[t.chave];
         const escolha = escolhas[t.chave] || {};
+        // Sugere a dívida quando o nome da pessoa aparece na descrição (ex.: "PIX JOAO SILVA")
+        const opcoes = t.valor > 0 ? dividas.receber : dividas.pagar;
+        const texto = dividas.sem(`${t.descricao} ${t.original || ''}`);
+        const sugerida = situacao === 'nova' ? opcoes.find((o) => o.busca.length >= 3 && texto.includes(o.busca.split(' ')[0])) : null;
         return {
           ...t,
           situacao,
           incluir: escolha.incluir ?? situacao === 'nova',
           categoria: escolha.categoria ?? sugestao.categoria,
           como: escolha.categoria ? 'voce' : sugestao.como,
+          opcoesDeDivida: opcoes,
+          divida: escolha.divida ?? (sugerida ? sugerida.chave : ''),
+          dividaSugerida: escolha.divida === undefined && Boolean(sugerida),
         };
       }),
-    [extrato, lancamentos, conta, sugestoes, escolhas]
+    [extrato, lancamentos, conta, sugestoes, escolhas, dividas]
   );
 
   const marcadas = linhas.filter((l) => l.incluir);
@@ -118,7 +152,14 @@ export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: 
     aoConfirmar({
       conta: conta.trim().replace(/\s+/g, ' '),
       cartao: extrato.cartao,
-      itens: marcadas.map((l) => ({ chave: l.chave, data: l.data, descricao: l.descricao, valor: l.valor, categoria: l.categoria })),
+      itens: marcadas.map((l) => ({
+        chave: l.chave,
+        data: l.data,
+        descricao: l.descricao,
+        valor: l.valor,
+        categoria: l.categoria,
+        divida: l.divida || null, // "receber:<id>" ou "pagar:<id>": registra a parcela em vez de um lançamento solto
+      })),
       saldo: ajustarSaldo ? extrato.saldo : null,
       saldoData: extrato.saldoData || extrato.fim,
     });
@@ -308,13 +349,35 @@ export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: 
               <b className={l.valor >= 0 ? 'ofx-linha__valor valor--entrada' : 'ofx-linha__valor valor--saida'}>
                 {valorComSinal(l.valor)}
               </b>
+              {l.opcoesDeDivida.length > 0 && l.situacao !== 'importada' && (
+                <label className={l.divida ? 'ofx-linha__divida ofx-linha__divida--ligada' : 'ofx-linha__divida'}>
+                  <span>{l.valor > 0 ? 'É recebimento de uma dívida?' : 'É pagamento de uma dívida?'}</span>
+                  <select
+                    value={l.divida}
+                    onChange={(e) => mudar(l.chave, { divida: e.target.value })}
+                    aria-label={`Ligar ${l.descricao} a uma dívida`}
+                  >
+                    <option value="">Não, é um lançamento comum</option>
+                    {l.opcoesDeDivida.map((o) => (
+                      <option key={o.chave} value={o.chave}>
+                        {o.texto}
+                      </option>
+                    ))}
+                  </select>
+                  {l.dividaSugerida && <small>Sugerido pelo nome na descrição</small>}
+                </label>
+              )}
             </li>
           ))}
         </ul>
 
         {/* ===== Rodapé ===== */}
         <div className="ofx__rodape">
-          <p>Tudo entra como já pago/recebido e atualiza Contas, Lançamentos, Painel e Relatórios.</p>
+          <p>
+            Tudo entra como já pago/recebido e atualiza Contas, Lançamentos, Painel e Relatórios.
+            {marcadas.some((l) => l.divida) &&
+              ` ${marcadas.filter((l) => l.divida).length} ${marcadas.filter((l) => l.divida).length === 1 ? 'movimentação vai' : 'movimentações vão'} quitar parcelas de A receber/A pagar.`}
+          </p>
           <div className="ofx__botoes">
             <button type="button" className="ofx__cancelar" onClick={aoFechar}>
               Cancelar

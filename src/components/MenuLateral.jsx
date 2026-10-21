@@ -1,6 +1,8 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import logoCifra from '../assets/cifra-logo.png';
+import logoDistraction from '../assets/distraction-block.png';
+import { DISTRACTION_BLOCK_URL } from '../config.js';
 import {
   IconeCasa,
   IconeLista,
@@ -30,15 +32,15 @@ import './MenuLateral.css';
 const menu = [
   { para: '/painel', texto: 'Visão geral', Icone: IconeCasa },
   { para: '/painel/lancamentos', texto: 'Lançamentos', Icone: IconeLista },
-  { para: '/painel/checklist', texto: 'Checklist', Icone: IconeChecklist },
   { para: '/painel/contas', texto: 'Contas', Icone: IconeCarteira },
+  { para: '/painel/checklist', texto: 'Checklist', Icone: IconeChecklist },
   { para: '/painel/relatorios', texto: 'Relatórios', Icone: IconeGrafico },
-  { para: '/painel/calendario', texto: 'Calendário', Icone: IconeCalendario },
   { para: '/painel/objetivos', texto: 'Objetivos', Icone: IconeAlvo },
-  { para: '/painel/calculadora', texto: 'Calculadora', Icone: IconeCalculadora },
+  { para: '/painel/calendario', texto: 'Calendário', Icone: IconeCalendario },
+  { para: '/painel/comprovantes', texto: 'Comprovantes', Icone: IconeRecibo },
   { para: '/painel/receber', texto: 'A receber', Icone: IconeMoeda },
   { para: '/painel/pagar', texto: 'A pagar', Icone: IconeAPagar },
-  { para: '/painel/comprovantes', texto: 'Comprovantes', Icone: IconeRecibo },
+  { para: '/painel/calculadora', texto: 'Calculadora', Icone: IconeCalculadora },
   'separador', // linha cinza separando as ferramentas do conteúdo
   { para: '/painel/cursos', texto: 'Cursos', Icone: IconeLivro },
   { para: '/painel/noticias', texto: 'Notícias', Icone: IconeJornal },
@@ -118,6 +120,30 @@ export default function MenuLateral() {
   }
 
   const [relatando, setRelatando] = useState(false); // janela "Relatar problema"
+  const [apps, setApps] = useState(null); // posição da caixinha "Escolha o app" (clique na logo)
+
+  // Clique na logo: mostra a escolha entre a CIFRA e o Distraction Block
+  function abrirApps(evento) {
+    const r = evento.currentTarget.getBoundingClientRect();
+    setApps((atual) => (atual ? null : { top: r.bottom + 8, left: Math.max(8, r.left) }));
+  }
+
+  useEffect(() => {
+    if (!apps) return undefined;
+    const fechar = (e) => {
+      if (e.type === 'keydown' && e.key !== 'Escape') return;
+      if (e.type === 'pointerdown' && e.target.closest?.('.lateral-apps, .lateral__marca')) return;
+      setApps(null);
+    };
+    document.addEventListener('pointerdown', fechar);
+    document.addEventListener('keydown', fechar);
+    window.addEventListener('scroll', fechar, true);
+    return () => {
+      document.removeEventListener('pointerdown', fechar);
+      document.removeEventListener('keydown', fechar);
+      window.removeEventListener('scroll', fechar, true);
+    };
+  }, [apps]);
 
   // Sai da conta (os dados ficam na nuvem; a cópia deste aparelho é apagada)
   async function sair() {
@@ -127,12 +153,50 @@ export default function MenuLateral() {
 
   return (
     <aside className="lateral" ref={barra} onScroll={guardarRolagem}>
-      <Link to="/painel" className="lateral__marca" aria-label="CIFRA — visão geral">
+      <button
+        type="button"
+        className="lateral__marca"
+        onClick={abrirApps}
+        aria-haspopup="menu"
+        aria-expanded={Boolean(apps)}
+        aria-label="Escolher o app: CIFRA ou Distraction Block"
+      >
         <span className="lateral__logo">
           <img src={logoCifra} alt="" />
         </span>
         Cifra
-      </Link>
+        <span className="lateral__marca-seta" aria-hidden="true">▾</span>
+      </button>
+      {apps && (
+        <div className="lateral-apps" role="menu" style={{ top: apps.top, left: apps.left }}>
+          <span className="lateral-apps__titulo">Qual app você quer usar?</span>
+          <Link to="/painel" role="menuitem" className="lateral-apps__item lateral-apps__item--atual" onClick={() => setApps(null)}>
+            <span className="lateral-apps__icone lateral-apps__icone--cifra">
+              <img src={logoCifra} alt="" />
+            </span>
+            <span>
+              <b>CIFRA</b>
+              <small>Suas finanças · você está aqui</small>
+            </span>
+          </Link>
+          <a
+            href={DISTRACTION_BLOCK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            role="menuitem"
+            className="lateral-apps__item"
+            onClick={() => setApps(null)}
+          >
+            <span className="lateral-apps__icone">
+              <img src={logoDistraction} alt="" />
+            </span>
+            <span>
+              <b>Distraction Block</b>
+              <small>Bloqueie distrações · abre em outra aba</small>
+            </span>
+          </a>
+        </div>
+      )}
 
       <nav className="lateral__menu" aria-label="Menu do sistema">
         {menu.map((item, i) =>

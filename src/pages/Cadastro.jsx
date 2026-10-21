@@ -4,6 +4,7 @@ import logoCifra from '../assets/cifra-logo.png';
 import { IconeSeta, IconeCheck } from '../components/Icones.jsx';
 import { irPara } from '../dados/acesso.js';
 import { iniciarTeste, DIAS_DE_TESTE } from '../dados/plano.js';
+import { prepararFoto, guardarFotoDoCadastro } from '../dados/fotoPerfil.js';
 import {
   ESTADOS,
   IDADE_MINIMA,
@@ -77,6 +78,9 @@ export default function Cadastro() {
   const [cep, setCep] = useState({ estado: 'parado', texto: '' }); // parado | buscando | achou | nao-achou
   const [enviando, setEnviando] = useState(false);
   const [erroGeral, setErroGeral] = useState('');
+  const [foto, setFoto] = useState(''); // foto de perfil (opcional)
+  const [erroFoto, setErroFoto] = useState('');
+  const campoFoto = useRef(null);
   const [confirmar, setConfirmar] = useState(null); // e-mail para onde foi o link de confirmação
   const [reenvio, setReenvio] = useState('');
   const local = useLocation();
@@ -137,6 +141,7 @@ export default function Cadastro() {
         senha: f.senha,
         endereco: { cep: f.cep, rua: f.rua, numero: f.numero, complemento: f.complemento, bairro: f.bairro, cidade: f.cidade, uf: f.uf },
       });
+      if (foto) guardarFotoDoCadastro(f.email, foto); // entra na conta no primeiro login
       if (resultado.precisaConfirmar) {
         // O Supabase mandou um link para o e-mail; a conta só abre depois de confirmar
         setEnviando(false);
@@ -244,6 +249,50 @@ export default function Cadastro() {
           <legend className="cad__legenda">
             <span className="cad__numero">01</span> Seus dados
           </legend>
+          <div className="cad__foto">
+            <button
+              type="button"
+              className="cad__foto-circulo"
+              onClick={() => campoFoto.current?.click()}
+              aria-label={foto ? 'Trocar a foto de perfil' : 'Escolher uma foto de perfil'}
+            >
+              {foto ? <img src={foto} alt="" /> : <span aria-hidden="true">📷</span>}
+            </button>
+            <div className="cad__foto-textos">
+              <b>
+                Foto de perfil <small>(opcional)</small>
+              </b>
+              <span>
+                <button type="button" className="cad__foto-link" onClick={() => campoFoto.current?.click()}>
+                  {foto ? 'Trocar foto' : 'Escolher foto'}
+                </button>
+                {foto && (
+                  <button type="button" className="cad__foto-link" onClick={() => setFoto('')}>
+                    Tirar
+                  </button>
+                )}
+              </span>
+              {erroFoto && <small className="cad__foto-erro">{erroFoto}</small>}
+            </div>
+            <input
+              ref={campoFoto}
+              id="cad-foto"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              hidden
+              onChange={async (e) => {
+                const arquivo = e.target.files?.[0];
+                e.target.value = '';
+                if (!arquivo) return;
+                try {
+                  setFoto(await prepararFoto(arquivo));
+                  setErroFoto('');
+                } catch (falha) {
+                  setErroFoto(falha.message);
+                }
+              }}
+            />
+          </div>
           <div className="cad__grade">
             <label className="cad__campo">
               <span className="cad__rotulo">Nome</span>

@@ -137,3 +137,18 @@ button:focus-visible {
   outline-offset: 3px;
   border-radius: 8px;
 }
+
+/* Foto de perfil redonda (componente Avatar) */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar--inicial {
+  background: var(--dourado);
+  color: var(--preto);
+  font-weight: 800;
+}

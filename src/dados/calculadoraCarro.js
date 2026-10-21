@@ -81,6 +81,7 @@ export function calcularCarro(d) {
   const licenciamento = n(d.licenciamentoAno) / 12;
   const parcela = n(d.parcela);
   const outros = n(d.outrosMes);
+  const equipamentos = n(d.equipamentosAno) / 12; // moto: capacete, luvas, capa de chuva...
 
   // ----- Custos escondidos (não saem do bolso todo mês, mas existem) -----
   const depreciacao = d.contarDepreciacao ? (valor * n(d.depreciacao)) / 100 / 12 : 0;
@@ -95,6 +96,7 @@ export function calcularCarro(d) {
     { id: 'pneus', nome: 'Pneus', valor: pneus, tipo: 'rodar', dica: 'Preço do jogo ÷ km que ele dura × km do mês' },
     { id: 'licenciamento', nome: 'Licenciamento', valor: licenciamento, tipo: 'fixo', dica: 'Taxa do ano ÷ 12' },
     { id: 'outros', nome: 'Estacionamento, pedágio e lavagem', valor: outros, tipo: 'fixo' },
+    { id: 'equipamentos', nome: 'Equipamentos (capacete, luvas, capa)', valor: equipamentos, tipo: 'fixo', dica: 'Valor do ano ÷ 12' },
     { id: 'depreciacao', nome: 'Desvalorização do carro', valor: depreciacao, tipo: 'escondido', dica: `${String(n(d.depreciacao)).replace('.', ',')}% do valor por ano ÷ 12` },
     { id: 'rendimento', nome: 'Rendimento que o dinheiro teria', valor: rendimento, tipo: 'escondido', dica: `${String(n(d.rendimento)).replace('.', ',')}% ao ano sobre o valor do carro ÷ 12` },
   ].filter((i) => i.valor > 0);

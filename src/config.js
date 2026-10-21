@@ -22,3 +22,5 @@ export const FORO = 'Jundiaí/SP';
 
 // Botão do Distraction Block (acima do atendimento): outro projeto, para bloquear distrações
 export const DISTRACTION_BLOCK_URL = 'https://distractionblock.vercel.app';
+// Preço do Distraction Block Pro sozinho (por mês): usado para mostrar o desconto no Plano Combo
+export const DISTRACTION_BLOCK_PRECO = 9.99;

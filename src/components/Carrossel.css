@@ -1,0 +1,144 @@
+/* ===== Carrossel de gráficos (Painel) ===== */
+.carrossel {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.carrossel__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.carrossel__abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.carrossel__aba {
+  padding: 6px 14px;
+  border: 1.5px solid var(--borda);
+  border-radius: 999px;
+  background: var(--branco);
+  color: var(--cinza);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.carrossel__aba:hover {
+  border-color: var(--preto);
+  color: var(--preto);
+}
+
+.carrossel__aba--ativa,
+.carrossel__aba--ativa:hover {
+  border-color: var(--preto);
+  background: var(--preto);
+  color: var(--branco);
+}
+
+.carrossel__setas {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.carrossel__setas button {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--borda);
+  border-radius: 10px;
+  background: var(--branco);
+  color: var(--preto);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.carrossel__setas button:hover:not(:disabled) {
+  border-color: var(--preto);
+}
+
+.carrossel__setas button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.carrossel__contador {
+  min-width: 30px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cinza);
+}
+
+.carrossel__trilho {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  border-radius: 12px;
+}
+
+.carrossel__trilho::-webkit-scrollbar {
+  display: none;
+}
+
+.carrossel__trilho:focus-visible {
+  outline: 2px solid var(--dourado);
+  outline-offset: 4px;
+}
+
+.carrossel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Dentro do carrossel o gráfico não rola sozinho (quem rola é o carrossel) */
+.carrossel .pp__grafico {
+  overflow: visible;
+}
+
+.carrossel .pp__grafico svg {
+  min-width: 0;
+}
+
+.carrossel__pontos {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.carrossel__ponto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--borda);
+  transition: width 0.2s, background 0.2s;
+}
+
+.carrossel__ponto--ativo {
+  width: 22px;
+  border-radius: 999px;
+  background: var(--dourado);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carrossel__trilho {
+    scroll-behavior: auto;
+  }
+}

@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
 import MenuLateral from '../components/MenuLateral.jsx';
 import { IconeCarteira, IconeAlvo, IconeBusca, IconeSino, IconeMais, IconeCima, IconeBaixo } from '../components/Icones.jsx';
-import { GraficoColunas, reais } from '../components/Graficos.jsx';
+import { GraficoColunas, GraficoRosca, reais, reaisRedondo } from '../components/Graficos.jsx';
+import Carrossel from '../components/Carrossel.jsx';
+import Avatar from '../components/Avatar.jsx';
+import { previsaoDosMeses } from '../dados/previsao.js';
 import { chave } from '../dados/armazenamento.js';
 import { CartaoOrcamento } from '../components/Orcamento.jsx';
 import { carregarPagar, situacaoDaDivida as situacaoDoPagar } from '../dados/pagar.js';
 import { parcelasAPagarAte, parcelasAReceberAte } from '../dados/parcelas.js';
 import {
   carregar,
+  categoria,
   lancamentosDoMes,
   dataDeHoje,
   mudarMes,
@@ -61,7 +65,27 @@ function contasEmAberto(lista) {
     .sort((a, b) => a.data.localeCompare(b.data));
 }
 
-function CartaoResumo({ rotulo, valor, Icone, destaque, variante, rodape }) {
+function CartaoResumo({ rotulo, valor, Icone, destaque, variante, rodape, para, estado, titulo }) {
+  const conteudo = (
+    <>
+      <div className="resumo__topo">
+        <span className="resumo__rotulo">{rotulo}</span>
+        <span className={`resumo__icone resumo__icone--${variante}`}>
+          <Icone tamanho={18} espessura={2.2} />
+        </span>
+      </div>
+      <div className="resumo__valor">{valor}</div>
+      {rodape}
+    </>
+  );
+  // Com "para", o cartão inteiro é um link (ex.: Receitas -> Lançamentos filtrado por Ganhos)
+  if (para) {
+    return (
+      <Link to={para} state={estado} className="resumo resumo--link" title={titulo}>
+        {conteudo}
+      </Link>
+    );
+  }
   return (
     <div className={destaque ? 'resumo resumo--destaque' : 'resumo'}>
       <div className="resumo__topo">
@@ -144,6 +168,32 @@ export default function Painel() {
     };
   });
 
+  // ----- Previsão: próximos 6 meses (ganhos, fixas, cartão e parcelas) -----
+  const previsaoFutura = previsaoDosMeses({ lista, contas, mesAtual, quantos: 6, inicio: inicioDoMes(), saldoInicial: sobrara });
+  const totalFuturo = previsaoFutura.reduce(
+    (t, m) => ({ ganhos: t.ganhos + m.ganhos, fixas: t.fixas + m.fixas, cartao: t.cartao + m.cartao, parcelas: t.parcelas + m.parcelas }),
+    { ganhos: 0, fixas: 0, cartao: 0, parcelas: 0 }
+  );
+  const dadosPrevisao = previsaoFutura.map((m) => ({
+    chave: m.mes,
+    mes: MESES_CURTOS[Number(m.mes.slice(5, 7)) - 1],
+    receitas: m.ganhos,
+    despesas: m.gastos,
+    saldo: m.saldo,
+  }));
+
+  // ----- Gastos do mês por categoria (rosca) -----
+  const porCategoria = {};
+  doMesComFixas
+    .filter((l) => l.valor < 0)
+    .forEach((l) => {
+      porCategoria[l.categoria] = (porCategoria[l.categoria] || 0) - l.valor;
+    });
+  const categoriasDoMes = Object.entries(porCategoria)
+    .map(([nome, valor]) => ({ nome, valor, cor: categoria(nome).cor, emoji: categoria(nome).emoji }))
+    .sort((a, b) => b.valor - a.valor);
+  const totalCategorias = categoriasDoMes.reduce((s, c) => s + c.valor, 0);
+
   // ----- Listas -----
   const ultimos = lista
     .filter((l) => l.data <= hoje && !l.transferencia)
@@ -184,7 +234,11 @@ export default function Painel() {
       {/* ===== Conteúdo ===== */}
       <main className="pp">
         <div className="pp__topo">
-          <div>
+          <div className="pp__ola">
+            <Link to="/painel/configuracoes" className="pp__avatar" aria-label="Sua foto de perfil (trocar em Configurações)" title="Trocar a foto em Configurações">
+              <Avatar nome={nome} />
+            </Link>
+            <div>
             <h1 className="pp__titulo">
               {saudacao()}
               {nome ? `, ${nome}` : ''}!
@@ -192,6 +246,7 @@ export default function Painel() {
             <p className="pp__subtitulo">
               <span className="pp__data">{hojePorExtenso}</span> · aqui está o resumo do seu mês
             </p>
+            </div>
           </div>
           <div className="pp__acoes">
             <Link to="/painel/lancamentos" state={{ buscar: true }} className="pp__icone" aria-label="Buscar lançamento">
@@ -273,19 +328,25 @@ export default function Painel() {
             valor={reais(previsao.receitas)}
             Icone={IconeCima}
             variante="positivo"
-            rodape={<span className="resumo__formula">Recebidas e previstas</span>}
+            para="/painel/lancamentos"
+            estado={{ tipo: 'receita' }}
+            titulo="Ver os ganhos do mês em Lançamentos"
+            rodape={<span className="resumo__formula">Recebidas e previstas · ver ganhos →</span>}
           />
           <CartaoResumo
             rotulo="Despesas do mês"
             valor={reais(previsao.despesas)}
             Icone={IconeBaixo}
             variante="negativo"
+            para="/painel/lancamentos"
+            estado={{ tipo: 'despesa' }}
+            titulo="Ver as despesas do mês em Lançamentos"
             rodape={
               <span
                 className="resumo__formula"
                 title={`Fixas ${reais(previsao.fixas)} + gastos lançados ${reais(previsao.lancadas)}${previsao.parcelas ? ` + parcelas a pagar ${reais(previsao.parcelas)}` : ''}`}
               >
-                {previsao.parcelas ? 'Fixas + gastos + parcelas a pagar' : 'Fixas previstas + gastos lançados'}
+                {previsao.parcelas ? 'Fixas + gastos + parcelas a pagar' : 'Fixas previstas + gastos lançados'} · ver despesas →
               </span>
             }
           />
@@ -368,8 +429,15 @@ export default function Painel() {
         {/* Orçamento do mês (só aparece quando há limites definidos) */}
         <CartaoOrcamento />
 
-        {/* Gráfico */}
-        <section className="cartao">
+        {/* Gráficos: arraste para o lado ou use as setas */}
+        <Carrossel
+          rotulo="Gráficos do painel"
+          slides={[
+            {
+              id: 'historico',
+              aba: 'Últimos meses',
+              conteudo: (
+                <>
           <TituloCartao titulo="Receitas x despesas x saldo" link="Relatórios" para="/painel/relatorios" />
           <div className="legenda">
             <span className="legenda__item">
@@ -387,9 +455,111 @@ export default function Painel() {
             <span className="legenda__item">últimos 6 meses</span>
           </div>
           <div className="cartao__grafico pp__grafico">
-            <GraficoColunas dados={historico} largura={telaPequena ? 560 : 1000} altura={telaPequena ? 220 : 230} />
+            <GraficoColunas dados={historico} largura={telaPequena ? 380 : 1000} altura={telaPequena ? 220 : 230} />
           </div>
-        </section>
+                </>
+              ),
+            },
+            {
+              id: 'previsao',
+              aba: 'Previsão',
+              conteudo: (
+                <>
+                  <TituloCartao titulo="Previsão dos próximos 6 meses" link="Calendário" para="/painel/calendario" />
+                  <div className="legenda">
+                    <span className="legenda__item">
+                      <span className="legenda__cor legenda__cor--receita" />
+                      Ganhos previstos
+                    </span>
+                    <span className="legenda__item">
+                      <span className="legenda__cor legenda__cor--despesa" />
+                      Gastos previstos (fixas + cartão + parcelas)
+                    </span>
+                    <span className="legenda__item">
+                      <span className="legenda__cor legenda__cor--saldo" />
+                      Saldo previsto no fim do mês
+                    </span>
+                  </div>
+                  <div className="cartao__grafico pp__grafico">
+                    <GraficoColunas
+                      dados={dadosPrevisao}
+                      largura={telaPequena ? 380 : 1000}
+                      altura={telaPequena ? 220 : 210}
+                      rotulos={{ receitas: 'ganhos previstos', despesas: 'gastos previstos', saldo: 'saldo previsto' }}
+                    />
+                  </div>
+                  <div className="pp-previsao">
+                    <table className="pp-previsao__tabela">
+                      <thead>
+                        <tr>
+                          <th>Mês</th>
+                          <th>Ganhos</th>
+                          <th>Fixas</th>
+                          <th>Cartão</th>
+                          <th>Parcelas</th>
+                          <th>Sobra</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previsaoFutura.map((m) => (
+                          <tr key={m.mes}>
+                            <td>{MESES_CURTOS[Number(m.mes.slice(5, 7)) - 1]}</td>
+                            <td className="valor--entrada">{reaisRedondo(m.ganhos)}</td>
+                            <td>{reaisRedondo(m.fixas)}</td>
+                            <td>{reaisRedondo(m.cartao)}</td>
+                            <td>{reaisRedondo(m.parcelas)}</td>
+                            <td className={m.sobra >= 0 ? 'valor--entrada' : 'valor--saida'}>
+                              {m.sobra < 0 ? `− ${reaisRedondo(-m.sobra)}` : reaisRedondo(m.sobra)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="pp-previsao__nota">
+                      Conta com o que já está lançado: ganhos e contas fixas que se repetem, faturas do cartão (no mês em que
+                      vencem) e parcelas de compras e de “A pagar”. Em 6 meses: {reaisRedondo(totalFuturo.ganhos)} de ganhos,{' '}
+                      {reaisRedondo(totalFuturo.fixas)} de fixas e {reaisRedondo(totalFuturo.cartao)} no cartão.
+                    </p>
+                  </div>
+                </>
+              ),
+            },
+            {
+              id: 'categorias',
+              aba: 'Por categoria',
+              conteudo: (
+                <>
+                  <TituloCartao titulo="Gastos do mês por categoria" link="Lançamentos" para="/painel/lancamentos" />
+                  {categoriasDoMes.length === 0 ? (
+                    <p className="pp__vazio">Nenhum gasto neste mês ainda.</p>
+                  ) : (
+                    <div className="pp-categorias">
+                      <GraficoRosca
+                        categorias={categoriasDoMes}
+                        tamanho={170}
+                        espessura={24}
+                        textoCentro={reaisRedondo(totalCategorias)}
+                        legendaCentro="no mês"
+                      />
+                      <ul className="pp-categorias__lista">
+                        {categoriasDoMes.slice(0, 6).map((c) => (
+                          <li key={c.nome}>
+                            <span className="pp-categorias__icone" style={{ background: c.cor }} aria-hidden="true">
+                              {c.emoji}
+                            </span>
+                            <span className="pp-categorias__nome">{c.nome}</span>
+                            <span className="pp-categorias__parte">{Math.round((c.valor / totalCategorias) * 100)}%</span>
+                            <b>{reais(c.valor)}</b>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              ),
+            },
+          ]}
+        />
 
         <div className="pp__linha pp__linha--listas">
           <section className="cartao">

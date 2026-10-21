@@ -24,6 +24,8 @@ import {
   IconeImagem,
 } from '../components/Icones.jsx';
 import EscolherFundo from '../components/EscolherFundo.jsx';
+import Avatar from '../components/Avatar.jsx';
+import { fotoDePerfil, prepararFoto, salvarFotoDePerfil, apagarFotoDePerfil } from '../dados/fotoPerfil.js';
 import { EditarDados, TrocarSenha, ExcluirConta, SegundoFator } from '../components/MinhaConta.jsx';
 import OrcamentoCategorias from '../components/Orcamento.jsx';
 import ContasFixas from '../components/ContasFixas.jsx';
@@ -120,6 +122,28 @@ export default function Configuracoes() {
   const [rascunho, setRascunho] = useState({ nome: '', email: '' });
   const [mensagem, setMensagem] = useState('');
   const arquivoBackup = useRef(null);
+  const campoFoto = useRef(null);
+  const [temFoto, setTemFoto] = useState(() => Boolean(fotoDePerfil()));
+
+  async function trocarFoto(evento) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = '';
+    if (!arquivo) return;
+    try {
+      const dados = await prepararFoto(arquivo);
+      if (!salvarFotoDePerfil(dados)) throw new Error('Não foi possível guardar a foto.');
+      setTemFoto(true);
+      setMensagem('Foto de perfil trocada.');
+    } catch (falha) {
+      setMensagem(falha.message);
+    }
+  }
+
+  function tirarFoto() {
+    apagarFotoDePerfil();
+    setTemFoto(false);
+    setMensagem('Foto de perfil removida.');
+  }
 
   const [contagem] = useState(() => contar());
 
@@ -304,9 +328,24 @@ export default function Configuracoes() {
         <div className="cfg__coluna">
           {/* ===== Perfil ===== */}
           <section className="cfg-perfil">
-            <span className="cfg-perfil__avatar" aria-hidden="true">
-              {(nome || 'C').charAt(0).toUpperCase()}
-            </span>
+            <div className="cfg-perfil__foto">
+              <button
+                type="button"
+                className="cfg-perfil__avatar"
+                onClick={() => campoFoto.current?.click()}
+                aria-label={temFoto ? 'Trocar a foto de perfil' : 'Colocar uma foto de perfil'}
+                title={temFoto ? 'Trocar a foto de perfil' : 'Colocar uma foto de perfil'}
+              >
+                <Avatar nome={nome} />
+                <span className="cfg-perfil__camera" aria-hidden="true">📷</span>
+              </button>
+              {temFoto && (
+                <button type="button" className="cfg-perfil__tirar" onClick={tirarFoto}>
+                  Tirar foto
+                </button>
+              )}
+              <input ref={campoFoto} id="cfg-foto" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={trocarFoto} />
+            </div>
             <div className="cfg-perfil__textos">
               <b className="cfg-perfil__nome">{nome || 'Sem nome'}</b>
               <span className="cfg-perfil__plano">

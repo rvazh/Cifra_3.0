@@ -508,3 +508,39 @@
     margin-right: 16px;
   }
 }
+
+/* Ligar a movimentação a uma dívida de A receber / A pagar */
+.ofx-linha__divida {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 2px 0 0 28px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.ofx-linha__divida select {
+  max-width: 100%;
+  min-width: 0;
+  flex: 1;
+  padding: 6px 8px;
+  border: 1.5px solid var(--borda);
+  border-radius: 10px;
+  background: var(--branco);
+  font: inherit;
+  font-size: 12px;
+  color: var(--preto);
+}
+
+.ofx-linha__divida--ligada select {
+  border-color: var(--dourado);
+  background: var(--dourado-claro);
+  font-weight: 700;
+}
+
+.ofx-linha__divida small {
+  color: var(--dourado-escuro);
+  font-weight: 700;
+}

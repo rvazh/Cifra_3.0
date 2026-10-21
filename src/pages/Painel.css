@@ -627,3 +627,161 @@
     justify-content: center;
   }
 }
+
+/* Cartões de resumo que levam para Lançamentos */
+.resumo--link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.resumo--link:hover {
+  border-color: var(--preto);
+  transform: translateY(-2px);
+}
+
+.resumo--link:focus-visible {
+  outline: 2px solid var(--dourado);
+  outline-offset: 2px;
+}
+
+/* Previsão dos próximos meses */
+.pp-previsao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pp-previsao__tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pp-previsao__tabela th,
+.pp-previsao__tabela td {
+  padding: 6px 8px;
+  text-align: right;
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+.pp-previsao__tabela th:first-child,
+.pp-previsao__tabela td:first-child {
+  text-align: left;
+  font-weight: 700;
+}
+
+.pp-previsao__tabela th {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cinza);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pp-previsao__nota {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--cinza);
+}
+
+/* Gastos por categoria */
+.pp-categorias {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.pp-categorias__lista {
+  flex: 1;
+  min-width: 220px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pp-categorias__lista li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.pp-categorias__icone {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.pp-categorias__nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pp-categorias__parte {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+@media (max-width: 600px) {
+  .pp-previsao__tabela th:nth-child(5),
+  .pp-previsao__tabela td:nth-child(5) {
+    display: none; /* no celular, "Parcelas" sai da tabela (continua somada no gráfico) */
+  }
+
+  .pp-previsao__tabela th,
+  .pp-previsao__tabela td {
+    padding: 6px 4px;
+    font-size: 12px;
+  }
+
+  .pp-categorias {
+    justify-content: center;
+  }
+}
+
+/* Foto de perfil ao lado do "Bom dia" */
+.pp__ola {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pp__avatar {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--dourado);
+  overflow: hidden;
+  display: flex;
+}
+
+.pp__avatar .avatar {
+  width: 100%;
+  height: 100%;
+  font-size: 22px;
+}
+
+@media (max-width: 560px) {
+  .pp__avatar {
+    width: 42px;
+    height: 42px;
+  }
+}

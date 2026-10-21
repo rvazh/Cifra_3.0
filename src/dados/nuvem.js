@@ -14,6 +14,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { gravarSessao, apagarSessao, usuarioAtualId } from './armazenamento.js';
+import { aplicarFotoDoCadastro } from './fotoPerfil.js';
 
 const URL_DO_PROJETO = import.meta.env.VITE_SUPABASE_URL || 'https://iwcdsxtatatrwlblzxye.supabase.co';
 const CHAVE_PUBLICA = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_5dEFZ0FHknik2F8nxJb0NQ_JOds1VMX';
@@ -353,6 +354,7 @@ async function comecarSincronia(usuario, { limite = 8000 } = {}) {
   try {
     await comLimite(enviarPendentes(), limite);
     ({ vazio } = await comLimite(baixarTudo(), limite));
+    aplicarFotoDoCadastro(usuario.email); // foto escolhida no cadastro (fica esperando até o 1º login)
     const perfil = await comLimite(buscarPerfil(usuario), limite);
     completarDadosIniciais(perfil);
   } catch {
