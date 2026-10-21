@@ -55,7 +55,8 @@ function dividasEmAberto() {
 
 // Janela de conferência: mostra o que veio do extrato antes de virar lançamento
 // modo: 'conta' (extrato do banco) ou 'cartao' (fatura do cartão de crédito)
-export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: todasAsContas, lancamentos, aoConfirmar, aoFechar }) {
+// saldoDoBanco: já vem marcado "Deixar o saldo igual ao do banco" (em Trazer meses passados vem desmarcado: extrato antigo)
+export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: todasAsContas, lancamentos, aoConfirmar, aoFechar, saldoDoBanco = true }) {
   const categorias = carregarCategorias();
   const csv = arquivo.tipo === 'csv';
   const paraCartao = modo === 'cartao';
@@ -73,7 +74,7 @@ export default function ImportarOFX({ extrato: arquivo, modo = 'conta', contas: 
   // Arquivo de um tipo importado pelo botão do outro (ex.: fatura no botão de extrato)
   const tipoTrocado = paraCartao ? !csv && !arquivo.cartao : Boolean(arquivo.cartao) && !csv;
   const [conta, setConta] = useState(() => contaSugerida(extrato, contas, paraCartao));
-  const [ajustarSaldo, setAjustarSaldo] = useState(arquivo.saldo != null);
+  const [ajustarSaldo, setAjustarSaldo] = useState(arquivo.saldo != null && saldoDoBanco);
   const [escolhas, setEscolhas] = useState({}); // o que a pessoa mudou: { [chave]: { incluir, categoria, divida } }
   // Pagamentos e recebimentos podem quitar parcelas de "A receber"/"A pagar" (só no extrato da conta)
   const dividas = useMemo(() => (paraCartao ? { receber: [], pagar: [], sem: (s) => s } : dividasEmAberto()), [paraCartao]);

@@ -6,14 +6,13 @@ import ImportarOFX from '../components/ImportarOFX.jsx';
 import Transferir from '../components/Transferir.jsx';
 import { reais } from '../components/Graficos.jsx';
 import { carregar, salvar, novoId, dataCurta, nomeDoMes, dataDeHoje, TRANSFERENCIA } from '../dados/lancamentos.js';
-import { TIPOS, CORES, carregarContas, salvarContas, resumoDaConta, mesmoNome, ehCartao, resumoDoCartao } from '../dados/contas.js';
+import { TIPOS, CORES, carregarContas, salvarContas, resumoDaConta, ehCartao, resumoDoCartao } from '../dados/contas.js';
 import { lerArquivoOFX } from '../dados/ofx.js';
 import { lerArquivoCSV } from '../dados/csv.js';
+import { aplicarImportacao } from '../dados/importacao.js';
 import './Painel.css';
 import './Contas.css';
 import { mascaraValor, valorParaCampo } from '../dados/dinheiro.js';
-import { carregarReceber, salvarReceber, registrarRecebimento } from '../dados/receber.js';
-import { carregarPagar, salvarPagar, registrarPagamento } from '../dados/pagar.js';
 
 function valorComSinal(valor) {
   return `${valor >= 0 ? '+ ' : '− '}${reais(Math.abs(valor))}`;
@@ -187,6 +186,11 @@ export default function Contas() {
       ...(cartao
         ? { limite, fechamento: Number(formulario.fechamento), vencimento: Number(formulario.vencimento) }
         : {}),
+      // Histórico trazido de meses passados: guarda o ponto de partida original (para desfazer depois)
+      ...(antiga?.inicioReal
+        ? { inicioReal: { ...antiga.inicioReal, lancamento: antiga.inicioReal.lancamento ? { ...antiga.inicioReal.lancamento, conta: nome } : null } }
+        : {}),
+      ...(antiga?.criadaPorImportacao ? { criadaPorImportacao: true } : {}),
     };
 
     if (!conta.criadaEm) delete conta.criadaEm;
@@ -212,91 +216,24 @@ export default function Contas() {
     setAvisoImportacao(null);
     try {
       const csv = /\.(csv|txt)$/i.test(arquivo.name) || arquivo.type === 'text/csv';
-      setExtrato(csv ? await lerArquivoCSV(arquivo) : await lerArquivoOFX(arquivo));
+      setExtrato({ ...(csv ? await lerArquivoCSV(arquivo) : await lerArquivoOFX(arquivo)), nomeDoArquivo: arquivo.name });
     } catch (e) {
       setAvisoImportacao({ tipo: 'erro', texto: e.message || 'Não foi possível ler este arquivo.' });
     }
   }
 
-  function confirmarImportacao({ conta: nomeDigitado, cartao, itens, saldo, saldoData }) {
-    // Usa a conta existente (sem ligar para maiúsculas/acentos) ou cria uma nova
-    const existente = contas.find((c) => mesmoNome(c.nome, nomeDigitado));
-    const nome = existente ? existente.nome : nomeDigitado;
-
-    // Movimentações ligadas a uma dívida viram recebimento/pagamento de parcela (o lançamento é criado por lá)
-    const ligadas = itens.filter((t) => t.divida);
-    const novos = itens.filter((t) => !t.divida).map((t) => ({
-      id: novoId(),
-      data: t.data,
-      descricao: t.descricao,
-      categoria: t.categoria,
-      conta: nome,
-      valor: t.valor,
-      pago: true, // movimentação do extrato já aconteceu
-      repete: false,
-      observacao: 'Importado do extrato (OFX)',
-      ofx: t.chave, // evita importar a mesma movimentação duas vezes
-    }));
-    let todos = [...novos, ...lancamentos];
-    let quitadas = 0;
-    if (ligadas.length) {
-      salvar(todos); // as funções de A receber/A pagar leem e gravam a lista guardada
-      let receber = carregarReceber();
-      let pagar = carregarPagar();
-      ligadas.forEach((t) => {
-        const [tipo, id] = t.divida.split(':');
-        const lista = tipo === 'receber' ? receber : pagar;
-        const d = lista.find((x) => x.id === id);
-        if (!d) return;
-        const registrar = tipo === 'receber' ? registrarRecebimento : registrarPagamento;
-        const nova = registrar(d, { valor: Math.abs(t.valor), data: t.data, conta: nome });
-        const ultimo = (tipo === 'receber' ? nova.recebimentos : nova.pagamentos).at(-1);
-        // Marca o lançamento criado com o código do extrato (para não importar de novo)
-        if (ultimo?.lancamentoId) {
-          salvar(carregar().map((l) => (l.id === ultimo.lancamentoId ? { ...l, ofx: t.chave, observacao: l.observacao || 'Importado do extrato' } : l)));
-        }
-        if (tipo === 'receber') receber = receber.map((x) => (x.id === id ? nova : x));
-        else pagar = pagar.map((x) => (x.id === id ? nova : x));
-        quitadas += 1;
-      });
-      salvarReceber(receber);
-      salvarPagar(pagar);
-      todos = carregar();
-    }
-
-    // Saldo igual ao do banco: calcula o saldo inicial que faz a conta bater com o extrato naquela data
-    let saldoInicial = existente ? existente.saldoInicial : 0;
-    if (saldo !== null) {
-      const movimentado = todos
-        .filter((l) => l.conta === nome && l.pago && l.data <= saldoData)
-        .reduce((s, l) => s + l.valor, 0);
-      saldoInicial = Math.round((saldo - movimentado) * 100) / 100;
-    }
-
-    if (existente) {
-      setContas((atual) => atual.map((c) => (c.id === existente.id ? { ...c, saldoInicial } : c)));
-    } else {
-      setContas((atual) => [
-        ...atual,
-        {
-          id: novoId(),
-          nome,
-          tipo: cartao ? 'Cartão de crédito' : 'Conta corrente',
-          saldoInicial,
-          criadaEm: dataDeHoje(),
-          cor: CORES[atual.length % CORES.length],
-          noTotal: !cartao,
-        },
-      ]);
-    }
-    setLancamentos(todos);
+  function confirmarImportacao(dados) {
+    // Grava tudo de uma vez (lançamentos, dívidas, conta e o lote para desfazer) e relê
+    const r = aplicarImportacao(dados, { descricao: extrato?.nomeDoArquivo || `Extrato ${dados.conta}` });
+    setLancamentos(carregar());
+    setContas(carregarContas());
     setExtrato(null);
     setAvisoImportacao({
       tipo: 'ok',
-      texto: `${novos.length} ${novos.length === 1 ? 'lançamento importado' : 'lançamentos importados'} para ${nome}${
-        existente ? '' : ' (conta criada)'
-      }.${quitadas ? ` ${quitadas} ${quitadas === 1 ? 'parcela registrada' : 'parcelas registradas'} em A receber/A pagar.` : ''}${
-        saldo !== null ? ' Saldo igual ao do banco.' : ''
+      texto: `${r.importados} ${r.importados === 1 ? 'lançamento importado' : 'lançamentos importados'} para ${r.nome}${
+        r.criada ? ' (conta criada)' : ''
+      }.${r.quitadas ? ` ${r.quitadas} ${r.quitadas === 1 ? 'parcela registrada' : 'parcelas registradas'} em A receber/A pagar.` : ''}${
+        dados.saldo !== null && dados.saldo !== undefined ? ' Saldo igual ao do banco.' : ''
       } Já aparecem em Lançamentos, Painel e Relatórios.`,
     });
   }
@@ -361,6 +298,10 @@ export default function Contas() {
               Importar extrato
             </button>
             <input ref={campoOFX} type="file" accept=".ofx,.qfx,.csv,.txt,text/csv,application/x-ofx" hidden onChange={escolherOFX} />
+            <Link to="/painel/historico" className="ct__importar" title="Extratos antigos, planilhas (Excel, Organizze, Mobills) ou o total de cada mês">
+              <span aria-hidden="true">🕘</span>
+              Trazer meses passados
+            </Link>
             <button type="button" className="pp__novo ct__novo" onClick={() => abrirNova()}>
               <IconeMais tamanho={18} espessura={2.6} />
               Nova conta

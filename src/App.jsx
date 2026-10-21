@@ -27,6 +27,7 @@ import TesteGratis from './pages/TesteGratis.jsx';
 import Cadastro from './pages/Cadastro.jsx';
 import Receber from './pages/Receber.jsx';
 import Pagar from './pages/Pagar.jsx';
+import Historico from './pages/Historico.jsx';
 import RecuperarSenha from './pages/RecuperarSenha.jsx';
 import BaixarApp from './pages/BaixarApp.jsx';
 import NovaSenha from './pages/NovaSenha.jsx';
@@ -84,6 +85,7 @@ export default function App() {
           <Route path="/painel/checklist" element={<Checklist />} />
           <Route path="/painel/noticias" element={<Noticias />} />
           <Route path="/painel/comprovantes" element={<Comprovantes />} />
+          <Route path="/painel/historico" element={<Historico />} />
           <Route
             path="/painel/*"
             element={<EmBreve titulo="Em construção" voltarPara="/painel" voltarTexto="Voltar para o painel" />}

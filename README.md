@@ -36,6 +36,12 @@ Gestão financeira pessoal na web, que também pode ser instalada como app no ce
   - Carro/moto: custo por km e renda pela regra de 10%, 20% ou 30%. Aluguel: 3x o aluguel e moradia até 30%. Casa: SAC ou Price, ITBI, cartório e parcela até 30% da renda. Pet: por espécie e porte, reserva de emergência e custo na vida toda.
   - Referências: [IPVA 2026 por estado](https://www.numerando.com.br/ipva), [custos de manter um carro](https://www.comprecar.com.br/blog/?p=1499), [regra de 10/20/30% da renda](https://www.calculadoradetaxas.com.br/public/ferramentas/calculadora-qual-carro-posso-comprar/renda-6000), [renda mínima para alugar](https://geracontratos.com.br/recursos/renda-minima-para-alugar-imovel), [juros da Caixa em 2026](https://www.spimovel.com.br/blog/qual-a-taxa-de-juros-para-financiamento-imobiliario-da-caixa-em-2026/2877/) e [custos de ter um pet em 2026](https://timesbrasil.com.br/minhas-financas/quanto-custa-ter-um-pet-em-2026-veja-os-gastos-que-mais-pesam-no-bolso/).
 - **Importar extrato** OFX ou CSV. Cada pagamento ou recebimento pode quitar uma parcela de "A pagar" ou "A receber" (a CIFRA sugere pela pessoa citada na descrição).
+- **Trazer meses passados** (Contas ou Configurações > Seus dados):
+  - vários extratos/faturas de uma vez (um de cada vez na conferência). Se o histórico é mais antigo que a conta, a conta passa a começar na data mais antiga e o **saldo de hoje não muda** (sem precisar do saldo do banco);
+  - planilha CSV: modelo da CIFRA para baixar, Organizze, Mobills ou qualquer outra (colunas achadas pelo título, linhas repetidas ficam de fora, categorias e contas novas são criadas);
+  - **resumo do mês** por categoria, para quem não tem os detalhes: entra nos gráficos e relatórios, mas não mexe no saldo das contas;
+  - **ganhos e contas que se repetem**: a CIFRA acha o que entra/sai todo mês (mesmo pagador ou mesmo dia com valor parecido) e leva para o **Checklist** (seção "Ganhos fixos": Recebido/Pendente);
+  - cada importação pode ser **desfeita** (em qualquer ordem: o saldo de hoje continua certo).
 
 **Conta**
 - Cadastro com e-mail e senha, confirmação de e-mail e "Esqueci minha senha".
@@ -177,6 +183,9 @@ cifra/
     │   ├── relatos.js         "Relatar problema"
     │   ├── instalar.js        instalação do app (PWA)
     │   ├── ofx.js / csv.js    importação de extratos
+    │   ├── importacao.js      trazer meses passados: lotes, começo da conta, resumo, desfazer
+    │   ├── planilha.js        planilhas (modelo da CIFRA, Organizze, Mobills)
+    │   ├── recorrentes.js     acha ganhos e gastos que se repetem todo mês
     │   └── plano.js, cursos.js, noticias.js, resumo.js
     ├── components/            pedaços de tela reaproveitados (menu, gráficos, janelas…)
     └── pages/
@@ -185,7 +194,7 @@ cifra/
         ├── Privacidade, Termos                                    documentos
         └── Painel, Lancamentos, Checklist, Contas, Relatorios,
             Calendario, Objetivos, Calculadora, Receber, Pagar, Comprovantes,
-            Cursos, Noticias, Configuracoes                        sistema (/painel/...)
+            Cursos, Noticias, Configuracoes, Historico             sistema (/painel/...)
 ```
 
 **Trocar as cores:** edite as variáveis no topo de `src/styles/global.css`. As `--esc-*` são as do tema do painel.

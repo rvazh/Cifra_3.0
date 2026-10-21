@@ -644,6 +644,11 @@ export default function Configuracoes() {
 
           {/* ===== Seus dados ===== */}
           <Grupo titulo="Seus dados">
+            <Link to="/painel/historico" className="cfg-linha">
+              <Linha Icone={IconeCalendario} titulo="Trazer meses passados" sub="Extratos antigos, planilhas (Excel, Organizze, Mobills) ou o total de cada mês">
+                <Seta />
+              </Linha>
+            </Link>
             <button type="button" className="cfg-linha" onClick={baixarBackup}>
               <Linha Icone={IconeBaixar} titulo="Baixar backup" sub="Uma cópia dos seus dados (os comprovantes ficam de fora)">
                 <span className="cfg-linha__valor">

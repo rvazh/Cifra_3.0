@@ -138,8 +138,10 @@ export function lancamentosDoMes(lista, mes, inicio = 1) {
       const diaOriginal = Number(l.data.slice(8));
       const mesDoCalendario = diaOriginal >= inicio ? mes : mudarMes(mes, 1);
       const dia = Math.min(diaOriginal, diasNoMes(mesDoCalendario));
+      // A cópia do mês não é a movimentação importada: não leva o código do extrato nem o lote da importação
+      const { ofx, lote, ...base } = l; // eslint-disable-line no-unused-vars
       return {
-        ...l,
+        ...base,
         id: `${l.id}@${mes}`,
         data: `${mesDoCalendario}-${String(dia).padStart(2, '0')}`,
         pago: false,

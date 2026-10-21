@@ -17,6 +17,7 @@ const TELAS = {
   '/painel/receber': 'A receber',
   '/painel/pagar': 'A pagar',
   '/painel/comprovantes': 'Comprovantes',
+  '/painel/historico': 'Trazer meses passados',
   '/painel/cursos': 'Cursos',
   '/painel/noticias': 'Notícias',
   '/painel/configuracoes': 'Configurações',

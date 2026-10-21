@@ -26,6 +26,11 @@ const SITUACOES = [
   { id: 'guardado', texto: 'Guardado' },
   { id: 'pendente', texto: 'Pendente' },
 ];
+// Ganho não tem "guardado": ou já caiu na conta, ou ainda vai cair
+const SITUACOES_GANHO = [
+  { id: 'pago', texto: 'Recebido' },
+  { id: 'pendente', texto: 'Pendente' },
+];
 
 // Conta fixa = repete todo mês (ou veio de uma que repete). Parcelada = tem parcelas.
 function tipoDaConta(l) {
@@ -161,7 +166,7 @@ function CartaoParcelamento({ p, hoje }) {
   );
 }
 
-function Linha({ l, hoje, aoMudar, aoReajustar }) {
+function Linha({ l, hoje, aoMudar, aoReajustar, situacoes = SITUACOES }) {
   const situacao = situacaoDe(l);
   const atrasada = situacao === 'pendente' && l.data < hoje;
   const [, mes, dia] = l.data.split('-');
@@ -178,7 +183,7 @@ function Linha({ l, hoje, aoMudar, aoReajustar }) {
         <span className="chk-item__detalhe">
           {l.conta}
           {l.parcela ? ` · parcela ${l.parcela.numero} de ${l.parcela.total}` : ''}
-          {atrasada && <span className="chk-item__atrasada">Atrasada</span>}
+          {atrasada && <span className="chk-item__atrasada">{l.valor > 0 ? 'Não caiu ainda' : 'Atrasada'}</span>}
           {aoReajustar && (
             <button type="button" className="chk-item__reajustar" onClick={() => aoReajustar(l)}>
               Reajustar
@@ -186,9 +191,12 @@ function Linha({ l, hoje, aoMudar, aoReajustar }) {
           )}
         </span>
       </span>
-      <b className="chk-item__valor">{reais(Math.abs(l.valor))}</b>
+      <b className={l.valor > 0 ? 'chk-item__valor valor--entrada' : 'chk-item__valor'}>
+        {l.valor > 0 ? '+ ' : ''}
+        {reais(Math.abs(l.valor))}
+      </b>
       <span className="chk-situacao" role="group" aria-label={`Situação de ${l.descricao}`}>
-        {SITUACOES.map((s) => (
+        {situacoes.map((s) => (
           <button
             key={s.id}
             type="button"
@@ -222,6 +230,16 @@ export default function Checklist() {
   const parcelamentos = useMemo(() => montarParcelamentos(lista), [lista]);
   const emAndamento = parcelamentos.filter((p) => !p.quitado);
   const fixas = contas.filter((l) => tipoDaConta(l) === 'fixa');
+  // Ganhos fixos do mês (salário, aluguel que você recebe...): marque quando cair na conta
+  const ganhos = useMemo(
+    () =>
+      lancamentosDoMes(lista, mes)
+        .filter((l) => l.valor > 0 && !l.transferencia && tipoDaConta(l) === 'fixa')
+        .sort((a, b) => a.data.localeCompare(b.data)),
+    [lista, mes]
+  );
+  const ganhosTotal = ganhos.reduce((t, l) => t + l.valor, 0);
+  const ganhosRecebidos = ganhos.filter((l) => situacaoDe(l) === 'pago').reduce((t, l) => t + l.valor, 0);
   const parceladas = contas.filter((l) => tipoDaConta(l) === 'parcelada');
 
   // Parcelas de "A pagar" e "A receber" do mês (ficam guardadas à parte; "versao" recarrega depois de uma mudança)
@@ -260,7 +278,7 @@ export default function Checklist() {
         <div className="pp__topo">
           <div>
             <h1 className="pp__titulo">Checklist do mês</h1>
-            <p className="pp__subtitulo">Contas fixas e parceladas: marque o que já foi pago ou guardado</p>
+            <p className="pp__subtitulo">Ganhos e contas fixas e parceladas: marque o que já caiu, foi pago ou guardado</p>
           </div>
           <div className="chk__navegacao">
             <button type="button" className="chk__seta" onClick={() => setMes(mudarMes(mes, -1))} aria-label="Mês anterior">
@@ -338,7 +356,35 @@ export default function Checklist() {
           </div>
         )}
 
-        {contas.length === 0 && parcelas.length > 0 ? null : contas.length === 0 ? (
+        {/* ===== Ganhos fixos ===== */}
+        {ganhos.length > 0 && (
+          <div className="chk__grupos">
+            <section className="cartao chk-grupo chk-grupo--ganhos">
+              <div className="cartao__titulo-linha">
+                <h2 className="cartao__titulo">
+                  Ganhos fixos <span className="chk-grupo__qtd">{ganhos.length}</span>
+                </h2>
+                <span className="chk-grupo__sub">
+                  Recebido <b className="valor--entrada">{reais(ganhosRecebidos)}</b> de {reais(ganhosTotal)}
+                </span>
+              </div>
+              <ul className="chk-lista">
+                {ganhos.map((l) => (
+                  <Linha
+                    key={l.id}
+                    l={l}
+                    hoje={hoje}
+                    situacoes={SITUACOES_GANHO}
+                    aoMudar={mudarSituacao}
+                    aoReajustar={modeloDaFixa(l, lista) ? (item) => setReajustando(modeloDaFixa(item, lista)) : null}
+                  />
+                ))}
+              </ul>
+            </section>
+          </div>
+        )}
+
+        {contas.length === 0 && (parcelas.length > 0 || ganhos.length > 0) ? null : contas.length === 0 ? (
           <section className="cartao chk-vazio">
             <b>Nenhuma conta fixa ou parcelada em {nomeDoMes(mes)}.</b>
             <span>
